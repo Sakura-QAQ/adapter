@@ -1,0 +1,118 @@
+<template>
+  <el-container class="home-container">
+    <el-aside class="my-aside" :width="collapse?'64px':'200px'">
+      <div class="logo" :class="{close:collapse}"></div>
+      <el-menu
+        style="border-right:none"
+        default-active="1"
+        background-color="#002033"
+        text-color="#fff"
+        active-text-color="#ffd04b"
+        :collapse="collapse"
+        :collapse-transition="false"
+      >
+        <el-menu-item index="1">
+          <i class="el-icon-s-home"></i>
+          <span slot="title">实时数据</span>
+        </el-menu-item>
+        <el-menu-item index="2">
+          <i class="el-icon-s-opportunity"></i>
+          <span slot="title">气象站</span>
+        </el-menu-item>
+        <el-menu-item index="3">
+          <i class="el-icon-tickets"></i>
+          <span slot="title">土壤墒情</span>
+        </el-menu-item>
+        <el-menu-item index="4">
+          <i class="el-icon-edit-outline"></i>
+          <span slot="title">灌溉策略</span>
+        </el-menu-item>
+        <el-menu-item index="5">
+          <i class="el-icon-s-flag"></i>
+          <span slot="title">施肥策略</span>
+        </el-menu-item>
+        <el-menu-item index="6">
+          <i class="el-icon-s-data"></i>
+          <span slot="title">数据统计</span>
+        </el-menu-item>
+        <el-menu-item index="7">
+          <i class="el-icon-connection"></i>
+          <span slot="title">现场实况</span>
+        </el-menu-item>
+      </el-menu>
+    </el-aside>
+    <el-container>
+      <el-header class="my-header">
+        <span class="el-icon-s-fold" @click="toggleMenu()"></span>
+        <span class="text">北京蓝洋益海科技有限公司</span>
+        <el-dropdown style="float:right">
+          <span class="el-dropdown-link">
+            <img style="vertical-align:middle" width="30" height="30" :src="avatar" alt />
+            <b style="vertical-align:middle;padding-left:5px">{{name}}</b>
+            <i class="el-icon-arrow-down el-icon--right"></i>
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item icon="el-icon-setting" command="setting">个人设置</el-dropdown-item>
+            <el-dropdown-item icon="el-icon-lock" command="logout">退出登录</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </el-header>
+      <el-main>
+        <!-- 二级路由显示的位置 -->
+        <router-view></router-view>
+      </el-main>
+    </el-container>
+  </el-container>
+</template>
+
+<script>
+export default {
+  data () {
+    return {
+      collapse: false,
+      avatar: '',
+      name: ''
+    }
+  },
+  methods: {
+    toggleMenu () {
+      this.collapse = !this.collapse
+    }
+  }
+}
+</script>
+
+<style lang="less" scoped>
+.home-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  .my-aside {
+    background: #002033;
+    .logo {
+      width: 100%;
+      height: 60px;
+      background: #002033 url(../../assets/images/logo.png) no-repeat center /
+        140px auto;
+    }
+    .close {
+      background-image: url(../../assets/images/logo_min.png);
+      background-size: 36px auto;
+    }
+  }
+  .my-header {
+    border-bottom: 1px solid #ddd;
+    line-height: 60px;
+    .el-icon-s-fold {
+      font-size: 26px;
+      vertical-align: middle;
+    }
+    .text {
+      vertical-align: middle;
+      padding-left: 10px;
+    }
+  }
+}
+</style>
