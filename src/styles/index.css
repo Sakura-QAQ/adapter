@@ -1,0 +1,59 @@
+body,
+dd,
+div,
+dl,
+dt,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+input,
+li,
+ol,
+p,
+ul,
+i {
+  margin: 0;
+  padding: 0;
+  text-decoration: none;
+  box-sizing: border-box;
+  font-style: normal;
+  font-family: "微软雅黑";
+  font-size: 16px;
+  color: #97b1c9;
+}
+.clearfix::after,
+.clearfix::before {
+  content: "";
+  display: table;
+}
+.clearfix::after {
+  clear: both;
+}
+.clearfix {
+  *zoom: 1;
+}
+li {
+  list-style: none;
+}
+a {
+  text-decoration: none;
+  color: #000;
+}
+img {
+  border: 0 none;
+  vertical-align: middle;
+}
+textarea {
+  outline: 0;
+  border: 0 none;
+}
+.el-menu-item {
+  font-size: 16px;
+}
+.el-container {
+  background: url(../assets/images/bg.png) no-repeat center / cover;
+  color: #fff;
+}

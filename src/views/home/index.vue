@@ -3,39 +3,40 @@
     <el-aside class="my-aside" :width="collapse?'64px':'200px'">
       <div class="logo" :class="{close:collapse}"></div>
       <el-menu
+        router
         style="border-right:none"
-        default-active="1"
+        :default-active="$route.path"
         background-color="#002033"
         text-color="#fff"
         active-text-color="#ffd04b"
         :collapse="collapse"
         :collapse-transition="false"
       >
-        <el-menu-item index="1">
+        <el-menu-item index="/">
           <i class="el-icon-s-home"></i>
           <span slot="title">实时数据</span>
         </el-menu-item>
-        <el-menu-item index="2">
+        <el-menu-item index="/weather">
           <i class="el-icon-s-opportunity"></i>
           <span slot="title">气象站</span>
         </el-menu-item>
-        <el-menu-item index="3">
+        <el-menu-item index="/soil">
           <i class="el-icon-tickets"></i>
           <span slot="title">土壤墒情</span>
         </el-menu-item>
-        <el-menu-item index="4">
+        <el-menu-item index="/irrigation">
           <i class="el-icon-edit-outline"></i>
           <span slot="title">灌溉策略</span>
         </el-menu-item>
-        <el-menu-item index="5">
+        <el-menu-item index="/fertilizer">
           <i class="el-icon-s-flag"></i>
           <span slot="title">施肥策略</span>
         </el-menu-item>
-        <el-menu-item index="6">
+        <el-menu-item index="/statistic">
           <i class="el-icon-s-data"></i>
           <span slot="title">数据统计</span>
         </el-menu-item>
-        <el-menu-item index="7">
+        <el-menu-item index="/scene">
           <i class="el-icon-connection"></i>
           <span slot="title">现场实况</span>
         </el-menu-item>
@@ -45,10 +46,10 @@
       <el-header class="my-header">
         <span class="el-icon-s-fold" @click="toggleMenu()"></span>
         <span class="text">北京蓝洋益海科技有限公司</span>
-        <el-dropdown style="float:right">
+        <el-dropdown style="float:right;color:#fff">
           <span class="el-dropdown-link">
             <img style="vertical-align:middle" width="30" height="30" :src="avatar" alt />
-            <b style="vertical-align:middle;padding-left:5px">{{name}}</b>
+            <b style="vertical-align:middle;padding-left:5px">admin</b>
             <i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
@@ -94,7 +95,7 @@ export default {
     .logo {
       width: 100%;
       height: 60px;
-      background: #002033 url(../../assets/images/logo.png) no-repeat center /
+      background: url(../../assets/images/logo.png) no-repeat center /
         140px auto;
     }
     .close {
