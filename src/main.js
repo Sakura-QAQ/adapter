@@ -10,9 +10,9 @@ import router from '@/router'
 import '@/styles/index.less'
 
 // 导入axios
-// import axios from '@/api/axios'
+import axios from '@/api/axios'
 
-// Vue.prototype.$http = axios
+Vue.prototype.$http = axios
 
 Vue.use(ElementUI)
 
