@@ -7,7 +7,11 @@ import Welcome from '@/views/welcome'
 import Weather from '@/views/weather'
 import Soil from '@/views/soil'
 import Irrigation from '@/views/irrigation'
-import Fertilizer from '@/views/fertilizer'
+// import Fertilizer from '@/views/fertilizer'
+import Crop from '@/views/fertilizer/crop'
+import Cycle from '@/views/fertilizer/cycle'
+import Formula from '@/views/fertilizer/formula'
+import Passageway from '@/views/fertilizer/passageway'
 import Statistic from '@/views/statistic'
 import Scene from '@/views/scene'
 import NotFound from '@/views/404'
@@ -25,7 +29,11 @@ const router = new VueRouter({
         { name: 'weather', path: '/weather', component: Weather },
         { name: 'soil', path: '/soil', component: Soil },
         { name: 'irrigation', path: '/irrigation', component: Irrigation },
-        { name: 'fertilizer', path: '/fertilizer', component: Fertilizer },
+        // { name: 'fertilizer', path: '/fertilizer', component: Fertilizer },
+        { name: 'crop', path: '/crop', component: Crop },
+        { name: 'cycle', path: '/cycle', component: Cycle },
+        { name: 'formula', path: '/formula', component: Formula },
+        { name: 'passageway', path: '/passageway', component: Passageway },
         { name: 'statistic', path: '/statistic', component: Statistic },
         { name: 'scene', path: '/scene', component: Scene }
       ]

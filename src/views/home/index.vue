@@ -28,10 +28,24 @@
           <i class="el-icon-edit-outline"></i>
           <span slot="title">灌溉策略</span>
         </el-menu-item>
-        <el-menu-item index="/fertilizer">
+        <!-- <el-menu-item index="/fertilizer">
           <i class="el-icon-s-flag"></i>
           <span slot="title">施肥策略</span>
-        </el-menu-item>
+        </el-menu-item> -->
+        <el-submenu index="/fertilizer">
+          <template slot="title">
+            <i class="el-icon-s-flag"></i>
+            <span slot="title" style="font-size: 16px">施肥策略</span>
+          </template>
+          <el-menu-item-group title="管理">
+            <el-menu-item index="/crop">作物管理</el-menu-item>
+            <el-menu-item index="/cycle">周期管理</el-menu-item>
+            <el-menu-item index="/passageway">通道管理</el-menu-item>
+          </el-menu-item-group>
+          <el-menu-item-group title="配方">
+            <el-menu-item index="/formula">施肥配方</el-menu-item>
+          </el-menu-item-group>
+        </el-submenu>
         <el-menu-item index="/statistic">
           <i class="el-icon-s-data"></i>
           <span slot="title">数据统计</span>
@@ -95,12 +109,15 @@ export default {
     .logo {
       width: 100%;
       height: 60px;
-      background: url(../../assets/images/logo.png) no-repeat center /
-        140px auto;
+      background: url(../../assets/images/logo.png) no-repeat center / 140px
+        auto;
     }
     .close {
       background-image: url(../../assets/images/logo_min.png);
       background-size: 36px auto;
+    }
+    /deep/ .el-menu-item-group__title {
+      font-size: 14px;
     }
   }
   .my-header {

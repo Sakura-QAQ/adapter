@@ -1,6 +1,6 @@
 <template>
   <div class="sta-container">
-    <div class="define-time">
+    <div>
       <div class="bg-title">
         <p>定义时长</p>
       </div>
@@ -33,7 +33,7 @@
         </tbody>
       </table>
     </div>
-    <div class="define-time">
+    <div>
       <div class="bg-title">
         <p>灌溉统计</p>
       </div>
@@ -65,7 +65,7 @@ export default {
 .sta-container {
   display: flex;
   justify-content: space-evenly;
-  .define-time {
+  > div {
     position: relative;
     width: 670px;
     height: 500px;
