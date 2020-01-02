@@ -32,7 +32,7 @@ export default {
       data: [
         {
           name: 'EC:',
-          data: [43934, 52503, 57177, 69658, 97031, 119931, 137133, 154175]
+          data: [43934, 52503, 57177, 69658, 97031, 119931, 137133, 154175, 162010]
         }
       ],
       other: {
@@ -105,19 +105,37 @@ export default {
   beforeCreate: function () {
     myvue = this
   },
-  // methods: {
-  //   async getData () {
-  //     // 请求数据
-  //     let last = await this.$http.get('https://data.jianshukeji.com/jsonp?filename=json/usdeur.json&callback=?')
-  //     console.log(last)
-  //   }
+  // created () {
+  //   this.getData()
   // },
+  methods: {
+    async getData () {
+      // 请求数据
+      // const res = await this.$http.get('https://data.jianshukeji.com/jsonp?filename=json/usdeur.json&callback=?')
+      // console.log(res)
+
+      // const array = JSON.parse(res)
+      // console.log(array)
+      // try {
+      //   const res = await this.$http.get('https://data.jianshukeji.com/jsonp?filename=json/usdeur.json&callback=?')
+      //   console.log(res)
+      // } catch (e) {
+      //   // console.log(this.data[0].data)
+      //   // console.log(e)
+      //   // this.data[0].data = e.text
+      //   console.log(e.text)
+      //   // const array = JSON.parse(e)
+      //   // console.log(array)
+      // }
+    }
+
+  },
   mounted: function () {
     this.other.title.text = '蓝洋益海施肥机系统'
     this.other.subtitle.text = '数据来源：thesolarfoundation.com'
     this.other.series = myvue.data // 数据
     this.option = myvue.other
-    // this.getData()
+    this.getData()
   },
   components: {
     XChart

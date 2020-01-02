@@ -4,7 +4,50 @@
     <div class="bg-title">
       <p>作物管理</p>
     </div>
-    <el-transfer v-model="value" :data="data" :titles="['Source', 'Target']"></el-transfer>
+    <div class="add-data">
+      添加作物:<input type="text" v-model="obj.user" />
+      <!-- 时长:<input type="text" v-model="obj.time" />
+      数量:<input type="text" v-model="obj.type" /> -->
+      <span>
+        <button @click="add()">增加</button>
+      </span>
+    </div>
+    <div class="layer" v-show="flag">
+      <div class="mask">
+        <div class="content">
+          编辑作物:<input type="text" v-model="edit.user" />
+          <!-- 时长:<input type="text" v-model="edit.time" />
+          流量<input type="text" v-model="edit.type" /> -->
+          <button @click="updata()">更新</button>
+          <button @click="flag=false">取消</button>
+        </div>
+      </div>
+    </div>
+    <div class="pn-ltable">
+      <table border="1" cellspacing="0" cellpadding="10" align="center">
+        <thead  align="center">
+          <tr>
+            <td width="70">序号</td>
+            <td width="70">作物</td>
+            <!-- <td width="70">时长(秒)</td>
+            <td width="70">数量</td> -->
+            <td width="120">操作</td>
+          </tr>
+        </thead>
+        <tbody  align="center">
+          <tr v-for="(item,index) in titles" :key="index">
+            <td>{{item.id}}</td>
+            <td>{{item.user}}</td>
+            <!-- <td>{{item.time}}</td>
+            <td>{{item.type}}</td> -->
+            <td>
+              <span class="edit" @click="editData(item)">编辑</span>
+              <span class="delete" @click="del(index)">删除</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 </template>
@@ -12,20 +55,105 @@
 <script>
 export default {
   data () {
-    const generateData = _ => {
-      const data = []
-      for (let i = 1; i <= 9; i++) {
-        data.push({
-          key: i,
-          label: `备选项 ${i}`
-          // disabled: i % 4 === 0
-        })
-      }
-      return data
-    }
     return {
-      data: generateData(),
-      value: [2, 4]
+      find: 'find',
+      flag: false,
+      obj: {
+        user: '',
+        // time: '',
+        // type: '',
+        id: ''
+      },
+      titles: [
+        {
+          user: '西红柿',
+          // time: '12',
+          // type: '0',
+          id: '1'
+        },
+        {
+          user: '番茄',
+          // time: '20',
+          // type: '0',
+          id: '2'
+        },
+        {
+          user: '土豆',
+          // time: '19',
+          // type: '1',
+          id: '3'
+        },
+        {
+          user: '马铃薯',
+          // time: '19',
+          // type: '1',
+          id: '4'
+        }
+      ],
+      edit: {}
+    }
+  },
+  methods: {
+    add () {
+      // 增加数据
+      // 动态id
+      var _id =
+        Math.max.apply(
+          null,
+          this.titles.map(v => {
+            return v.id
+          })
+        ) + 1
+
+      // 判断增加数据是否全部为空
+      if (!this.obj.user) return
+      // 将添加的数据，增加到数组中
+      this.titles.push({
+        user: this.obj.user,
+        // time: this.obj.time,
+        // type: this.obj.type,
+        id: _id
+      })
+      // 添加完成后，将输入框清空
+      this.obj = {
+        user: '',
+        // time: '',
+        // type: '',
+        id: ''
+      }
+    },
+    // 删除数据
+    del (index) {
+      // 点击删除后，将删除数据的下标传入，进行删除
+      if (this.titles.length === 1) {
+        alert('至少保留一条数据')
+        return false
+      } else {
+        this.titles.splice(index, 1)
+      }
+    },
+    // 编辑数据
+    editData (item) {
+      // 将要编辑的数据传入
+      // 编辑层打开，显示
+      this.flag = true
+      // 将要编辑的数据赋值给this.edit，绑定this.edit
+      this.edit = {
+        user: item.user,
+        // time: item.time,
+        // type: item.type,
+        id: item.id
+      }
+    },
+    // 更新数据
+    updata () {
+      // 点击更新按钮后触发，将用对象中的ID值来判断，选中更改的对象，并将更改后的对象重新给到this.titles
+      for (var i = 0; i < this.titles.length; i++) {
+        if (this.titles[i].id === this.edit.id) {
+          this.titles[i] = this.edit
+          this.flag = false
+        }
+      }
     }
   }
 }
@@ -64,27 +192,11 @@ export default {
       }
     }
 
-    /deep/.el-transfer {
-      display: -webkit-box;
-      -webkit-box-pack: center;
-      // color: #fff;
-      .el-transfer-panel {
-        background-color: transparent;
-        border: 1px solid #6989a5;
-        .el-transfer-panel__header {
-          background: #ccc;
-        }
-        .el-transfer-panel__item.el-checkbox {
-          color: #ccc;
-        }
-        .el-checkbox__inner {
-          background-color: rgba(185, 177, 177, 0.774);
-        }
-      }
-
-      .el-transfer__button i {
-        color: #fff;
-      }
+    .add-data {
+      text-align: center;
+    }
+    .layer {
+      text-align: center;
     }
   }
 }

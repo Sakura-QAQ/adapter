@@ -54,6 +54,10 @@
           <i class="el-icon-connection"></i>
           <span slot="title">现场实况</span>
         </el-menu-item>
+        <el-menu-item index="/try">
+          <i class="el-icon-connection"></i>
+          <span slot="title">测试页</span>
+        </el-menu-item>
       </el-menu>
     </el-aside>
     <el-container>

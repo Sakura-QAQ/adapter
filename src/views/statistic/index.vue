@@ -1,6 +1,6 @@
 <template>
   <div class="sta-container">
-    <div>
+    <!-- <div>
       <div class="bg-title">
         <p>定义时长</p>
       </div>
@@ -32,7 +32,7 @@
           </tr>
         </tbody>
       </table>
-    </div>
+    </div> -->
     <div>
       <div class="bg-title">
         <p>灌溉统计</p>
@@ -46,6 +46,24 @@
           end-placeholder="结束时间"
           placeholder="选择时间范围">
         </el-time-picker>
+        <table class="pn-ltable" border="1" cellspacing="0" cellpadding="10" align="center">
+          <thead>
+            <tr>
+              <th width="100">类型</th>
+              <th width="100">最大值</th>
+              <th width="100">最小值</th>
+              <th width="100">平均值</th>
+            </tr>
+          </thead>
+          <tbody class="pn-ltbody" align="center">
+            <tr v-for="item in 4" :key="item">
+              <td>PH</td>
+              <td>35</td>
+              <td>35</td>
+              <td>35</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -123,6 +141,10 @@ export default {
         /deep/ .el-range-input {
           color: #fff;
         }
+      }
+
+      .pn-ltable {
+        margin-top: 20px;
       }
     }
   }

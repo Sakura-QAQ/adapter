@@ -15,6 +15,7 @@ import Passageway from '@/views/fertilizer/passageway'
 import Statistic from '@/views/statistic'
 import Scene from '@/views/scene'
 import NotFound from '@/views/404'
+import Try from '@/views/try'
 
 Vue.use(VueRouter)
 const router = new VueRouter({
@@ -35,7 +36,8 @@ const router = new VueRouter({
         { name: 'formula', path: '/formula', component: Formula },
         { name: 'passageway', path: '/passageway', component: Passageway },
         { name: 'statistic', path: '/statistic', component: Statistic },
-        { name: 'scene', path: '/scene', component: Scene }
+        { name: 'scene', path: '/scene', component: Scene },
+        { name: 'try', path: '/try', component: Try }
       ]
     },
     { name: '404', path: '*', component: NotFound }
