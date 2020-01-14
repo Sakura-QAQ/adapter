@@ -2,7 +2,7 @@
   <div class="fer-container">
     <div class="fer-plan">
       <div>
-        <p>配方列表</p>
+        <p>配方</p>
       </div>
       <table class="pn-ltable" border="1" cellspacing="0" cellpadding="10" align="center">
         <thead>
@@ -11,10 +11,12 @@
             <th width="90">EC基数</th>
             <th width="90">EC目标</th>
             <th width="90">PH目标</th>
+            <th width="90">通道</th>
           </tr>
         </thead>
         <tbody class="pn-ltbody" align="center">
           <tr v-for="item in 7" :key="item">
+            <td>null</td>
             <td>null</td>
             <td>null</td>
             <td>null</td>
@@ -39,8 +41,10 @@
           <span>
             选择周期:
             <select name id>
-              <option value="week">一周</option>
-              <option value="month">一月</option>
+              <option value="">定值</option>
+              <option value="">幼苗</option>
+              <option value="">清苗</option>
+              <option value="">开花</option>
             </select>
           </span>
           <span>
@@ -188,24 +192,6 @@ export default {
       padding: 0 15px;
       li {
         margin-bottom: 10px;
-      }
-      .check-time {
-        select {
-          width: 100px;
-          height: 34px;
-          padding: 0 15px;
-          font-size: 16px;
-          color: #fff;
-          border: 1px solid #215077;
-          background-color: rgba(41, 58, 72);
-        }
-
-        .submit {
-          width: 100px;
-          height: 35px;
-          color: #fff;
-          background-color: #6888a4;
-        }
       }
       li:last-child {
         div {

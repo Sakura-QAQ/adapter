@@ -20,6 +20,7 @@ input {
   color: #fff;
   background: #2a3b49;
   font-size: 18px;
+  vertical-align: middle;
 }
 input:-webkit-autofill,
 textarea:-webkit-autofill,
@@ -30,6 +31,21 @@ select:-webkit-autofill {
   background-image: none;
   transition: background-color 50000s ease-in-out 0s;
 }
+select {
+  height: 30px;
+  padding: 0 15px;
+  font-size: 16px;
+  color: #fff;
+  border: 1px solid #215077;
+  background-color: rgba(41, 58, 72);
+  // vertical-align: middle;
+}
+.submit {
+  width: 80px;
+  height: 30px;
+  color: #fff;
+  background-color: #6888a4;
+}
 .el-menu-item {
   font-size: 16px;
 }
@@ -37,4 +53,16 @@ select:-webkit-autofill {
 .el-container {
   background: url(../assets/images/bg.png) no-repeat center / cover;
   color: #fff;
+}
+.top-position {
+  background: linear-gradient(to right, #213b53, transparent);
+  height: 40px;
+  line-height: 40px;
+  margin-bottom: 20px;
+  padding: 0 80px;
+
+  .submit {
+    float: right;
+    margin-top: 5px;
+  }
 }

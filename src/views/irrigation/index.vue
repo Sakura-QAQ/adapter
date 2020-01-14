@@ -1,107 +1,130 @@
 <template>
   <!-- 启动时间 灌溉时长 灌溉流量 选择配方 -->
   <!-- 有运行停止的切换按钮 -->
-  <div class="irr-container">
-    <div class="irr-form">
-      <div class="bg-title">
-        <p>策略列表</p>
-      </div>
-      <div class="pn-ltable">
-        <table border="1" cellspacing="0" cellpadding="10" align="center">
-          <thead align="center">
-            <tr>
-              <td width="70">序号</td>
-              <td width="70">灌溉名称</td>
-              <td width="70">启动时间</td>
-              <td width="70">灌溉时长(秒)</td>
-              <td width="70">灌溉流量(m³)</td>
-              <td width="70">配方</td>
-              <td width="70">下次启动时间</td>
-              <td width="70">状态</td>
-              <td width="120">操作</td>
-            </tr>
-          </thead>
-          <tbody align="center">
-            <tr v-for="(item,index) in titles" :key="index">
-              <td>{{item.id}}</td>
-              <td>{{item.name}}</td>
-              <td>{{item.start}}</td>
-              <td>{{item.time}}</td>
-              <td>{{item.flow}}</td>
-              <td>{{item.formula}}</td>
-              <td>{{item.next}}</td>
-              <td>{{item.type}}</td>
-              <td>
-                <span class="edit" @click="editData(item)">编辑</span>
-                <span class="delete" @click="del(index)">删除</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
 
-    <div class="show-form">
-      <div class="bg-title">
-        <p>灌溉管理</p>
-      </div>
-      <div class="layer">
-        <div class="bg-tag">
-          <p>详情</p>
+  <div class="irr-container">
+    <div class="top-position">
+      <span>
+        选择施肥机:
+        <select name id>
+          <option value>1#施肥机</option>
+          <option value>2#施肥机</option>
+        </select>
+      </span>
+      <input class="submit" type="submit" value="确定" />
+    </div>
+    <div class="irrigation">
+      <div class="irr-form">
+        <div class="bg-title">
+          <p>策略列表</p>
         </div>
-        <ul class="mask">
-          <li>
-            名称:
-            <input type="text" v-model="edit.name" />
-          </li>
-          <li class="content">
-            启动时间:
-            <input type="text" v-model="edit.start" />
-            <el-radio-group v-model="radio">
-              <el-radio label="1">仅一次</el-radio>
-              <el-radio label="2">
-                每隔
-                <input type="text" :value="message" :disabled="diasabledInput" />天
-                <input type="text" :value="message" :disabled="diasabledInput" />小时
+        <div class="pn-ltable">
+          <table border="1" cellspacing="0" cellpadding="10" align="center">
+            <thead align="center">
+              <tr>
+                <td width="70">序号</td>
+                <td width="70">灌溉名称</td>
+                <td width="70">启动时间</td>
+                <td width="70">灌溉时长(秒)</td>
+                <td width="70">灌溉流量(m³)</td>
+                <td width="70">配方</td>
+                <td width="70">下次启动时间</td>
+                <td width="70">状态</td>
+                <td width="120">操作</td>
+              </tr>
+            </thead>
+            <tbody align="center">
+              <tr v-for="(item,index) in titles" :key="index">
+                <td>{{item.id}}</td>
+                <td>{{item.name}}</td>
+                <td>{{item.hours}}:{{item.mins}}</td>
+                <td>{{item.time}}</td>
+                <td>{{item.flow}}</td>
+                <td>{{item.formula}}</td>
+                <td>{{item.next}}</td>
+                <td>{{item.type}}</td>
+                <td>
+                  <span class="edit" @click="editData(item)">编辑</span>
+                  <span class="delete" @click="del(index)">删除</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="show-form">
+        <div class="bg-title">
+          <p>灌溉管理</p>
+        </div>
+        <div class="layer">
+          <div class="bg-tag">
+            <p>详情</p>
+          </div>
+          <ul class="mask">
+            <li>
+              名称:
+              <input type="text" v-model="edit.name" />
+            </li>
+            <li class="content">
+              启动时间:
+              <input type="text" v-model="edit.hours" />时
+              <input type="text" v-model="edit.mins" />分
+              <el-radio-group v-model="radio">
+                <el-radio label="1">仅一次</el-radio>
+                <el-radio label="2">
+                  每隔
+                  <input type="text" :value="message" :disabled="diasabledInput" />天
+                  <input type="text" :value="message" :disabled="diasabledInput" />小时
+                </el-radio>
+              </el-radio-group>
+            </li>
+            <li>
+              <el-radio v-model="radio1" label="1">
+                灌溉时长:
+                <input type="text" v-model="edit.time" :disabled="diasabledInput1" />
               </el-radio>
-            </el-radio-group>
-          </li>
-          <li>
-            <el-radio v-model="radio1" label="1">
-              灌溉时长:
-              <input type="text" v-model="edit.time" :disabled="diasabledInput1" />
-            </el-radio>
-            <el-radio v-model="radio1" label="2">
-              灌溉流量:
-              <input type="text" v-model="edit.flow" :disabled="diasabledInput2" />
-            </el-radio>
-          </li>
-          <li>
-            配方:
-            <input type="text" v-model="edit.formula" />
-          </li>
-          <li>
-            <button @click="updata()">更新</button>
-            <button @click="clean()">清空</button>
-            <!-- @click="flag=false" -->
-          </li>
-        </ul>
-      </div>
-      <div class="control-valve">
-        <div class="bg-tag">
-          <p>阀号</p>
+              <el-radio v-model="radio1" label="2">
+                灌溉流量:
+                <input type="text" v-model="edit.flow" :disabled="diasabledInput2" />
+              </el-radio>
+            </li>
+            <li>
+              配方:
+              <input type="text" v-model="edit.formula" />
+            </li>
+            <li>
+              <button @click="updata()">更新</button>
+              <button @click="clean()">清空</button>
+              <!-- @click="flag=false" -->
+            </li>
+          </ul>
         </div>
-        <ul class="valve">
-          <li v-for="item in 64" :key="item">
-            <span>{{item}}#阀</span>
-          </li>
-        </ul>
+        <div class="control-valve">
+          <div class="bg-tag">
+            <p>阀号</p>
+          </div>
+          <ul class="valve">
+              <li v-for="item in 8" :key="item">
+                <span>{{item}}#阀</span>
+              </li>
+          </ul>
+          <collapse>
+            <ul class="valve" v-show="isActive">
+                <li v-for="item in 56" :key="item">
+                  <span>{{item + 8}}#阀</span>
+                </li>
+            </ul>
+          </collapse>
+          <div @click="lock" style="text-align:center;color:#fff;cursor:pointer;padding-bottom:5px;">{{content}}</div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import collapse from '@/collapse'
 export default {
   data () {
     return {
@@ -113,10 +136,13 @@ export default {
       message: '',
       message1: '',
       message2: '',
+      isActive: false,
+      content: '展开▼',
       titles: [
         {
           name: 'null',
-          start: 'start',
+          hours: '8',
+          mins: '30',
           time: 'time',
           flow: 'flow',
           formula: 'formula',
@@ -126,7 +152,8 @@ export default {
         },
         {
           name: '1',
-          start: '2',
+          hours: '2',
+          mins: '30',
           time: 'tim33e',
           flow: '4',
           formula: '5',
@@ -168,7 +195,8 @@ export default {
         name: item.name,
         time: item.time,
         flow: item.flow,
-        start: item.start,
+        hours: item.hours,
+        mins: item.mins,
         formula: item.formula,
         type: item.type,
         next: item.next,
@@ -176,7 +204,7 @@ export default {
       }
     },
     // 更新数据
-    updata () {
+    async updata () {
       // 点击更新按钮后触发，将用对象中的ID值来判断，选中更改的对象，并将更改后的对象重新给到this.titles
       for (var i = 0; i < this.titles.length; i++) {
         if (this.titles[i].id === this.edit.id) {
@@ -184,12 +212,32 @@ export default {
           // this.flag = false
           // console.log(this.edit)
           this.$set(this.titles, i, this.edit)
+          let data = JSON.stringify(this.titles)
+          // console.log(title)
+          await this.$http
+            .post('url', data)
+            .then(res => {
+              console.log(111)
+            })
+            .catch(err => {
+              console.log(err)
+            })
         }
       }
     },
     // 清空
     clean () {
       this.edit = {}
+    },
+    // 展开/折叠
+    lock () {
+      if (!this.isActive) {
+        this.isActive = true
+        this.content = '折叠▲'
+      } else {
+        this.isActive = false
+        this.content = '展开▼'
+      }
     }
     // change () {
     //   if (this.radio === '1') {
@@ -220,12 +268,15 @@ export default {
         this.edit.time = ''
       }
     }
+  },
+  components: {
+    collapse
   }
 }
 </script>
 
 <style lang="less" scoped>
-.irr-container {
+.irrigation {
   display: flex;
   justify-content: space-evenly;
   .irr-form {

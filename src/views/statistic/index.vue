@@ -1,69 +1,38 @@
 <template>
   <div class="sta-container">
-    <!-- <div>
-      <div class="bg-title">
-        <p>定义时长</p>
-      </div>
-      <div class="check-time">
-        <span>
-          选择时间:
-          <select name id>
-            <option value="week">一周</option>
-            <option value="month">一月</option>
-          </select>
-        </span>
-        <input class="submit" type="submit" value="确认" />
-      </div>
-      <table class="pn-ltable" border="1" cellspacing="0" cellpadding="10" align="center">
-        <thead>
-          <tr>
-            <th width="100">类型</th>
-            <th width="100">最大值</th>
-            <th width="100">最小值</th>
-            <th width="100">平均值</th>
-          </tr>
-        </thead>
-        <tbody class="pn-ltbody" align="center">
-          <tr v-for="item in 4" :key="item">
-            <td>土壤温度</td>
-            <td>35</td>
-            <td>35</td>
-            <td>35</td>
-          </tr>
-        </tbody>
-      </table>
-    </div> -->
-    <div>
-      <div class="bg-title">
-        <p>灌溉统计</p>
-      </div>
-      <div class="check-time">
-        <el-time-picker
-          is-range
-          v-model="value1"
-          range-separator="至"
-          start-placeholder="开始时间"
-          end-placeholder="结束时间"
-          placeholder="选择时间范围">
-        </el-time-picker>
-        <table class="pn-ltable" border="1" cellspacing="0" cellpadding="10" align="center">
-          <thead>
-            <tr>
-              <th width="100">类型</th>
-              <th width="100">最大值</th>
-              <th width="100">最小值</th>
-              <th width="100">平均值</th>
-            </tr>
-          </thead>
-          <tbody class="pn-ltbody" align="center">
-            <tr v-for="item in 4" :key="item">
-              <td>PH</td>
-              <td>35</td>
-              <td>35</td>
-              <td>35</td>
-            </tr>
-          </tbody>
-        </table>
+    <div class="statistic">
+      <div class="sta-from">
+        <div class="bg-title">
+          <p>灌溉统计</p>
+        </div>
+        <div class="check-time">
+          <el-time-picker
+            is-range
+            v-model="value1"
+            range-separator="至"
+            start-placeholder="开始时间"
+            end-placeholder="结束时间"
+            placeholder="选择时间范围">
+          </el-time-picker>
+          <table class="pn-ltable" border="1" cellspacing="0" cellpadding="10" align="center">
+            <thead>
+              <tr>
+                <th width="100">类型</th>
+                <th width="100">最大值</th>
+                <th width="100">最小值</th>
+                <th width="100">平均值</th>
+              </tr>
+            </thead>
+            <tbody class="pn-ltbody" align="center">
+              <tr v-for="item in 4" :key="item">
+                <td>PH</td>
+                <td>35</td>
+                <td>35</td>
+                <td>35</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -80,10 +49,10 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.sta-container {
+.statistic {
   display: flex;
   justify-content: space-evenly;
-  > div {
+  .sta-from {
     position: relative;
     width: 670px;
     height: 500px;

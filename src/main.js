@@ -12,16 +12,21 @@ import '@/styles/index.less'
 // 导入axios
 import axios from '@/api/axios'
 
+// 全局注册的组件index.js
+import components from '@/components'
+
 // jquery
 // import 'jquery'
 
 // 百度地图
 import BaiduMap from 'vue-baidu-map'
 
+// axios挂载到大vue原型上
 Vue.prototype.$http = axios
 
-Vue.use(ElementUI)
+Vue.use(components)
 
+Vue.use(ElementUI)
 
 Vue.use(BaiduMap, {
   // ak 是在百度地图开发者平台申请的密钥 详见 http://lbsyun.baidu.com/apiconsole/key */

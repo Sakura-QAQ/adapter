@@ -6,41 +6,72 @@
     :zoom="zoom"
     @ready="handler"
   >
-    <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
-    <bm-map-type :map-types="['BMAP_NORMAL_MAP', 'BMAP_HYBRID_MAP']" anchor="BMAP_ANCHOR_TOP_LEFT"></bm-map-type>
-    <bm-geolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :showAddressBar="true" :autoLocation="true"></bm-geolocation>
-    <bm-overview-map anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :isOpen="true"></bm-overview-map>
-    <bm-marker :position="{lng: 116.276429, lat: 40.192449}" :dragging="true" animation="BMAP_ANIMATION_BOUNCE" @click="clickHandler">
-      <bm-label content="1#施肥机" :labelStyle="{color: 'red', fontSize : '24px'}" :offset="{width: -35, height: 30}" />
-    </bm-marker>
-    <bm-marker :position="{lng: 116.2777, lat: 40.192704}" :dragging="true" animation="BMAP_ANIMATION_BOUNCE" @click="clickHandler">
-      <bm-label content="2#施肥机" :labelStyle="{color: 'red', fontSize : '24px'}" :offset="{width: -35, height: 30}" />
-    </bm-marker>
+    <bml-marker-clusterer :averageCenter="true">
+      <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
+      <bm-map-type
+        :map-types="['BMAP_NORMAL_MAP', 'BMAP_HYBRID_MAP']"
+        anchor="BMAP_ANCHOR_TOP_LEFT"
+      ></bm-map-type>
+      <bm-geolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :showAddressBar="true" :autoLocation="true"></bm-geolocation>
+      <bm-overview-map anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :isOpen="true"></bm-overview-map>
+      <bm-marker
+        v-for="(marker, i) of markers"
+        :key="i"
+        :position="{lng: marker.lng, lat: marker.lat}"
+        :dragging="true"
+        @click="clickHandler"
+      >
+        <bm-label
+          :content = "i+1+'#施肥机'"
+          :labelStyle="{color: 'red', fontSize : '14px'}"
+          :offset="{width: -18, height: 30}"
+        />
+        <!-- <bm-info-window :show="show" @close="infoWindowClose" @open="infoWindowOpen">{{i}}施肥机</bm-info-window> -->
+      </bm-marker>
+      <button @click="add">add</button>
+      <button @click="del">del</button>
+    </bml-marker-clusterer>
   </baidu-map>
 </template>
 
 <script>
-import BaiduMap from 'vue-baidu-map/components/map/Map.vue'
+import { BmlMarkerClusterer } from 'vue-baidu-map'
 export default {
   data () {
     return {
+      markers: [],
       center: { lng: 0, lat: 0 },
-      zoom: 3
+      zoom: 3,
+      i: 1,
+      show: false
     }
   },
   methods: {
-    clickHandler (e) {
-      alert(`单击点的坐标为：${e.point.lng}, ${e.point.lat}`)
+    add () {
+      const position = {
+        lng: 116.276429,
+        lat: 40.192602
+      }
+      if (this.markers.length === 5) {
+        return false
+      } else {
+        this.markers.push(position)
+      }
+    },
+    del () {
+      this.markers.splice(this.markers.indexOf(this.markers), 1)
     },
     handler ({ BMap, map }) {
-      // console.log(BMap, map)
       this.center.lng = 116.27667165
       this.center.lat = 40.19271592
       this.zoom = 18
+    },
+    clickHandler (e) {
+      alert(`当前施肥机坐标为：${e.point.lng}, ${e.point.lat}`)
     }
   },
   components: {
-    BaiduMap
+    BmlMarkerClusterer
   }
 }
 </script>

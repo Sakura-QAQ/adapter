@@ -21,7 +21,6 @@
 </template>
 
 <script>
-
 // 导入chart组件
 import XChart from '@/components/charts'
 var myvue = {}
@@ -44,48 +43,52 @@ export default {
         title: {
           text: '',
           style: {
-            'color': '#fff'
+            color: '#fff'
           }
         },
         subtitle: {
           text: '',
           style: {
-            'color': 'rgb(151, 177, 201)'
+            color: 'rgb(151, 177, 201)'
           }
         },
-        xAxis: [{
-          type: 'datetime',
-          lineColor: '#6989a5',
-          tickColor: '#6989a5',
-          labels: {
-            style: {
-              'color': '#fff',
-              'cursor': 'default',
-              'fontSize': '14px'
+        xAxis: [
+          {
+            type: 'datetime',
+            lineColor: '#6989a5',
+            tickColor: '#6989a5',
+            labels: {
+              style: {
+                color: '#fff',
+                cursor: 'default',
+                fontSize: '14px'
+              }
             }
           }
-        }],
-        yAxis: [{
-          title: {
-            text: 'EC值',
-            style: {
-              'color': 'rgb(151, 177, 201)',
-              'font-size': '14px'
-            }
-          },
-          // 轴标签
-          labels: {
-            style: {
-              'color': '#fff',
-              'cursor': 'default',
-              'fontSize': '14px'
+        ],
+        yAxis: [
+          {
+            title: {
+              text: 'EC值',
+              style: {
+                color: 'rgb(151, 177, 201)',
+                'font-size': '14px'
+              }
             },
-            align: 'center'
-          },
-          // 角标
-          gridLineColor: '#2e3f4f',
-          gridLineDashStyle: 'solid'
-        }],
+            // 轴标签
+            labels: {
+              style: {
+                color: '#fff',
+                cursor: 'default',
+                fontSize: '14px'
+              },
+              align: 'center'
+            },
+            // 角标
+            gridLineColor: '#2e3f4f',
+            gridLineDashStyle: 'solid'
+          }
+        ],
         legend: {
           enabled: false
         },
