@@ -41,8 +41,9 @@
             <!-- <td>{{item.time}}</td>
             <td>{{item.type}}</td> -->
             <td>
-              <span class="edit" @click="editData(item)">编辑</span>
-              <span class="delete" @click="del(index)">删除</span>
+              <span class="edit" @click="editData(item)" style="cursor: pointer;">编辑</span>
+              &nbsp;
+              <span class="delete" @click="del(index)" style="cursor: pointer;">删除</span>
             </td>
           </tr>
         </tbody>
@@ -124,12 +125,14 @@ export default {
     },
     // 删除数据
     del (index) {
-      // 点击删除后，将删除数据的下标传入，进行删除
-      if (this.titles.length === 1) {
-        alert('至少保留一条数据')
-        return false
-      } else {
-        this.titles.splice(index, 1)
+      if (confirm('确定删除？')) {
+        // 点击删除后，将删除数据的下标传入，进行删除
+        if (this.titles.length === 1) {
+          alert('至少保留一条数据')
+          return false
+        } else {
+          this.titles.splice(index, 1)
+        }
       }
     },
     // 编辑数据
@@ -166,11 +169,10 @@ export default {
   .fer-table {
     position: relative;
     width: 670px;
-    height: 500px;
     border: 1px solid #5c7b95;
     border-radius: 20px;
     background: #000;
-    padding-top: 60px;
+    padding: 60px 0px;
     margin-top: 30px;
 
     .bg-title {

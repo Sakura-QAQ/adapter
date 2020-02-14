@@ -11,6 +11,7 @@ import Irrigation from '@/views/irrigation'
 import Crop from '@/views/fertilizer/crop'
 import Cycle from '@/views/fertilizer/cycle'
 import Formula from '@/views/fertilizer/formula'
+// import Details from '@/views/fertilizer/details'
 import Passageway from '@/views/fertilizer/passageway'
 import Statistic from '@/views/statistic'
 import Scene from '@/views/scene'
@@ -34,6 +35,7 @@ const router = new VueRouter({
         { name: 'crop', path: '/crop', component: Crop },
         { name: 'cycle', path: '/cycle', component: Cycle },
         { name: 'formula', path: '/formula', component: Formula },
+        // { name: 'details', path: '/details', component: Details },
         { name: 'passageway', path: '/passageway', component: Passageway },
         { name: 'statistic', path: '/statistic', component: Statistic },
         { name: 'scene', path: '/scene', component: Scene },

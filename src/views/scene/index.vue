@@ -28,8 +28,24 @@
         />
         <!-- <bm-info-window :show="show" @close="infoWindowClose" @open="infoWindowOpen">{{i}}施肥机</bm-info-window> -->
       </bm-marker>
-      <button @click="add">add</button>
-      <button @click="del">del</button>
+      <bm-marker
+        v-for="(valve, i) of valves"
+        :key="i + '-only'"
+        :position="{lng: valve.lng, lat: valve.lat}"
+        :dragging="true"
+        @click="clickHandler"
+      >
+        <bm-label
+          :content = "i+1+'#电磁阀'"
+          :labelStyle="{color: 'blue', fontSize : '14px'}"
+          :offset="{width: -18, height: 30}"
+        />
+        <!-- <bm-info-window :show="show" @close="infoWindowClose" @open="infoWindowOpen">{{i}}施肥机</bm-info-window> -->
+      </bm-marker>
+      <button @click="add">添加施肥机</button>
+      <button @click="del">删除施肥机</button>
+      <button @click="addvalve">添加电磁阀</button>
+      <button @click="delvalve">删除电磁阀</button>
     </bml-marker-clusterer>
   </baidu-map>
 </template>
@@ -40,6 +56,7 @@ export default {
   data () {
     return {
       markers: [],
+      valves: [],
       center: { lng: 0, lat: 0 },
       zoom: 3,
       i: 1,
@@ -60,6 +77,21 @@ export default {
     },
     del () {
       this.markers.splice(this.markers.indexOf(this.markers), 1)
+    },
+    addvalve () {
+      const valve = {
+        lng: 116.276429,
+        lat: 40.192602
+      }
+      // if (this.valve.length === 5) {
+      //   return false
+      // } else {
+      //   this.valves.push(valve)
+      // }
+      this.valves.push(valve)
+    },
+    delvalve () {
+      this.valves.splice(this.valves.indexOf(this.valves), 1)
     },
     handler ({ BMap, map }) {
       this.center.lng = 116.27667165

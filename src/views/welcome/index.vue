@@ -14,7 +14,7 @@
       </li>
     </ul>
     <!-- charts图表 -->
-    <div>
+    <div class="bg-charts">
       <x-chart id="highcharts" class="high" :option="option"></x-chart>
     </div>
   </div>
@@ -171,8 +171,12 @@ export default {
     }
   }
 
-  .high {
-    margin-top: 30px;
+  .bg-charts {
+    background: url(../../assets/images/bg3.png) no-repeat;
+    background-size: 100% 100%;
+    .high {
+      margin-top: 30px;
+    }
   }
 }
 </style>

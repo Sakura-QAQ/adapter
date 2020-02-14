@@ -38,12 +38,13 @@
             <span slot="title" style="font-size: 16px">施肥策略</span>
           </template>
           <el-menu-item-group title="管理">
-            <el-menu-item index="/crop">作物管理</el-menu-item>
-            <el-menu-item index="/cycle">周期管理</el-menu-item>
-            <el-menu-item index="/passageway">通道管理</el-menu-item>
+            <el-menu-item index="/crop" style="text-align:center;">作物管理</el-menu-item>
+            <el-menu-item index="/cycle" style="text-align:center;">周期管理</el-menu-item>
+            <el-menu-item index="/passageway" style="text-align:center;">通道管理</el-menu-item>
           </el-menu-item-group>
           <el-menu-item-group title="配方">
-            <el-menu-item index="/formula">施肥配方</el-menu-item>
+            <!-- <el-menu-item index="/details" style="text-align:center;">施肥配方</el-menu-item> -->
+            <el-menu-item index="/formula" style="text-align:center;">配方管理</el-menu-item>
           </el-menu-item-group>
         </el-submenu>
         <el-menu-item index="/statistic">

@@ -188,11 +188,10 @@ export default {
   .fer-table {
     position: relative;
     width: 670px;
-    height: 520px;
     border: 1px solid #5c7b95;
     border-radius: 20px;
     background: #000;
-    padding-top: 60px;
+    padding: 60px 0px;
     margin-top: 30px;
 
     .bg-title {

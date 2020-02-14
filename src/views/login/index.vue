@@ -26,8 +26,8 @@ export default {
   data () {
     return {
       loginForm: {
-        account: '',
-        password: ''
+        account: '123456789',
+        password: '000'
       },
       loginRules: {
         account: [
@@ -71,17 +71,21 @@ export default {
   background: url(../../assets/images/demo-1-bg.jpg) no-repeat center / cover;
   .login-box {
     width: 400px;
-    // height: 300px;
+    // height: 350px;
     position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    background-color: #000;
+    background-color: transparent;
+    border: none;
     img {
       display: block;
       width: 200px;
       margin: 10px auto;
     }
+    // /deep/ .el-input__inner {
+    //   background-color: transparent;
+    // }
   }
 }
 </style>

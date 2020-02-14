@@ -1,7 +1,6 @@
 <template>
   <!-- 启动时间 灌溉时长 灌溉流量 选择配方 -->
   <!-- 有运行停止的切换按钮 -->
-
   <div class="irr-container">
     <div class="top-position">
       <span>
@@ -44,8 +43,13 @@
                 <td>{{item.next}}</td>
                 <td>{{item.type}}</td>
                 <td>
-                  <span class="edit" @click="editData(item)">编辑</span>
-                  <span class="delete" @click="del(index)">删除</span>
+                  <span class="edit" @click="editData(item)" style="cursor: pointer;">编辑</span>
+                  &nbsp;
+                  <span
+                    class="delete"
+                    @click="del(index)"
+                    style="cursor: pointer;"
+                  >删除</span>
                 </td>
               </tr>
             </tbody>
@@ -55,70 +59,144 @@
 
       <div class="show-form">
         <div class="bg-title">
-          <p>灌溉管理</p>
+          <p>详情</p>
         </div>
-        <div class="layer">
-          <div class="bg-tag">
-            <p>详情</p>
-          </div>
-          <ul class="mask">
-            <li>
-              名称:
-              <input type="text" v-model="edit.name" />
-            </li>
-            <li class="content">
-              启动时间:
-              <input type="text" v-model="edit.hours" />时
-              <input type="text" v-model="edit.mins" />分
-              <el-radio-group v-model="radio">
-                <el-radio label="1">仅一次</el-radio>
-                <el-radio label="2">
-                  每隔
-                  <input type="text" :value="message" :disabled="diasabledInput" />天
-                  <input type="text" :value="message" :disabled="diasabledInput" />小时
-                </el-radio>
-              </el-radio-group>
-            </li>
-            <li>
-              <el-radio v-model="radio1" label="1">
-                灌溉时长:
-                <input type="text" v-model="edit.time" :disabled="diasabledInput1" />
-              </el-radio>
-              <el-radio v-model="radio1" label="2">
-                灌溉流量:
-                <input type="text" v-model="edit.flow" :disabled="diasabledInput2" />
-              </el-radio>
-            </li>
-            <li>
-              配方:
-              <input type="text" v-model="edit.formula" />
-            </li>
-            <li>
-              <button @click="updata()">更新</button>
-              <button @click="clean()">清空</button>
-              <!-- @click="flag=false" -->
-            </li>
-          </ul>
+        <div class="layer" v-if="flag">
+          <table border="0" cellspacing="0" cellpadding="5" style="width:100%;margin-top:20px;">
+            <tbody align="center">
+              <tr>
+                <td width="150">名称</td>
+                <td><input type="text" v-model="edit.name" /></td>
+              </tr>
+              <tr>
+                <td>启动时间</td>
+                <td>
+                  <input type="text" v-model="edit.hours" />时
+                  <input type="text" v-model="edit.mins" />分
+                  <el-radio-group v-model="radio">
+                    <el-radio label="1">仅一次</el-radio>
+                    <el-radio label="2">
+                      每隔
+                      <input type="text" :value="message" :disabled="diasabledInput" />天
+                      <input type="text" :value="message" :disabled="diasabledInput" />小时
+                      <input type="text" :value="message" :disabled="diasabledInput" />分
+                    </el-radio>
+                  </el-radio-group>
+                </td>
+              </tr>
+              <tr>
+                <td>灌溉</td>
+                <td>
+                  <el-radio v-model="radio1" label="1">
+                    灌溉时长:
+                    <input type="text" v-model="edit.time" :disabled="diasabledInput1" />
+                  </el-radio>
+                  <el-radio v-model="radio1" label="2">
+                    灌溉流量:
+                    <input type="text" v-model="edit.flow" :disabled="diasabledInput2" />
+                  </el-radio>
+                </td>
+              </tr>
+              <tr>
+                <td>配方</td>
+                <td>
+                  <el-select v-model="plan" filterable placeholder="请选择" value-key="id" @change="currentSel">
+                    <el-option v-for="item in options" :key="item.id" :label="item.label" :value="item"></el-option>
+                  </el-select>
+                </td>
+              </tr>
+              <tr>
+                <td>操作</td>
+                <td>
+                  <button @click="updata()">更新</button>&nbsp;
+                  <button @click="close()">取消</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <div class="control-valve">
           <div class="bg-tag">
             <p>阀号</p>
           </div>
           <ul class="valve">
-              <li v-for="item in 8" :key="item">
-                <span>{{item}}#阀</span>
-              </li>
+            <li v-for="item in 8" :key="item">
+              <span>{{item}}#阀</span>
+            </li>
           </ul>
           <collapse>
             <ul class="valve" v-show="isActive">
-                <li v-for="item in 56" :key="item">
-                  <span>{{item + 8}}#阀</span>
-                </li>
+              <li v-for="item in 56" :key="item">
+                <span>{{item + 8}}#阀</span>
+              </li>
             </ul>
           </collapse>
-          <div @click="lock" style="text-align:center;color:#fff;cursor:pointer;padding-bottom:5px;">{{content}}</div>
+          <div
+            @click="lock"
+            style="text-align:center;color:#fff;cursor:pointer;padding-bottom:5px;"
+          >{{content}}</div>
         </div>
       </div>
+
+      <!-- <div class="flag-form" v-if="flag">
+        <div class="layer">
+          <div class="close-icon"></div>
+          <div class="bg-tag">
+            <p>详情</p>
+          </div>
+          <table border="0" cellspacing="0" cellpadding="10" style="width:100%;margin-top:20px;">
+            <tbody  align="center">
+              <tr>
+                <td width="150">名称</td>
+                <td><input type="text" v-model="edit.name" /></td>
+              </tr>
+              <tr>
+                <td>启动时间</td>
+                <td>
+                  <input type="text" v-model="edit.hours" />时
+                  <input type="text" v-model="edit.mins" />分
+                  <el-radio-group v-model="radio">
+                    <el-radio label="1">仅一次</el-radio>
+                    <el-radio label="2">
+                      每隔
+                      <input type="text" :value="message" :disabled="diasabledInput" />天
+                      <input type="text" :value="message" :disabled="diasabledInput" />小时
+                    </el-radio>
+                  </el-radio-group>
+                </td>
+              </tr>
+              <tr>
+                <td>灌溉</td>
+                <td>
+                  <el-radio v-model="radio1" label="1">
+                    灌溉时长:
+                    <input type="text" v-model="edit.time" :disabled="diasabledInput1" />
+                  </el-radio>
+                  <el-radio v-model="radio1" label="2">
+                    灌溉流量:
+                    <input type="text" v-model="edit.flow" :disabled="diasabledInput2" />
+                  </el-radio>
+                </td>
+              </tr>
+              <tr>
+                <td>配方</td>
+                <td>
+                  <el-select v-model="plan" filterable placeholder="请选择" value-key="id" @change="currentSel">
+                    <el-option v-for="item in options" :key="item.id" :label="item.label" :value="item"></el-option>
+                  </el-select>
+                </td>
+              </tr>
+              <tr>
+                <td>操作</td>
+                <td>
+                  <button @click="updata()">更新</button>&nbsp;
+                  <button @click="close()">取消</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -145,26 +223,48 @@ export default {
           mins: '30',
           time: 'time',
           flow: 'flow',
-          formula: 'formula',
+          formula: 'null',
           next: 'next',
           type: '0',
           id: '1'
-        },
-        {
-          name: '1',
-          hours: '2',
-          mins: '30',
-          time: 'tim33e',
-          flow: '4',
-          formula: '5',
-          next: '6',
-          type: '0',
-          id: '2'
         }
       ],
       radio: '1',
       radio1: '1',
-      edit: {}
+      edit: {},
+      plan: '',
+      options: [
+        {
+          value: '选项1',
+          id: 1,
+          code: 'xuanxiang1',
+          label: '黄金糕'
+        },
+        {
+          code: 'xuanxiang2',
+          id: 2,
+          value: '选项2',
+          label: '双皮奶'
+        },
+        {
+          id: 3,
+          value: '选项3',
+          code: 'xuanxiang3',
+          label: '蚵仔煎'
+        },
+        {
+          value: '选项4',
+          id: 4,
+          code: 'xuanxiang4',
+          label: '龙须面'
+        },
+        {
+          value: '选项5',
+          label: '北京烤鸭',
+          id: 5,
+          code: 'xuanxiang5'
+        }
+      ]
     }
   },
   // created () {
@@ -178,18 +278,20 @@ export default {
     // 删除数据
     del (index) {
       // 点击删除后，将删除数据的下标传入，进行删除
-      if (this.titles.length === 1) {
-        alert('至少保留一条数据')
-        return false
-      } else {
-        this.titles.splice(index, 1)
+      if (confirm('是否删除') === true) {
+        if (this.titles.length === 1) {
+          alert('至少保留一条数据')
+          return false
+        } else {
+          this.titles.splice(index, 1)
+        }
       }
     },
     // 编辑数据
     editData (item) {
       // 将要编辑的数据传入
       // 编辑层打开，显示
-      // this.flag = true
+      this.flag = true
       // 将要编辑的数据赋值给this.edit，绑定this.edit
       this.edit = {
         name: item.name,
@@ -203,31 +305,43 @@ export default {
         id: item.id
       }
     },
+    currentSel (selVal) {
+      this.code = selVal.code
+      this.name = selVal.label
+      // console.log('选择的name为：' + this.name, '选择的code为:' + this.code)
+      // console.log(this.name)
+    },
     // 更新数据
     async updata () {
       // 点击更新按钮后触发，将用对象中的ID值来判断，选中更改的对象，并将更改后的对象重新给到this.titles
       for (var i = 0; i < this.titles.length; i++) {
         if (this.titles[i].id === this.edit.id) {
           this.titles[i] = this.edit
+          this.titles[i].formula = this.name
           // this.flag = false
           // console.log(this.edit)
-          this.$set(this.titles, i, this.edit)
-          let data = JSON.stringify(this.titles)
-          // console.log(title)
-          await this.$http
-            .post('url', data)
-            .then(res => {
-              console.log(111)
-            })
-            .catch(err => {
-              console.log(err)
-            })
+          if (this.$set(this.titles, i, this.edit)) {
+            alert('更新成功')
+          }
+          // console.log(this.options[i].text)
+
+          // let data = JSON.stringify(this.titles)
+          // // console.log(title)
+          // await this.$http
+          //   .post('url', data)
+          //   .then(res => {
+          //     console.log(111)
+          //   })
+          //   .catch(err => {
+          //     console.log(err)
+          //   })
         }
       }
+      this.flag = false
     },
     // 清空
-    clean () {
-      this.edit = {}
+    close () {
+      this.flag = false
     },
     // 展开/折叠
     lock () {
@@ -341,21 +455,17 @@ export default {
         font-weight: 800;
       }
     }
-
     .layer {
-      text-align: center;
-      .mask {
-        padding: 0 20px;
-        text-align: left;
+      background-color: #000;
+      margin: 0 auto;
+      // border-radius: 20px;
+      // border: 1px solid #3c5061;
 
-        li {
-          margin-bottom: 10px;
-
-          /deep/ .el-radio__label {
-            font-size: 16px;
-            color: #97b1c9;
-          }
-        }
+      /deep/ .el-input__inner {
+        border: none;
+        background-color: #2a3b49;
+        border-radius: 0;
+        color: #fff;
       }
     }
     .control-valve {
@@ -378,10 +488,36 @@ export default {
     }
   }
 
+  .flag-form {
+    width: 80%;
+    height: 80%;
+    position: fixed;
+    top: 120px;
+    background: rgba(1, 1, 1, 0.5);
+    // border: 1px solid #97b1c9;
+    .layer {
+      width: 50%;
+      height: 50%;
+      background-color: #000;
+      margin: 0 auto;
+      // border-radius: 20px;
+      border: 1px solid #3c5061;
+      margin-top: 150px;
+
+      /deep/ .el-input__inner {
+        border: none;
+        background-color: #2a3b49;
+        border-radius: 0;
+        color: #fff;
+      }
+    }
+  }
+
   .bg-tag {
     width: 100%;
     height: 30px;
     text-align: center;
+    margin-top: 30px;
     background: url(../../assets/images/bg_title.png) no-repeat center;
 
     p {

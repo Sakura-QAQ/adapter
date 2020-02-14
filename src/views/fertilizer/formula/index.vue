@@ -2,20 +2,24 @@
   <div class="fer-container">
     <div class="fer-plan">
       <div>
-        <p>配方</p>
+        <p>配方列表</p>
       </div>
       <table class="pn-ltable" border="1" cellspacing="0" cellpadding="10" align="center">
         <thead>
           <tr>
-            <th width="150">配方名称</th>
-            <th width="90">EC基数</th>
-            <th width="90">EC目标</th>
-            <th width="90">PH目标</th>
-            <th width="90">通道</th>
+            <th width="130">配方名称</th>
+            <th width="70">作物</th>
+            <th width="70">周期</th>
+            <th width="70">EC基数</th>
+            <th width="70">EC目标</th>
+            <th width="70">PH目标</th>
+            <th width="70">通道</th>
           </tr>
         </thead>
         <tbody class="pn-ltbody" align="center">
           <tr v-for="item in 7" :key="item">
+            <td>null</td>
+            <td>null</td>
             <td>null</td>
             <td>null</td>
             <td>null</td>
@@ -27,7 +31,7 @@
     </div>
     <div class="fer-table">
       <div class="bg-title">
-        <p>施肥详情</p>
+        <p>配方详情</p>
       </div>
       <ul>
         <li>配方名称: <input type="text"></li>
@@ -106,28 +110,27 @@ export default {
   justify-content: space-evenly;
   .fer-plan {
     position: relative;
-    width: 670px;
+    width: 760px;
     margin-top: 28px;
     border: 1px solid #5c7b95;
     background-color: #000;
     border-radius: 10px;
-    padding-top: 60px;
+    padding: 60px 0px;
 
     div:nth-child(1) {
       position: absolute;
-      top: -10px;
-      left: -1px;
-      width: 150px;
-      height: 40px;
-      background: url(../../../assets/images/bg4.png) no-repeat;
-      background-size: 150px 40px;
+      top: -25px;
+      left: 21%;
+      width: 380px;
+      height: 50px;
+      background: url(../../../assets/images/bg0.png) no-repeat;
+      background-size: contain;
 
       p {
-        height: 40px;
-        line-height: 36px;
+        line-height: 50px;
         text-align: center;
         color: #fff;
-        font-size: 24px;
+        font-size: 26px;
         font-weight: 800;
       }
     }
