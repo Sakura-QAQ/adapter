@@ -10,6 +10,38 @@
     <el-select v-model="plan" filterable placeholder="请选择" value-key="id" @change="currentSel">
       <el-option v-for="item in options" :key="item.id" :label="item.label" :value="item"></el-option>
     </el-select>
+    <el-time-picker
+      v-model="value1"
+      :picker-options="{
+      selectableRange: '18:30:00 - 20:30:00'
+    }"
+      placeholder="任意时间点"
+    ></el-time-picker>
+    <el-time-picker
+      arrow-control
+      v-model="value2"
+      :picker-options="{
+      selectableRange: '18:30:00 - 20:30:00'
+    }"
+      placeholder="任意时间点"
+    ></el-time-picker>
+    <el-time-select
+      v-model="value"
+      :picker-options="{
+        start: '07:30',
+        step: '00:10',
+        end: '18:30'
+      }"
+      placeholder="选择时间">
+    </el-time-select>
+    <el-date-picker
+      v-model="value1"
+      type="daterange"
+      range-separator="至"
+      start-placeholder="开始日期"
+      end-placeholder="结束日期"
+      style="width:250px;">
+    </el-date-picker>
   </div>
 </template>
 
@@ -49,7 +81,9 @@ export default {
           id: 5,
           code: 'xuanxiang5'
         }
-      ]
+      ],
+      value: '',
+      value1: ''
     }
   },
   methods: {
@@ -67,6 +101,12 @@ export default {
 }
 </script>
 
-<style>
-
+<style lang="less" scoped>
+    /deep/ .el-input__inner {
+      width: 150px;
+      height: 35px;
+      border: none;
+      background-color: #2a3b49;
+      border-radius: 0;
+    }
 </style>

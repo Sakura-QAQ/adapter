@@ -36,7 +36,7 @@
               <tr v-for="(item,index) in titles" :key="index">
                 <td>{{item.id}}</td>
                 <td>{{item.name}}</td>
-                <td>{{item.hours}}:{{item.mins}}</td>
+                <td>{{item.start}}</td>
                 <td>{{item.time}}</td>
                 <td>{{item.flow}}</td>
                 <td>{{item.formula}}</td>
@@ -62,8 +62,8 @@
           <p>详情</p>
         </div>
         <div class="layer" v-if="flag">
-          <table border="0" cellspacing="0" cellpadding="5" style="width:100%;margin-top:20px;">
-            <tbody align="center">
+          <!-- <table border="0" cellspacing="0" cellpadding="5" style="width:100%;margin-top:20px;">
+            <tbody align="left">
               <tr>
                 <td width="150">名称</td>
                 <td><input type="text" v-model="edit.name" /></td>
@@ -71,8 +71,15 @@
               <tr>
                 <td>启动时间</td>
                 <td>
-                  <input type="text" v-model="edit.hours" />时
-                  <input type="text" v-model="edit.mins" />分
+                  <el-time-select
+                    v-model="value"
+                    :picker-options="{
+                      start: '07:30',
+                      step: '00:10',
+                      end: '18:30'
+                    }"
+                    placeholder="选择时间">
+                  </el-time-select>
                   <el-radio-group v-model="radio">
                     <el-radio label="1">仅一次</el-radio>
                     <el-radio label="2">
@@ -80,6 +87,26 @@
                       <input type="text" :value="message" :disabled="diasabledInput" />天
                       <input type="text" :value="message" :disabled="diasabledInput" />小时
                       <input type="text" :value="message" :disabled="diasabledInput" />分
+                      <br>
+                      <el-time-select
+                        placeholder="起始时间"
+                        v-model="startTime"
+                        :picker-options="{
+                          start: '08:30',
+                          step: '00:15',
+                          end: '18:30'
+                        }">
+                      </el-time-select>
+                      <el-time-select
+                        placeholder="结束时间"
+                        v-model="endTime"
+                        :picker-options="{
+                          start: '08:30',
+                          step: '00:15',
+                          end: '18:30',
+                          minTime: startTime
+                        }">
+                      </el-time-select>
                     </el-radio>
                   </el-radio-group>
                 </td>
@@ -113,7 +140,120 @@
                 </td>
               </tr>
             </tbody>
-          </table>
+          </table>-->
+          <div class="handle">
+            <button @click="updata()">更新</button>&nbsp;
+            <button @click="close()">取消</button>
+          </div>
+          <div class="information">
+            <div>
+              <div class="align">名称</div>
+              <div style="margin-left:50px;">
+                <input type="text" v-model="edit.name" />
+              </div>
+            </div>
+            <div>
+              <div class="align">启动时间</div>
+              <div style="margin-left:50px;">
+                <el-time-select
+                  v-model="edit.start"
+                  :picker-options="{
+                    start: '07:30',
+                    step: '00:10',
+                    end: '18:30'
+                  }"
+                  placeholder="选择时间"
+                ></el-time-select>
+              </div>
+              <div style="margin-left:50px;">
+                <el-radio-group v-model="radio">
+                  <el-radio label="1" style="padding-bottom:5px;">仅一次</el-radio>
+                  <br />
+                  <el-radio label="2">
+                    <div style="padding-bottom:5px;">
+                      每隔
+                      <input
+                        type="text"
+                        :value="message"
+                        :disabled="diasabledInput"
+                        style="width:60px;"
+                      />天
+                      <input
+                        type="text"
+                        :value="message"
+                        :disabled="diasabledInput"
+                        style="width:60px;"
+                      />小时
+                      <input
+                        type="text"
+                        :value="message"
+                        :disabled="diasabledInput"
+                        style="width:60px;"
+                      />分
+                    </div>
+                    <br />
+                    <div class="block">
+                      <el-date-picker
+                        v-model="value1"
+                        :disabled="diasabledInput"
+                        type="date"
+                        placeholder="起始日期">
+                      </el-date-picker>
+                      <el-date-picker
+                        v-model="value2"
+                        :disabled="diasabledInput"
+                        type="date"
+                        placeholder="结束日期">
+                      </el-date-picker>
+                    </div>
+                    <!-- <div class="block">
+                      <el-date-picker
+                        v-model="value1"
+                        type="daterange"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期"
+                        style="width:250px">
+                      </el-date-picker>
+                    </div> -->
+                  </el-radio>
+                </el-radio-group>
+              </div>
+            </div>
+            <div>
+              <div class="align">灌溉</div>
+              <div style="margin-left:50px;">
+                <el-radio v-model="radio1" label="1">
+                  灌溉时长:
+                  <input type="text" v-model="edit.time" :disabled="diasabledInput1" />
+                </el-radio>
+                <br />
+                <el-radio v-model="radio1" label="2" style="padding-top:5px;">
+                  灌溉流量:
+                  <input type="text" v-model="edit.flow" :disabled="diasabledInput2" />
+                </el-radio>
+              </div>
+            </div>
+            <br />
+            <div>
+              <div class="align">配方</div>
+              <div style="margin-left:50px">
+                <el-select
+                  v-model="plan"
+                  filterable
+                  placeholder="请选择"
+                  value-key="id"
+                  @change="currentSel"
+                >
+                  <el-option
+                    v-for="item in options"
+                    :key="item.id"
+                    :label="item.label"
+                    :value="item"
+                  ></el-option>
+                </el-select>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="control-valve">
           <div class="bg-tag">
@@ -137,15 +277,14 @@
           >{{content}}</div>
         </div>
       </div>
-
       <!-- <div class="flag-form" v-if="flag">
         <div class="layer">
           <div class="close-icon"></div>
           <div class="bg-tag">
             <p>详情</p>
           </div>
-          <table border="0" cellspacing="0" cellpadding="10" style="width:100%;margin-top:20px;">
-            <tbody  align="center">
+          <table border="0" cellspacing="0" cellpadding="5" style="width:100%;margin-top:20px;">
+            <tbody align="left">
               <tr>
                 <td width="150">名称</td>
                 <td><input type="text" v-model="edit.name" /></td>
@@ -153,14 +292,42 @@
               <tr>
                 <td>启动时间</td>
                 <td>
-                  <input type="text" v-model="edit.hours" />时
-                  <input type="text" v-model="edit.mins" />分
+                  <el-time-select
+                    v-model="value"
+                    :picker-options="{
+                      start: '07:30',
+                      step: '00:10',
+                      end: '18:30'
+                    }"
+                    placeholder="选择时间">
+                  </el-time-select>
                   <el-radio-group v-model="radio">
                     <el-radio label="1">仅一次</el-radio>
                     <el-radio label="2">
                       每隔
                       <input type="text" :value="message" :disabled="diasabledInput" />天
                       <input type="text" :value="message" :disabled="diasabledInput" />小时
+                      <input type="text" :value="message" :disabled="diasabledInput" />分
+                      <br>
+                      <el-time-select
+                        placeholder="起始时间"
+                        v-model="startTime"
+                        :picker-options="{
+                          start: '08:30',
+                          step: '00:15',
+                          end: '18:30'
+                        }">
+                      </el-time-select>
+                      <el-time-select
+                        placeholder="结束时间"
+                        v-model="endTime"
+                        :picker-options="{
+                          start: '08:30',
+                          step: '00:15',
+                          end: '18:30',
+                          minTime: startTime
+                        }">
+                      </el-time-select>
                     </el-radio>
                   </el-radio-group>
                 </td>
@@ -195,8 +362,94 @@
               </tr>
             </tbody>
           </table>
+          <div class="information">
+            <div>
+              <div>名称</div>
+              <div style="margin-left:50px;"><input type="text" v-model="edit.name" /></div>
+            </div>
+            <div>
+              <div>启动时间</div>
+              <div style="margin-left:50px;">
+                <el-time-select
+                  v-model="value"
+                  :picker-options="{
+                    start: '07:30',
+                    step: '00:10',
+                    end: '18:30'
+                  }"
+                  placeholder="选择时间">
+                </el-time-select>
+              </div>
+              <div style="margin-left:50px;">
+                <el-radio-group v-model="radio">
+                  <el-radio label="1" style="padding-bottom:5px;">仅一次</el-radio>
+                  <br>
+                  <el-radio label="2">
+                    <div style="padding-bottom:5px;">
+                      每隔
+                      <input type="text" :value="message" :disabled="diasabledInput" />天
+                      <input type="text" :value="message" :disabled="diasabledInput" />小时
+                      <input type="text" :value="message" :disabled="diasabledInput" />分
+                    </div>
+                    <br>
+                    <div>
+                      <el-time-select
+                        placeholder="起始时间"
+                        v-model="startTime"
+                        :picker-options="{
+                          start: '08:30',
+                          step: '00:15',
+                          end: '18:30'
+                        }">
+                      </el-time-select>
+                      <el-time-select
+                        placeholder="结束时间"
+                        v-model="endTime"
+                        :picker-options="{
+                          start: '08:30',
+                          step: '00:15',
+                          end: '18:30',
+                          minTime: startTime
+                        }">
+                      </el-time-select>
+                    </div>
+                  </el-radio>
+                </el-radio-group>
+              </div>
+            </div>
+            <div>
+              <div>灌溉</div>
+              <div style="margin-left:50px;">
+                <el-radio v-model="radio1" label="1">
+                  灌溉时长:
+                  <input type="text" v-model="edit.time" :disabled="diasabledInput1" />
+                </el-radio>
+                <el-radio v-model="radio1" label="2">
+                  灌溉流量:
+                  <input type="text" v-model="edit.flow" :disabled="diasabledInput2" />
+                </el-radio>
+              </div>
+            </div>
+            <br>
+            <div>
+              <div>配方</div>
+              <div style="margin-left:50px">
+                <el-select v-model="plan" filterable placeholder="请选择" value-key="id" @change="currentSel">
+                <el-option v-for="item in options" :key="item.id" :label="item.label" :value="item"></el-option>
+                </el-select>
+              </div>
+            </div>
+            <br>
+            <div>
+              <div>操作</div>
+              <div style="margin-left:50px">
+                <button @click="updata()">更新</button>&nbsp;
+                <button @click="close()">取消</button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div> -->
+      </div>-->
     </div>
   </div>
 </template>
@@ -219,8 +472,7 @@ export default {
       titles: [
         {
           name: 'null',
-          hours: '8',
-          mins: '30',
+          start: '',
           time: 'time',
           flow: 'flow',
           formula: 'null',
@@ -238,33 +490,35 @@ export default {
           value: '选项1',
           id: 1,
           code: 'xuanxiang1',
-          label: '黄金糕'
+          label: '1'
         },
         {
           code: 'xuanxiang2',
           id: 2,
           value: '选项2',
-          label: '双皮奶'
+          label: '2'
         },
         {
           id: 3,
           value: '选项3',
           code: 'xuanxiang3',
-          label: '蚵仔煎'
+          label: '3'
         },
         {
           value: '选项4',
           id: 4,
           code: 'xuanxiang4',
-          label: '龙须面'
+          label: '4'
         },
         {
           value: '选项5',
-          label: '北京烤鸭',
+          label: '5',
           id: 5,
           code: 'xuanxiang5'
         }
-      ]
+      ],
+      value1: '',
+      value2: ''
     }
   },
   // created () {
@@ -297,8 +551,7 @@ export default {
         name: item.name,
         time: item.time,
         flow: item.flow,
-        hours: item.hours,
-        mins: item.mins,
+        start: item.start,
         formula: item.formula,
         type: item.type,
         next: item.next,
@@ -318,11 +571,14 @@ export default {
         if (this.titles[i].id === this.edit.id) {
           this.titles[i] = this.edit
           this.titles[i].formula = this.name
-          // this.flag = false
+          this.flag = false
           // console.log(this.edit)
           if (this.$set(this.titles, i, this.edit)) {
             alert('更新成功')
           }
+          // if (Object.assign(this.edit, this.titles)) {
+          //   alert('1')
+          // }
           // console.log(this.options[i].text)
 
           // let data = JSON.stringify(this.titles)
@@ -458,14 +714,41 @@ export default {
     .layer {
       background-color: #000;
       margin: 0 auto;
-      // border-radius: 20px;
-      // border: 1px solid #3c5061;
+      padding: 0 15px;
+
+      .handle {
+        position: absolute;
+        top: 10px;
+        right: 30px;
+      }
+      .information {
+        div {
+          display: inline-block;
+        }
+        > div {
+          padding-top: 10px;
+        }
+
+        .align {
+          width: 65px;
+          text-align: center;
+        }
+      }
 
       /deep/ .el-input__inner {
+        width: 150px;
+        height: 35px;
         border: none;
         background-color: #2a3b49;
         border-radius: 0;
         color: #fff;
+      }
+      /deep/ .el-date-editor.el-input,
+      .el-date-editor {
+        width: 155px;
+      }
+      /deep/ .el-input__icon {
+        line-height: 35px;
       }
     }
     .control-valve {
@@ -494,21 +777,37 @@ export default {
     position: fixed;
     top: 120px;
     background: rgba(1, 1, 1, 0.5);
-    // border: 1px solid #97b1c9;
     .layer {
       width: 50%;
       height: 50%;
       background-color: #000;
       margin: 0 auto;
-      // border-radius: 20px;
       border: 1px solid #3c5061;
       margin-top: 150px;
 
+      .information {
+        div {
+          display: inline-block;
+        }
+        > div {
+          padding-top: 10px;
+        }
+      }
+
       /deep/ .el-input__inner {
+        width: 150px;
+        height: 35px;
         border: none;
         background-color: #2a3b49;
         border-radius: 0;
         color: #fff;
+      }
+      /deep/ .el-date-editor.el-input,
+      .el-date-editor.el-input__inner {
+        width: 155px;
+      }
+      /deep/ .el-input__icon {
+        line-height: 35px;
       }
     }
   }
