@@ -1,53 +1,66 @@
 <template>
-<div class="crop-container">
-  <div class="fer-table">
-    <div class="bg-title">
-      <p>作物管理</p>
-    </div>
-    <div class="add-data">
-      添加作物:<input type="text" v-model="obj.user" />
-      <!-- 时长:<input type="text" v-model="obj.time" />
-      数量:<input type="text" v-model="obj.type" /> -->
-      <span>
-        <button @click="add()">增加</button>
-      </span>
-    </div>
-    <div class="layer" v-show="flag">
-      <div class="mask">
-        <div class="content">
-          编辑作物:<input type="text" v-model="edit.user" />
-          <!-- 时长:<input type="text" v-model="edit.time" />
-          流量<input type="text" v-model="edit.type" /> -->
-          <button @click="updata()">更新</button>
-          <button @click="flag=false">取消</button>
+
+<div>
+  <div class="top-position">
+    <span>
+      选择施肥机:
+      <select name id>
+        <option value>1#施肥机</option>
+        <option value>2#施肥机</option>
+      </select>
+    </span>
+    <input class="submit" type="submit" value="确定" />
+  </div>
+  <div class="crop-container">
+    <div class="fer-table">
+      <div class="bg-title">
+        <p>作物管理</p>
+      </div>
+      <div class="add-data">
+        添加作物:<input type="text" v-model="obj.user" />
+        <!-- 时长:<input type="text" v-model="obj.time" />
+        数量:<input type="text" v-model="obj.type" /> -->
+        <span>
+          <button @click="add()">增加</button>
+        </span>
+      </div>
+      <div class="layer" v-show="flag">
+        <div class="mask">
+          <div class="content">
+            编辑作物:<input type="text" v-model="edit.user" />
+            <!-- 时长:<input type="text" v-model="edit.time" />
+            流量<input type="text" v-model="edit.type" /> -->
+            <button @click="updata()">更新</button>
+            <button @click="flag=false">取消</button>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="pn-ltable">
-      <table border="1" cellspacing="0" cellpadding="10" align="center">
-        <thead  align="center">
-          <tr>
-            <td width="70">序号</td>
-            <td width="70">作物</td>
-            <!-- <td width="70">时长(秒)</td>
-            <td width="70">数量</td> -->
-            <td width="120">操作</td>
-          </tr>
-        </thead>
-        <tbody  align="center">
-          <tr v-for="(item,index) in titles" :key="index">
-            <td>{{item.id}}</td>
-            <td>{{item.user}}</td>
-            <!-- <td>{{item.time}}</td>
-            <td>{{item.type}}</td> -->
-            <td>
-              <span class="edit" @click="editData(item)" style="cursor: pointer;">编辑</span>
-              &nbsp;
-              <span class="delete" @click="del(index)" style="cursor: pointer;">删除</span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="pn-ltable">
+        <table border="1" cellspacing="0" cellpadding="10" align="center">
+          <thead  align="center">
+            <tr>
+              <td width="70">序号</td>
+              <td width="70">作物</td>
+              <!-- <td width="70">时长(秒)</td>
+              <td width="70">数量</td> -->
+              <td width="120">操作</td>
+            </tr>
+          </thead>
+          <tbody  align="center">
+            <tr v-for="(item,index) in titles" :key="index">
+              <td>{{item.id}}</td>
+              <td>{{item.user}}</td>
+              <!-- <td>{{item.time}}</td>
+              <td>{{item.type}}</td> -->
+              <td>
+                <span class="edit" @click="editData(item)" style="cursor: pointer;">编辑</span>
+                &nbsp;
+                <span class="delete" @click="del(index)" style="cursor: pointer;">删除</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>

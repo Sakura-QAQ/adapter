@@ -61,7 +61,7 @@
         <div class="bg-title">
           <p>详情</p>
         </div>
-        <div class="layer" v-if="flag">
+        <div class="layer">
           <!-- <table border="0" cellspacing="0" cellpadding="5" style="width:100%;margin-top:20px;">
             <tbody align="left">
               <tr>
@@ -197,14 +197,14 @@
                         v-model="value1"
                         :disabled="diasabledInput"
                         type="date"
-                        placeholder="起始日期">
-                      </el-date-picker>
+                        placeholder="起始日期"
+                      ></el-date-picker>
                       <el-date-picker
                         v-model="value2"
                         :disabled="diasabledInput"
                         type="date"
-                        placeholder="结束日期">
-                      </el-date-picker>
+                        placeholder="结束日期"
+                      ></el-date-picker>
                     </div>
                     <!-- <div class="block">
                       <el-date-picker
@@ -214,7 +214,7 @@
                         end-placeholder="结束日期"
                         style="width:250px">
                       </el-date-picker>
-                    </div> -->
+                    </div>-->
                   </el-radio>
                 </el-radio-group>
               </div>
@@ -472,13 +472,23 @@ export default {
       titles: [
         {
           name: 'null',
-          start: '',
           time: 'time',
           flow: 'flow',
+          start: '',
           formula: 'null',
-          next: 'next',
           type: '0',
+          next: 'next',
           id: '1'
+        },
+        {
+          name: '2',
+          time: '',
+          flow: 'flow',
+          start: '07:50',
+          formula: '2',
+          type: '0',
+          next: 'next',
+          id: '2'
         }
       ],
       radio: '1',
@@ -487,34 +497,22 @@ export default {
       plan: '',
       options: [
         {
-          value: '选项1',
           id: 1,
-          code: 'xuanxiang1',
+          value: '选项1',
+          code: 'option1',
           label: '1'
         },
         {
-          code: 'xuanxiang2',
           id: 2,
           value: '选项2',
+          code: 'option2',
           label: '2'
         },
         {
           id: 3,
           value: '选项3',
-          code: 'xuanxiang3',
+          code: 'option3',
           label: '3'
-        },
-        {
-          value: '选项4',
-          id: 4,
-          code: 'xuanxiang4',
-          label: '4'
-        },
-        {
-          value: '选项5',
-          label: '5',
-          id: 5,
-          code: 'xuanxiang5'
         }
       ],
       value1: '',
@@ -545,7 +543,7 @@ export default {
     editData (item) {
       // 将要编辑的数据传入
       // 编辑层打开，显示
-      this.flag = true
+      // this.flag = true
       // 将要编辑的数据赋值给this.edit，绑定this.edit
       this.edit = {
         name: item.name,
@@ -557,25 +555,32 @@ export default {
         next: item.next,
         id: item.id
       }
+      // console.log(item)
+      // this.edit = item
+      // this.edit = Object.assign(this.edit, item)
     },
+    // 配方下拉框
     currentSel (selVal) {
       this.code = selVal.code
       this.name = selVal.label
       // console.log('选择的name为：' + this.name, '选择的code为:' + this.code)
-      // console.log(this.name)
     },
     // 更新数据
     async updata () {
       // 点击更新按钮后触发，将用对象中的ID值来判断，选中更改的对象，并将更改后的对象重新给到this.titles
       for (var i = 0; i < this.titles.length; i++) {
         if (this.titles[i].id === this.edit.id) {
-          this.titles[i] = this.edit
-          this.titles[i].formula = this.name
-          this.flag = false
-          // console.log(this.edit)
-          if (this.$set(this.titles, i, this.edit)) {
+          // this.titles[i] = this.edit
+          if ((this.titles[i] = Object.assign(this.titles[i], this.edit))) {
             alert('更新成功')
           }
+          this.titles[i].formula = this.name
+          console.log(this.edit)
+          // this.flag = false
+          // console.log(this.edit)
+          // if (this.$set(this.titles, i, this.edit)) {
+          //   alert('更新成功')
+          // }
           // if (Object.assign(this.edit, this.titles)) {
           //   alert('1')
           // }
@@ -593,7 +598,7 @@ export default {
           //   })
         }
       }
-      this.flag = false
+      // this.flag = false
     },
     // 清空
     close () {

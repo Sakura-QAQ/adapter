@@ -49,7 +49,7 @@ export default {
           this.$refs.loginForm.validate(valid => {
             if (valid) {
               // console.log(this.loginForm)
-              this.$router.push('/')
+              this.$router.push('/chose')
             }
           })
         }
@@ -83,9 +83,6 @@ export default {
       width: 200px;
       margin: 10px auto;
     }
-    // /deep/ .el-input__inner {
-    //   background-color: transparent;
-    // }
   }
 }
 </style>
