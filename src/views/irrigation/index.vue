@@ -170,7 +170,7 @@
                   <el-radio label="1" style="padding-bottom:5px;">仅一次</el-radio>
                   <br />
                   <el-radio label="2">
-                    <div style="padding-bottom:5px;">
+                    <div style="padding-bottom:5px;font-size: 14px;">
                       每隔
                       <input
                         type="text"
@@ -195,26 +195,12 @@
                     <div class="block">
                       <el-date-picker
                         v-model="value1"
-                        :disabled="diasabledInput"
-                        type="date"
-                        placeholder="起始日期"
-                      ></el-date-picker>
-                      <el-date-picker
-                        v-model="value2"
-                        :disabled="diasabledInput"
-                        type="date"
-                        placeholder="结束日期"
-                      ></el-date-picker>
-                    </div>
-                    <!-- <div class="block">
-                      <el-date-picker
-                        v-model="value1"
                         type="daterange"
-                        start-placeholder="开始日期"
+                        start-placeholder="起始日期"
                         end-placeholder="结束日期"
-                        style="width:250px">
+                        style="width:288px;">
                       </el-date-picker>
-                    </div>-->
+                    </div>
                   </el-radio>
                 </el-radio-group>
               </div>
@@ -473,7 +459,7 @@ export default {
         {
           name: 'null',
           time: 'time',
-          flow: 'flow',
+          flow: '',
           start: '',
           formula: 'null',
           type: '0',
@@ -483,7 +469,7 @@ export default {
         {
           name: '2',
           time: '',
-          flow: 'flow',
+          flow: '',
           start: '07:50',
           formula: '2',
           type: '0',
@@ -738,6 +724,16 @@ export default {
           width: 65px;
           text-align: center;
         }
+
+        /deep/ .block {
+          .el-range-editor .el-range-input {
+            color: #fff;
+            margin-bottom: 13px;
+          }
+          .el-range__close-icon {
+            position: absolute;
+          }
+        }
       }
 
       /deep/ .el-input__inner {
@@ -754,6 +750,9 @@ export default {
       }
       /deep/ .el-input__icon {
         line-height: 35px;
+      }
+      /deep/ .el-radio__label {
+        color: #97b1c9;
       }
     }
     .control-valve {
