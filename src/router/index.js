@@ -2,6 +2,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Login from '@/views/login'
+import Registe from '@/views/registe'
 import Chose from '@/views/chose'
 import Home from '@/views/home'
 import Welcome from '@/views/welcome'
@@ -24,6 +25,7 @@ const router = new VueRouter({
   // 配置路由规则
   routes: [
     { name: 'login', path: '/login', component: Login },
+    { name: 'registe', path: '/registe', component: Registe },
     { name: 'chose', path: '/chose', component: Chose },
     {
       path: '/',

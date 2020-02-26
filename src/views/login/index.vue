@@ -3,9 +3,9 @@
     <el-card class="login-box">
       <img src="../../assets/images/logo.png" alt />
       <!-- 登录表单 -->
-      <el-form ref="loginForm" :model="loginForm" :rules="loginRules">
-        <el-form-item prop="account">
-          <el-input v-model="loginForm.account" placeholder="请输入账号"></el-input>
+      <el-form ref="loginForm" :status-icon="true" :model="loginForm" :rules="loginRules">
+        <el-form-item prop="name">
+          <el-input v-model="loginForm.name" placeholder="请输入账号"></el-input>
         </el-form-item>
         <el-form-item prop="password">
           <el-input v-model="loginForm.password" placeholder="请输入密码" show-password></el-input>
@@ -14,7 +14,8 @@
           <el-checkbox :value="true">我已阅读并同意用户协议和隐私条款</el-checkbox>
         </el-form-item>
         <el-form-item>
-          <el-button style="width:100%" type="primary" @click="login">登 录</el-button>
+          <el-button style="width:48%" type="primary" @click="login">登 录</el-button>
+          <el-button style="width:48%" type="primary" plain @click="registe">注册</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -26,11 +27,11 @@ export default {
   data () {
     return {
       loginForm: {
-        account: '123456789',
-        password: '000'
+        name: '',
+        password: ''
       },
       loginRules: {
-        account: [
+        name: [
           { required: true, message: '请输入账号', trigger: 'blur' }
         ],
         password: [
@@ -43,17 +44,34 @@ export default {
   methods: {
     login () {
       // 对整个表单进行校验
-      this.$refs.loginForm.validate(valid => {
+      this.$refs.loginForm.validate(async valid => {
         if (valid) {
-          // 对整个表单进行校验
-          this.$refs.loginForm.validate(valid => {
-            if (valid) {
-              // console.log(this.loginForm)
+          // 发promise对象请求
+          try {
+          // 拿到登录的结果
+            const res = await this.$http.post('/sso/api/login', this.loginForm)
+            console.log(res.data)
+            if (res.data.code === 100 && res.data.msg === '用户不存在') {
+              this.$message.error('用户不存在')
+              return false
+            } else if (res.data.code === 100 && res.data.msg === '密码不正确') {
+              this.$message.error('密码错误')
+              return false
+            } else if (res.data.data === 200) {
+              // 跳路由
               this.$router.push('/chose')
+              // 存数据
+              window.sessionStorage.setItem('admin', JSON.stringify(res.data.data))
             }
-          })
+          } catch (err) {
+            this.$message.error('服务器异常')
+            // console.log(err)
+          }
         }
       })
+    },
+    registe () {
+      this.$router.push('/registe')
     }
   }
 }
