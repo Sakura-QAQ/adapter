@@ -18,24 +18,26 @@
       <table class="pn-ltable" border="1" cellspacing="0" cellpadding="10" align="center">
         <thead>
           <tr>
-            <th width="130">配方名称</th>
-            <th width="70">作物</th>
+            <th width="70">配方名称</th>
+            <th width="70">作物id</th>
             <th width="70">周期</th>
             <th width="70">EC基数</th>
             <th width="70">EC目标</th>
             <th width="70">PH目标</th>
-            <th width="70">通道</th>
+            <th width="70">操作</th>
           </tr>
         </thead>
         <tbody class="pn-ltbody" align="center">
-          <tr v-for="item in 7" :key="item">
-            <td>null</td>
-            <td>null</td>
-            <td>null</td>
-            <td>null</td>
-            <td>null</td>
-            <td>null</td>
-            <td>null</td>
+          <tr v-for="(item, index) in titles" :key="index">
+            <td>{{item.name}}</td>
+            <td>{{item.cropId}}</td>
+            <td>{{item.periodDay}}</td>
+            <td>{{item.ecBase}}</td>
+            <td>{{item.ecTarget}}</td>
+            <td>{{item.phTarget}}</td>
+            <td>
+              <span class="edit" @click="editData(item)" style="cursor: pointer;">编辑</span>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -45,56 +47,75 @@
         <p>配方详情</p>
       </div>
       <ul>
-        <li>配方名称: <input type="text"></li>
+        <li>
+          <input class="submit" type="submit" value="修改" @click="updata" />
+        </li>
+        <li>
+          配方名称: <input type="text" v-model="edit.name">
+        </li>
         <li class="check-time">
           <span>
             选择作物:
-            <select name id>
-              <option value="">无</option>
+            <select @change="fn($event)" v-model="edit.cropId">
+              <option v-for="item in crop" :value="item.id" :label="item.name" :key="item.id">{{item.name}}</option>
             </select>
           </span>
           <span>
             选择周期:
-            <select name id>
-              <option value="">定值</option>
-              <option value="">幼苗</option>
-              <option value="">清苗</option>
-              <option value="">开花</option>
+            <select @change="cycleindex($event)">
+              <option v-for="item in cycle" :value="item.id" :key="item.id">{{item.name}}</option>
             </select>
           </span>
           <span>
-            周期天数:
-            <input type="text" value="0" /> 天
+            周期:
+            <input type="text" v-model="edit.periodDay" /> 天
           </span>
-          <input class="submit" type="submit" value="确认" />
         </li>
         <li>
           <span>
             EC的基数:
-            <input type="number" />
+            <input type="number" v-model="edit.ecBase" />
           </span>
         </li>
         <li>
-          <!-- <span style="display:inline-block;margin-bottom:10px;">
-            EC的基数:
-            <input type="number" />
-          </span> -->
-          <!-- <br> -->
           <span>
             EC目标值:
-            <input type="number" />
+            <input type="number" v-model="edit.ecTarget" />
           </span>
           <span>
             PH目标值:
-            <input type="number" />
+            <input type="number" v-model="edit.phTarget" />
           </span>
         </li>
         <li>
           施肥通道:
           <div>
-            <span class="list-group-item" v-for="(item,index) in 9" :key="item">
-              {{index + 1}}#通道:
-              <input type="text" />
+            <span class="list-group-item">
+              {{channel.channel1}}: <input type="text" v-model="edit.channel1" />
+            </span>
+            <span class="list-group-item">
+              {{channel.channel2}}: <input type="text" v-model="edit.channel2" />
+            </span>
+            <span class="list-group-item">
+              {{channel.channel3}}: <input type="text" v-model="edit.channel3" />
+            </span>
+            <span class="list-group-item">
+              {{channel.channel4}}: <input type="text" v-model="edit.channel4" />
+            </span>
+            <span class="list-group-item">
+              {{channel.channel5}}: <input type="text" v-model="edit.channel5" />
+            </span>
+            <span class="list-group-item">
+              {{channel.channel6}}: <input type="text" v-model="edit.channel6" />
+            </span>
+            <span class="list-group-item">
+              {{channel.channel7}}: <input type="text" v-model="edit.channel7" />
+            </span>
+            <span class="list-group-item">
+              {{channel.channel8}}: <input type="text" v-model="edit.channel8" />
+            </span>
+            <span class="list-group-item">
+              {{channel.channel9}}: <input type="text" v-model="edit.channel9" />
             </span>
           </div>
         </li>
@@ -110,8 +131,82 @@ export default {
     return {
       list: {
         title: '通道'
+      },
+      titles: [],
+      projectId: {
+        projectId: 'project_id'
+      },
+      channelid: {
+        projectId: 'channel'
+      },
+      cycleid: {
+        projectId: '阿斯1111蒂芬'
+      },
+      channel: {},
+      crop: [],
+      cycle: [],
+      edit: {}
+    }
+  },
+  created () {
+    this.getfomula()
+  },
+  methods: {
+    async getfomula () {
+      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/formula/queryByProjectId', this.projectId)
+      this.titles = res.data.data
+    },
+    async getchannel () {
+      const way = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/channel/queryByProjectId', this.channelid)
+      this.channel = way.data.data
+    },
+    async getcrop () {
+      const crop = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/crop/queryByProjectId', this.channelid)
+      this.crop = crop.data.data
+    },
+    async getcycle () {
+      const cycle = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/period/queryByProjectId', this.cycleid)
+      this.cycle = cycle.data.data
+    },
+    fn (value) {
+      console.log(event.target.value)
+      // this.$emit('input', value)
+    },
+    cycleindex (event) {
+      console.log(event.target.value)
+    },
+    async updata () {
+      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/formula/saveOrUpdate', this.edit)
+      console.log(res)
+      this.getfomula()
+    },
+    editData (item) {
+      this.edit = {
+        id: item.id,
+        projectId: item.projectId,
+        name: item.name,
+        cropId: item.cropId,
+        periodId: item.periodId,
+        periodDay: item.periodDay,
+        ecBase: item.ecBase,
+        ecTarget: item.ecTarget,
+        phTarget: item.phTarget,
+        channel1: item.channel1,
+        channel2: item.channel2,
+        channel3: item.channel3,
+        channel4: item.channel4,
+        channel5: item.channel5,
+        channel6: item.channel6,
+        channel7: item.channel7,
+        channel8: item.channel8,
+        channel9: item.channel9
       }
     }
+  },
+  mounted () {
+    this.getchannel()
+    this.getcrop()
+    this.getcycle()
   }
 }
 </script>
@@ -122,7 +217,7 @@ export default {
   justify-content: space-evenly;
   .fer-plan {
     position: relative;
-    width: 760px;
+    width: 800px;
     margin-top: 28px;
     border: 1px solid #5c7b95;
     background-color: #000;
@@ -154,10 +249,6 @@ export default {
       padding-top: 50px;
       height: 140px;
       padding-left: 20px;
-
-      // span {
-      //   margin-left: 20px;
-      // }
     }
 
     div:nth-child(3) {
@@ -207,15 +298,21 @@ export default {
       padding: 0 15px;
       li {
         margin-bottom: 10px;
+
+        .submit {
+          position: absolute;
+          top: 30px;
+          right: 42px;
+        }
       }
       li:last-child {
         div {
           display: flex;
           justify-content: space-evenly;
           flex-wrap: wrap;
+
           .list-group-item {
-            width: 190px;
-            margin: 10px 0;
+            margin: 10px 15px;
           }
         }
       }

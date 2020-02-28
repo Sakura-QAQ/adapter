@@ -33,7 +33,7 @@
               </tr>
             </thead>
             <tbody align="center">
-              <tr v-for="(item,index) in titles" :key="index">
+              <tr v-for="(item, index) in titles" :key="index">
                 <td>{{item.id}}</td>
                 <td>{{item.name}}</td>
                 <td>{{item.start}}</td>
@@ -505,13 +505,6 @@ export default {
       value2: ''
     }
   },
-  // created () {
-  //   if (this.radio === '1') {
-  //     this.diasabledInput = true
-  //   } else {
-  //     this.diasabledInput = false
-  //   }
-  // },
   methods: {
     // 删除数据
     del (index) {
@@ -541,9 +534,6 @@ export default {
         next: item.next,
         id: item.id
       }
-      // console.log(item)
-      // this.edit = item
-      // this.edit = Object.assign(this.edit, item)
     },
     // 配方下拉框
     currentSel (selVal) {
@@ -600,14 +590,6 @@ export default {
         this.content = '展开▼'
       }
     }
-    // change () {
-    //   if (this.radio === '1') {
-    //     this.diasabledInput = true
-    //   } else {
-    //     this.diasabledInput = false
-    //   }
-    //   console.log(this.diasabledInput)
-    // }
   },
   watch: {
     radio () {

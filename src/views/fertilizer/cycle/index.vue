@@ -39,22 +39,26 @@
           <thead  align="center">
             <tr>
               <td width="70">序号</td>
-              <!-- <td width="70">作物</td> -->
               <td width="70">周期</td>
-              <!-- <td width="70">数量</td> -->
+              <td width="70">?</td>
+              <td width="70">?</td>
+              <td width="70">?</td>
               <td width="120">操作</td>
             </tr>
           </thead>
           <tbody  align="center">
             <tr v-for="(item,index) in titles" :key="index">
-              <td>{{item.id}}</td>
+              <td>{{index + 1}}</td>
+              <td>{{item.name}}</td>
+              <td>{{item.descr}}</td>
+              <td>{{item.projectId}}</td>
+              <td>{{item.isDel}}</td>
               <!-- <td>{{item.user}}</td> -->
               <!-- <td>
                 <select name="" id="">
                   <option value="" v-for="(item, i) in times" :key="item">{{times[i]}}</option>
                 </select>
               </td> -->
-              <td>{{item.time}}</td>
               <td>
                 <span class="edit" @click="editData(item)" style="cursor: pointer;">编辑</span>
                 &nbsp;
@@ -81,43 +85,17 @@ export default {
         // type: '',
         id: ''
       },
+      projectId: {
+        projectId: '阿斯1111蒂芬'
+      },
       titles: [
-        {
-          user: '西红柿',
-          time: '定值',
-          // type: '0',
-          id: '1'
-        },
-        {
-          user: '番茄',
-          time: '幼苗',
-          // type: '0',
-          id: '2'
-        },
-        {
-          user: '土豆',
-          time: '清苗',
-          // type: '1',
-          id: '3'
-        },
-        {
-          user: '马铃薯',
-          time: '开花',
-          // type: '1',
-          id: '4'
-        }
       ],
-      // times: [
-      //   '定值',
-      //   '幼苗',
-      //   '清苗',
-      //   '开花',
-      //   '结果',
-      //   '膨胀',
-      //   '成熟'
-      // ],
       edit: {}
     }
+  },
+  async created () {
+    const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/period/queryByProjectId', this.projectId)
+    this.titles = res.data.data
   },
   methods: {
     add () {
@@ -197,7 +175,7 @@ export default {
     border: 1px solid #5c7b95;
     border-radius: 20px;
     background: #000;
-    padding: 60px 0px;
+    padding: 40px 20px;
     margin-top: 30px;
 
     .bg-title {

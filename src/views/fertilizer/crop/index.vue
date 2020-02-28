@@ -17,9 +17,7 @@
         <p>作物管理</p>
       </div>
       <div class="add-data">
-        添加作物:<input type="text" v-model="obj.user" />
-        <!-- 时长:<input type="text" v-model="obj.time" />
-        数量:<input type="text" v-model="obj.type" /> -->
+        添加作物:<input type="text" v-model="crops.name" />
         <span>
           <button @click="add()">增加</button>
         </span>
@@ -41,17 +39,15 @@
             <tr>
               <td width="70">序号</td>
               <td width="70">作物</td>
-              <!-- <td width="70">时长(秒)</td>
-              <td width="70">数量</td> -->
+              <td width="70">状态id</td>
               <td width="120">操作</td>
             </tr>
           </thead>
           <tbody  align="center">
             <tr v-for="(item,index) in titles" :key="index">
-              <td>{{item.id}}</td>
-              <td>{{item.user}}</td>
-              <!-- <td>{{item.time}}</td>
-              <td>{{item.type}}</td> -->
+              <td>{{index + 1}}</td>
+              <td>{{item.name}}</td>
+              <td>{{item.isDel}}</td>
               <td>
                 <span class="edit" @click="editData(item)" style="cursor: pointer;">编辑</span>
                 &nbsp;
@@ -72,69 +68,56 @@ export default {
     return {
       find: 'find',
       flag: false,
-      obj: {
-        user: '',
-        // time: '',
-        // type: '',
-        id: ''
+      crops: {
+        id: '',
+        name: '',
+        projectId: 'channel',
+        isDel: 0
       },
-      titles: [
-        {
-          user: '西红柿',
-          // time: '12',
-          // type: '0',
-          id: '1'
-        },
-        {
-          user: '番茄',
-          // time: '20',
-          // type: '0',
-          id: '2'
-        },
-        {
-          user: '土豆',
-          // time: '19',
-          // type: '1',
-          id: '3'
-        },
-        {
-          user: '马铃薯',
-          // time: '19',
-          // type: '1',
-          id: '4'
-        }
-      ],
-      edit: {}
+      titles: [],
+      edit: {},
+      projectId: { projectId: 'channel' }
     }
   },
+  async created () {
+    const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/crop/queryByProjectId', this.projectId)
+    this.titles = res.data.data
+  },
   methods: {
-    add () {
-      // 增加数据
-      // 动态id
-      var _id =
-        Math.max.apply(
-          null,
-          this.titles.map(v => {
-            return v.id
-          })
-        ) + 1
+    created () {
+      this.getcrops()
+    },
+    async getcrops () {
+      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/crop/queryByProjectId', this.projectId)
+      this.titles = res.data.data
+    },
+    async add () {
+      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/crop/add', this.crops)
+      // // 动态id生成
+      // var _id =
+      // Math.max.apply(
+      //   null,
+      //   this.crops.map(v => {
+      //     return v.id
+      //   })
+      // ) + 1
 
-      // 判断增加数据是否全部为空
-      if (!this.obj.user) return
-      // 将添加的数据，增加到数组中
-      this.titles.push({
-        user: this.obj.user,
-        // time: this.obj.time,
-        // type: this.obj.type,
-        id: _id
-      })
+      // // 判断增加数据是否全部为空
+      // if (!this.crops.name) return
+      // // 将添加的数据，增加到数组中
+      // this.crops.push({
+      //   id: _id,
+      //   name: this.crops.name
+      // })
       // 添加完成后，将输入框清空
-      this.obj = {
-        user: '',
-        // time: '',
-        // type: '',
-        id: ''
+      this.crops = {
+        id: '',
+        name: '',
+        projectId: 'channel',
+        isDel: 0
       }
+      this.getcrops()
+      console.log(res)
     },
     // 删除数据
     del (index) {
@@ -171,6 +154,7 @@ export default {
         }
       }
     }
+
   }
 }
 </script>
@@ -185,7 +169,7 @@ export default {
     border: 1px solid #5c7b95;
     border-radius: 20px;
     background: #000;
-    padding: 60px 0px;
+    padding: 40px 20px;
     margin-top: 30px;
 
     .bg-title {

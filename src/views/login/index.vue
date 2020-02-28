@@ -5,7 +5,7 @@
       <!-- 登录表单 -->
       <el-form ref="loginForm" :status-icon="true" :model="loginForm" :rules="loginRules">
         <el-form-item prop="name">
-          <el-input v-model="loginForm.name" placeholder="请输入账号"></el-input>
+          <el-input v-model="loginForm.name" placeholder="请输入账号/手机号/邮箱"></el-input>
         </el-form-item>
         <el-form-item prop="password">
           <el-input v-model="loginForm.password" placeholder="请输入密码" show-password></el-input>
@@ -27,8 +27,8 @@ export default {
   data () {
     return {
       loginForm: {
-        name: '',
-        password: ''
+        name: '13145217573',
+        password: 'a123456789'
       },
       loginRules: {
         name: [
@@ -49,7 +49,7 @@ export default {
           // 发promise对象请求
           try {
           // 拿到登录的结果
-            const res = await this.$http.post('/sso/api/login', this.loginForm)
+            const res = await this.$http.post('http://192.168.1.202:10010/sso/api/login', this.loginForm)
             console.log(res.data)
             if (res.data.code === 100 && res.data.msg === '用户不存在') {
               this.$message.error('用户不存在')
@@ -57,15 +57,16 @@ export default {
             } else if (res.data.code === 100 && res.data.msg === '密码不正确') {
               this.$message.error('密码错误')
               return false
-            } else if (res.data.data === 200) {
+            } else if (res.data.code === 200) {
+              console.log(res.data.data)
               // 跳路由
               this.$router.push('/chose')
               // 存数据
-              window.sessionStorage.setItem('admin', JSON.stringify(res.data.data))
+              window.sessionStorage.setItem('token', JSON.stringify(res.data.data))
             }
           } catch (err) {
-            this.$message.error('服务器异常')
-            // console.log(err)
+            // this.$message.error('服务器异常')
+            console.log(err)
           }
         }
       })
