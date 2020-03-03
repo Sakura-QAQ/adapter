@@ -23,13 +23,11 @@
           <button @click="add()">增加</button>
         </span>
       </div>
-      <div class="layer" v-show="flag">
+      <div class="layer" v-if="flag">
         <div class="mask">
           <div class="content">
-            <!-- 作物:<input type="text" v-model="edit.user" /> -->
-            周期:<input type="text" v-model="edit.time" />
-            <!-- 流量<input type="text" v-model="edit.type" /> -->
-            <button @click="updata()">更新</button>
+            周期:<input type="text" v-model="edit.name" />
+            <button @click="updata">更新</button>
             <button @click="flag=false">取消</button>
           </div>
         </div>
@@ -40,9 +38,9 @@
             <tr>
               <td width="70">序号</td>
               <td width="70">周期</td>
-              <td width="70">?</td>
-              <td width="70">?</td>
-              <td width="70">?</td>
+              <td width="70">描述</td>
+              <td width="70">projectID</td>
+              <td width="70">状态</td>
               <td width="120">操作</td>
             </tr>
           </thead>
@@ -53,12 +51,6 @@
               <td>{{item.descr}}</td>
               <td>{{item.projectId}}</td>
               <td>{{item.isDel}}</td>
-              <!-- <td>{{item.user}}</td> -->
-              <!-- <td>
-                <select name="" id="">
-                  <option value="" v-for="(item, i) in times" :key="item">{{times[i]}}</option>
-                </select>
-              </td> -->
               <td>
                 <span class="edit" @click="editData(item)" style="cursor: pointer;">编辑</span>
                 &nbsp;
@@ -85,6 +77,10 @@ export default {
         // type: '',
         id: ''
       },
+      // 周期id
+      cycleId: {
+        id: ''
+      },
       projectId: {
         projectId: '阿斯1111蒂芬'
       },
@@ -93,11 +89,17 @@ export default {
       edit: {}
     }
   },
-  async created () {
-    const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/period/queryByProjectId', this.projectId)
-    this.titles = res.data.data
+  created () {
+    this.getCycle()
   },
   methods: {
+    // 获取周期
+    async getCycle () {
+      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/period/queryByProjectId', this.projectId)
+      console.log(res)
+      this.titles = res.data.data
+    },
+    // 增加数据
     add () {
       // 增加数据
       // 动态id
@@ -127,16 +129,19 @@ export default {
       }
     },
     // 删除数据
-    del (index) {
+    async del (index) {
       // 点击删除后，将删除数据的下标传入，进行删除
-      if (confirm('确认删除？') === true) {
-        if (this.titles.length === 1) {
-          alert('至少保留一条数据')
-          return false
-        } else {
-          this.titles.splice(index, 1)
-        }
-      }
+      // if (confirm('确认删除？') === true) {
+      //   if (this.titles.length === 1) {
+      //     alert('至少保留一条数据')
+      //     return false
+      //   } else {
+      //     this.titles.splice(index, 1)
+      //   }
+      // }
+      this.cycleId.id = this.titles[index].id
+      await this.$http.post('http://192.168.1.202:10020/fertilizer/api/period/delete', this.cycleId)
+      this.getCycle()
     },
     // 编辑数据
     editData (item) {
@@ -145,21 +150,25 @@ export default {
       this.flag = true
       // 将要编辑的数据赋值给this.edit，绑定this.edit
       this.edit = {
-        // user: item.user,
-        time: item.time,
-        // type: item.type,
-        id: item.id
+        id: item.id,
+        name: item.name,
+        descr: item.descr,
+        projectId: item.projectId,
+        isDel: item.isDel
       }
     },
     // 更新数据
-    updata () {
+    async updata () {
       // 点击更新按钮后触发，将用对象中的ID值来判断，选中更改的对象，并将更改后的对象重新给到this.titles
-      for (var i = 0; i < this.titles.length; i++) {
-        if (this.titles[i].id === this.edit.id) {
-          this.titles[i] = this.edit
-          this.flag = false
-        }
-      }
+      // for (var i = 0; i < this.titles.length; i++) {
+      //   if (this.titles[i].id === this.edit.id) {
+      //     this.titles[i] = this.edit
+      //     this.flag = false
+      //   }
+      // }
+      this.flag = false
+      await this.$http.post('http://192.168.1.202:10020/fertilizer/api/period/saveOrUpdate', this.edit)
+      this.getCycle()
     }
   }
 }

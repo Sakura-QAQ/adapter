@@ -42,6 +42,7 @@
       end-placeholder="结束日期"
       style="width:250px;">
     </el-date-picker>
+    <!-- <pa-ger></pa-ger> -->
   </div>
 </template>
 

@@ -22,18 +22,16 @@
           <button @click="add()">增加</button>
         </span>
       </div>
-      <div class="layer" v-show="flag">
+      <div class="layer" v-if="flag">
         <div class="mask">
           <div class="content">
-            编辑作物:<input type="text" v-model="edit.user" />
-            <!-- 时长:<input type="text" v-model="edit.time" />
-            流量<input type="text" v-model="edit.type" /> -->
-            <button @click="updata()">更新</button>
+            编辑作物:<input type="text" v-model="edit.name" />
+            <button @click="updata">更新</button>
             <button @click="flag=false">取消</button>
           </div>
         </div>
       </div>
-      <div class="pn-ltable">
+      <div class="list">
         <table border="1" cellspacing="0" cellpadding="10" align="center">
           <thead  align="center">
             <tr>
@@ -44,7 +42,7 @@
             </tr>
           </thead>
           <tbody  align="center">
-            <tr v-for="(item,index) in titles" :key="index">
+            <tr v-for="(item,index) in productList" :key="index">
               <td>{{index + 1}}</td>
               <td>{{item.name}}</td>
               <td>{{item.isDel}}</td>
@@ -63,36 +61,43 @@
 </template>
 
 <script>
+// import MoPaging from "./";
 export default {
   data () {
     return {
       find: 'find',
       flag: false,
+      // add请求作物数据
       crops: {
         id: '',
         name: '',
         projectId: 'channel',
         isDel: 0
       },
-      titles: [],
+      // 作物id
+      cropsID: {
+        id: ''
+      },
+      // 编辑的数据
       edit: {},
-      projectId: { projectId: 'channel' }
+      // 请求列表的参数
+      projectId: { projectId: 'channel' },
+      // 分页配置
+      productList: [] // 列表数据
     }
   },
-  async created () {
-    const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/crop/queryByProjectId', this.projectId)
-    this.titles = res.data.data
+  created () {
+    this.getcrops()
   },
   methods: {
-    created () {
-      this.getcrops()
-    },
+    // 获取作物列表
     async getcrops () {
       const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/crop/queryByProjectId', this.projectId)
-      this.titles = res.data.data
+      // console.log(res)
+      this.productList = res.data.data
     },
     async add () {
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/crop/add', this.crops)
+      await this.$http.post('http://192.168.1.202:10020/fertilizer/api/crop/add', this.crops)
       // // 动态id生成
       // var _id =
       // Math.max.apply(
@@ -117,19 +122,24 @@ export default {
         isDel: 0
       }
       this.getcrops()
-      console.log(res)
     },
     // 删除数据
-    del (index) {
-      if (confirm('确定删除？')) {
-        // 点击删除后，将删除数据的下标传入，进行删除
-        if (this.titles.length === 1) {
-          alert('至少保留一条数据')
-          return false
-        } else {
-          this.titles.splice(index, 1)
-        }
-      }
+    async del (index) {
+      // if (confirm('确定删除？')) {
+      //   // 点击删除后，将删除数据的下标传入，进行删除
+      //   if (this.productList.length === 1) {
+      //     alert('至少保留一条数据')
+      //     return false
+      //   } else {
+      //     this.productList.splice(index, 1)
+      //   }
+      // }
+      // const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/crop/delete', this.productList[index].id)
+      // console.log(res)
+      // this.getcrops()
+      this.cropsID.id = this.productList[index].id
+      await this.$http.post('http://192.168.1.202:10020/fertilizer/api/crop/delete', this.cropsID)
+      this.getcrops()
     },
     // 编辑数据
     editData (item) {
@@ -138,23 +148,19 @@ export default {
       this.flag = true
       // 将要编辑的数据赋值给this.edit，绑定this.edit
       this.edit = {
-        user: item.user,
-        // time: item.time,
-        // type: item.type,
-        id: item.id
+        id: item.id,
+        name: item.name,
+        projectId: item.projectId,
+        isDel: item.isDel
       }
     },
     // 更新数据
-    updata () {
-      // 点击更新按钮后触发，将用对象中的ID值来判断，选中更改的对象，并将更改后的对象重新给到this.titles
-      for (var i = 0; i < this.titles.length; i++) {
-        if (this.titles[i].id === this.edit.id) {
-          this.titles[i] = this.edit
-          this.flag = false
-        }
-      }
+    async updata () {
+      this.flag = false
+      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/crop/update', this.edit)
+      console.log(res)
+      this.getcrops()
     }
-
   }
 }
 </script>

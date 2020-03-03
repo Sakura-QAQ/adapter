@@ -19,7 +19,7 @@
         <thead>
           <tr>
             <th width="70">配方名称</th>
-            <th width="70">作物id</th>
+            <th width="70">作物</th>
             <th width="70">周期</th>
             <th width="70">EC基数</th>
             <th width="70">EC目标</th>
@@ -57,13 +57,13 @@
           <span>
             选择作物:
             <select @change="fn($event)" v-model="edit.cropId">
-              <option v-for="item in crop" :value="item.id" :label="item.name" :key="item.id">{{item.name}}</option>
+              <option v-for="item in crop" :value="item.name" :label="item.name" :key="item.id">{{item.name}}</option>
             </select>
           </span>
           <span>
             选择周期:
-            <select @change="cycleindex($event)">
-              <option v-for="item in cycle" :value="item.id" :key="item.id">{{item.name}}</option>
+            <select @change="cycleindex($event)" v-model="edit.periodId">
+              <option v-for="item in cycle" :value="item.name" :key="item.id">{{item.name}}</option>
             </select>
           </span>
           <span>
@@ -168,16 +168,14 @@ export default {
       const cycle = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/period/queryByProjectId', this.cycleid)
       this.cycle = cycle.data.data
     },
-    fn (value) {
+    fn (event) {
       console.log(event.target.value)
-      // this.$emit('input', value)
     },
     cycleindex (event) {
       console.log(event.target.value)
     },
     async updata () {
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/formula/saveOrUpdate', this.edit)
-      console.log(res)
+      await this.$http.post('http://192.168.1.202:10020/fertilizer/api/formula/saveOrUpdate', this.edit)
       this.getfomula()
     },
     editData (item) {

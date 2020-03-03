@@ -33,14 +33,14 @@ instance.interceptors.request.use(config => {
   return Promise.reject(error)
 })
 
-// // 响应拦截
-// instance.interceptors.response.use(response => response, error => {
-//   // 回调之前做一些事
-//   if (error.response && error.response.status === 401) {
-//     // hash 是url后#开始的字符串
-//     location.hash = '#/login'
-//   }
-//   return Promise.reject(error)
-// })
+// 响应拦截
+instance.interceptors.response.use(response => response, error => {
+  // 回调之前做一些事
+  if (error.response && error.response.status === 401) {
+    // hash 是url后#开始的字符串
+    location.hash = '#/login'
+  }
+  return Promise.reject(error)
+})
 
 export default instance

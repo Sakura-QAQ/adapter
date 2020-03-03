@@ -23,25 +23,31 @@
               <tr>
                 <td width="70">序号</td>
                 <td width="70">灌溉名称</td>
+                <td width="70">状态</td>
                 <td width="70">启动时间</td>
+                <td width="70">启动日期</td>
+                <td width="70">结束日期</td>
+                <td width="70">灌溉类型</td>
                 <td width="70">灌溉时长(秒)</td>
                 <td width="70">灌溉流量(m³)</td>
                 <td width="70">配方</td>
                 <td width="70">下次启动时间</td>
-                <td width="70">状态</td>
                 <td width="120">操作</td>
               </tr>
             </thead>
             <tbody align="center">
               <tr v-for="(item, index) in titles" :key="index">
-                <td>{{item.id}}</td>
+                <td>{{index + 1}}</td>
                 <td>{{item.name}}</td>
-                <td>{{item.start}}</td>
-                <td>{{item.time}}</td>
-                <td>{{item.flow}}</td>
+                <td>{{item.status}}</td>
+                <td>{{item.startTime}}</td>
+                <td>{{item.startDate}}</td>
+                <td>{{item.endDate}}</td>
+                <td>{{item.irrigationType}}</td>
+                <td>{{item.irrigationTime}}</td>
+                <td>{{item.irrigationVolume}}</td>
                 <td>{{item.formula}}</td>
-                <td>{{item.next}}</td>
-                <td>{{item.type}}</td>
+                <td>{{item.nextExeTime}}</td>
                 <td>
                   <span class="edit" @click="editData(item)" style="cursor: pointer;">编辑</span>
                   &nbsp;
@@ -141,22 +147,25 @@
               </tr>
             </tbody>
           </table>-->
+          <!-- 操作 -->
           <div class="handle">
-            <button @click="updata()">更新</button>&nbsp;
-            <button @click="close()">取消</button>
+            <input type="button" @click="updata()" value="修改">&nbsp;
+            <input type="button" @click="clear()" value="清空">
           </div>
           <div class="information">
+            <!-- 名称 -->
             <div>
               <div class="align">名称</div>
               <div style="margin-left:50px;">
                 <input type="text" v-model="edit.name" />
               </div>
             </div>
+            <!-- 启动时间 -->
             <div>
               <div class="align">启动时间</div>
               <div style="margin-left:50px;">
                 <el-time-select
-                  v-model="edit.start"
+                  v-model="edit.startTime"
                   :picker-options="{
                     start: '07:30',
                     step: '00:10',
@@ -205,21 +214,23 @@
                 </el-radio-group>
               </div>
             </div>
+            <!-- 灌溉 -->
             <div>
               <div class="align">灌溉</div>
               <div style="margin-left:50px;">
                 <el-radio v-model="radio1" label="1">
                   灌溉时长:
-                  <input type="text" v-model="edit.time" :disabled="diasabledInput1" />
+                  <input type="text" v-model="edit.irrigationTime" :disabled="diasabledInput1" />
                 </el-radio>
                 <br />
                 <el-radio v-model="radio1" label="2" style="padding-top:5px;">
                   灌溉流量:
-                  <input type="text" v-model="edit.flow" :disabled="diasabledInput2" />
+                  <input type="text" v-model="edit.irrigationVolume" :disabled="diasabledInput2" />
                 </el-radio>
               </div>
             </div>
             <br />
+            <!-- 配方 -->
             <div>
               <div class="align">配方</div>
               <div style="margin-left:50px">
@@ -237,6 +248,14 @@
                     :value="item"
                   ></el-option>
                 </el-select>
+              </div>
+            </div>
+            <br />
+            <!-- 下次启动时间 -->
+            <div style="vertical-align:middel;">
+              <div class="align">下次启动</div>
+              <div style="margin-left:50px">
+                <input type="text" v-model="edit.nextExeTime">
               </div>
             </div>
           </div>
@@ -455,28 +474,7 @@ export default {
       message2: '',
       isActive: false,
       content: '展开▼',
-      titles: [
-        {
-          name: 'null',
-          time: 'time',
-          flow: '',
-          start: '',
-          formula: 'null',
-          type: '0',
-          next: 'next',
-          id: '1'
-        },
-        {
-          name: '2',
-          time: '',
-          flow: '',
-          start: '07:50',
-          formula: '2',
-          type: '0',
-          next: 'next',
-          id: '2'
-        }
-      ],
+      titles: [],
       radio: '1',
       radio1: '1',
       edit: {},
@@ -502,21 +500,38 @@ export default {
         }
       ],
       value1: '',
-      value2: ''
+      value2: '',
+      projectId: {
+        projectId: 'asdf'
+      },
+      planId: {
+        id: null
+      }
     }
   },
+  created () {
+    this.getIrrigation()
+  },
   methods: {
+    // 获取灌溉列表
+    async getIrrigation () {
+      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/queryByProjectId', this.projectId)
+      this.titles = res.data.data
+    },
     // 删除数据
-    del (index) {
+    async del (index) {
       // 点击删除后，将删除数据的下标传入，进行删除
-      if (confirm('是否删除') === true) {
-        if (this.titles.length === 1) {
-          alert('至少保留一条数据')
-          return false
-        } else {
-          this.titles.splice(index, 1)
-        }
-      }
+      // if (confirm('是否删除') === true) {
+      //   if (this.titles.length === 1) {
+      //     alert('至少保留一条数据')
+      //     return false
+      //   } else {
+      //     this.titles.splice(index, 1)
+      //   }
+      // }
+      this.planId.id = this.titles[index].id
+      await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/delete', this.planId)
+      this.getIrrigation()
     },
     // 编辑数据
     editData (item) {
@@ -525,15 +540,27 @@ export default {
       // this.flag = true
       // 将要编辑的数据赋值给this.edit，绑定this.edit
       this.edit = {
+        id: item.id,
         name: item.name,
-        time: item.time,
-        flow: item.flow,
-        start: item.start,
-        formula: item.formula,
-        type: item.type,
-        next: item.next,
-        id: item.id
+        formulaId: item.formulaId,
+        projectId: item.projectId,
+        fertilizerId: item.fertilizerId,
+        status: item.status,
+        startTime: item.startTime,
+        onlyOnce: item.onlyOnce,
+        intervalTime: item.intervalTime,
+        startDate: item.startDate,
+        endDate: item.endDate,
+        irrigationType: item.irrigationType,
+        irrigationTime: item.irrigationTime,
+        irrigationVolume: item.irrigationVolume,
+        valveNumbers: item.valveNumbers,
+        nextExeTime: item.nextExeTime,
+        createTime: item.createTime,
+        updateTime: item.updateTime,
+        isDel: item.isDel
       }
+      console.log(this.edit)
     },
     // 配方下拉框
     currentSel (selVal) {
@@ -543,42 +570,45 @@ export default {
     },
     // 更新数据
     async updata () {
-      // 点击更新按钮后触发，将用对象中的ID值来判断，选中更改的对象，并将更改后的对象重新给到this.titles
-      for (var i = 0; i < this.titles.length; i++) {
-        if (this.titles[i].id === this.edit.id) {
-          // this.titles[i] = this.edit
-          if ((this.titles[i] = Object.assign(this.titles[i], this.edit))) {
-            alert('更新成功')
-          }
-          this.titles[i].formula = this.name
-          console.log(this.edit)
-          // this.flag = false
-          // console.log(this.edit)
-          // if (this.$set(this.titles, i, this.edit)) {
-          //   alert('更新成功')
-          // }
-          // if (Object.assign(this.edit, this.titles)) {
-          //   alert('1')
-          // }
-          // console.log(this.options[i].text)
+      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/saveOrUpdate', this.edit)
+      console.log(res)
+      this.getIrrigation()
+      // 页面功能：点击更新按钮后触发，将用对象中的ID值来判断，选中更改的对象，并将更改后的对象重新给到this.titles
+      // for (var i = 0; i < this.titles.length; i++) {
+      //   if (this.titles[i].id === this.edit.id) {
+      //     // this.titles[i] = this.edit
+      //     if ((this.titles[i] = Object.assign(this.titles[i], this.edit))) {
+      //       alert('更新成功')
+      //     }
+      //     this.titles[i].formula = this.name
+      //     console.log(this.edit)
+      //     // this.flag = false
+      //     // console.log(this.edit)
+      //     // if (this.$set(this.titles, i, this.edit)) {
+      //     //   alert('更新成功')
+      //     // }
+      //     // if (Object.assign(this.edit, this.titles)) {
+      //     //   alert('1')
+      //     // }
+      //     // console.log(this.options[i].text)
 
-          // let data = JSON.stringify(this.titles)
-          // // console.log(title)
-          // await this.$http
-          //   .post('url', data)
-          //   .then(res => {
-          //     console.log(111)
-          //   })
-          //   .catch(err => {
-          //     console.log(err)
-          //   })
-        }
-      }
+      //     // let data = JSON.stringify(this.titles)
+      //     // // console.log(title)
+      //     // await this.$http
+      //     //   .post('url', data)
+      //     //   .then(res => {
+      //     //     console.log(111)
+      //     //   })
+      //     //   .catch(err => {
+      //     //     console.log(err)
+      //     //   })
+      //   }
+      // }
       // this.flag = false
     },
     // 清空
-    close () {
-      this.flag = false
+    clear () {
+      this.edit = {}
     },
     // 展开/折叠
     lock () {
@@ -624,11 +654,11 @@ export default {
   justify-content: space-evenly;
   .irr-form {
     position: relative;
-    height: 700px;
+    width: 880px;
+    height: 475px;
     padding-top: 40px;
     border: 1px solid #6989a5;
     background-color: #000;
-    // overflow: auto;
 
     .bg-title {
       position: absolute;
@@ -650,8 +680,6 @@ export default {
     }
 
     .pn-ltable {
-      width: 730px;
-      height: 603px;
       overflow: auto;
       margin: 0 auto;
       padding: 0 20px;
