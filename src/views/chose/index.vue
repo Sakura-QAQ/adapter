@@ -1,17 +1,38 @@
 <template>
   <div class="login-container">
+      <!-- <img src="../../assets/images/logo.png" alt /> -->
     <div class="login-box">
-      <img src="../../assets/images/logo.png" alt />
-      请选择园区:
-      <el-select v-model="value" placeholder="请选择">
-        <el-option
-          v-for="item in options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value">
-        </el-option>
-      </el-select>
-      <el-button type="primary" autofocus @click="next">确定</el-button>
+      <!-- 项目选择 -->
+      <!-- <div class="chose">
+        请选择项目:
+        <el-select v-model="projectID" placeholder="请选择" @change="check">
+          <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        </el-select>
+        <el-button type="primary" autofocus @click="next">确定</el-button>
+      </div> -->
+      <!-- 项目列表 -->
+      <el-table
+        :data="options"
+        style="width: 100%">
+        <el-table-column
+          prop="name"
+          label="项目名称"
+          width="250">
+        </el-table-column>
+        <el-table-column
+          prop="descr"
+          label="项目描述"
+          width="350">
+        </el-table-column>
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <el-button
+              size="mini"
+              type="primary"
+              @click="pushIn(scope.$index, scope.row)">进入</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
   </div>
 </template>
@@ -20,23 +41,25 @@
 export default {
   data () {
     return {
-      options: [{
-        value: '选项1',
-        label: 'A园区'
-      }, {
-        value: '选项2',
-        label: 'B园区'
-      }, {
-        value: '选项3',
-        label: 'C园区'
-      }],
-      value: ''
+      options: [],
+      projectID: ''
     }
   },
+  created () {
+    this.getlogin()
+  },
   methods: {
+    async getlogin () {
+      const res = await this.$http.post('http://192.168.1.202:10010/sso/api/getLoginInfo')
+      this.options = res.data.data.projectList
+    },
+    pushIn (index, row) {
+      window.sessionStorage.setItem('projectId', JSON.stringify(row.id))
+      this.$router.push('/')
+    },
     next () {
       if (this.value === '') {
-        alert('请选择园区')
+        alert('请选择项目')
         return false
       } else {
         this.$router.push('/')
@@ -58,21 +81,44 @@ export default {
   background: url(../../assets/images/demo-1-bg.jpg) no-repeat center / cover;
 
   .login-box {
-    width: 400px;
-    height: 325px;
+    width: 800px;
+    height: 400px;
     position: absolute;
     left: 50%;
-    top: 50%;
+    top: 40%;
     transform: translate(-50%, -50%);
     background-color: transparent;
-    border: none;
     text-align: center;
     color: #fff;
-    img {
-      display: block;
-      width: 200px;
-      margin: 10px auto;
+
+    .chose {
+      margin: 0 0 50px 0;
     }
+    // img {
+    //   display: block;
+    //   width: 200px;
+    //   margin: 10px auto;
+    // }
+    // /deep/ .el-table::before {
+    //   height: 0;
+    // }
+
+    // /deep/ .el-table {
+    //   margin: 10px 0;
+    //   background-color: transparent;
+    //   th {
+    //     border: 0;
+    //     background-color: transparent;
+    //   }
+    //   tr {
+    //     border: 0;
+    //     background-color: transparent;
+    //   }
+    //   td {
+    //     border: none;
+    //     background-color: transparent;
+    //   }
+    // }
   }
 }
 </style>

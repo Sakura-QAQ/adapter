@@ -1,15 +1,5 @@
 <template>
 <div class="formula">
-  <div class="top-position">
-    <span>
-      选择施肥机:
-      <select name id>
-        <option value>1#施肥机</option>
-        <option value>2#施肥机</option>
-      </select>
-    </span>
-    <input class="submit" type="submit" value="确定" />
-  </div>
   <div class="fer-container">
     <div class="fer-plan">
       <div>
@@ -36,7 +26,8 @@
             <td>{{item.ecTarget}}</td>
             <td>{{item.phTarget}}</td>
             <td>
-              <span class="edit" @click="editData(item)" style="cursor: pointer;">编辑</span>
+              <span class="edit" @click="editData(item)" style="cursor: pointer;">编辑</span>&nbsp;
+              <span class="edit" @click="del(index)" style="cursor: pointer;">删除</span>
             </td>
           </tr>
         </tbody>
@@ -48,7 +39,8 @@
       </div>
       <ul>
         <li>
-          <input class="submit" type="submit" value="修改" @click="updata" />
+          <!-- <input class="add" type="submit" value="添加" @click="add" /> -->
+          <input class="submit" type="button" value="提交" @click="updata" />
         </li>
         <li>
           配方名称: <input type="text" v-model="edit.name">
@@ -80,9 +72,9 @@
         <li>
           <span>
             EC目标值:
-            <input type="number" v-model="edit.ecTarget" />
+            <input type="number" v-model="edit.ecTarget" />μS/cm
           </span>
-          <span>
+          <span style="margin-left:15px;">
             PH目标值:
             <input type="number" v-model="edit.phTarget" />
           </span>
@@ -129,55 +121,74 @@
 export default {
   data () {
     return {
+      // 项目id
+      request: {
+        projectId: ''
+      },
       list: {
         title: '通道'
       },
+      // 配方
       titles: [],
-      projectId: {
-        projectId: 'project_id'
+      // 根据索引id删除
+      fomulaId: {
+        id: ''
       },
-      channelid: {
-        projectId: 'channel'
-      },
-      cycleid: {
-        projectId: '阿斯1111蒂芬'
-      },
+      // 通道
       channel: {},
+      // 作物列表
       crop: [],
+      // 周期
       cycle: [],
+      // 编辑
       edit: {}
     }
   },
   created () {
+    this.getchannel()
+    this.getcrop()
+    this.getcycle()
     this.getfomula()
+    const projectId = JSON.parse(window.sessionStorage.getItem('projectId'))
+    this.request.projectId = projectId
   },
   methods: {
+    // 渲染配方列表
     async getfomula () {
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/formula/queryByProjectId', this.projectId)
+      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/formula/queryByProjectId', this.request)
+      // console.log(res)
       this.titles = res.data.data
     },
+    // 获取施肥通道
     async getchannel () {
-      const way = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/channel/queryByProjectId', this.channelid)
+      const way = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/channel/queryByProjectId', this.request)
       this.channel = way.data.data
     },
+    // 获取作物
     async getcrop () {
-      const crop = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/crop/queryByProjectId', this.channelid)
+      const crop = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/crop/queryByProjectId', this.request)
       this.crop = crop.data.data
     },
+    // 获取周期
     async getcycle () {
-      const cycle = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/period/queryByProjectId', this.cycleid)
+      const cycle = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/period/queryByProjectId', this.request)
       this.cycle = cycle.data.data
     },
+    // 删除作物
+    async del (index) {
+      this.fomulaId.id = this.titles[index].id
+      await this.$http.post('http://192.168.1.202:10020/fertilizer/api/formula/delete', this.fomulaId)
+      this.getfomula()
+    },
+    // 获取索引
     fn (event) {
       console.log(event.target.value)
     },
+    // 获取周期索引
     cycleindex (event) {
       console.log(event.target.value)
     },
-    async updata () {
-      await this.$http.post('http://192.168.1.202:10020/fertilizer/api/formula/saveOrUpdate', this.edit)
-      this.getfomula()
-    },
+    // 编辑
     editData (item) {
       this.edit = {
         id: item.id,
@@ -199,12 +210,33 @@ export default {
         channel8: item.channel8,
         channel9: item.channel9
       }
+    },
+    // 更新和提交
+    async updata () {
+      this.edit = {
+        id: this.edit.id,
+        projectId: this.request.projectId,
+        name: this.edit.name,
+        cropId: this.edit.cropId,
+        periodId: this.edit.periodId,
+        periodDay: this.edit.periodDay,
+        ecBase: this.edit.ecBase,
+        ecTarget: this.edit.ecTarget,
+        phTarget: this.edit.phTarget,
+        channel1: this.edit.channel1,
+        channel2: this.edit.channel2,
+        channel3: this.edit.channel3,
+        channel4: this.edit.channel4,
+        channel5: this.edit.channel5,
+        channel6: this.edit.channel6,
+        channel7: this.edit.channel7,
+        channel8: this.edit.channel8,
+        channel9: this.edit.channel9
+      }
+      await this.$http.post('http://192.168.1.202:10020/fertilizer/api/formula/saveOrUpdate', this.edit)
+      this.edit = {}
+      this.getfomula()
     }
-  },
-  mounted () {
-    this.getchannel()
-    this.getcrop()
-    this.getcycle()
   }
 }
 </script>
@@ -301,6 +333,11 @@ export default {
           position: absolute;
           top: 30px;
           right: 42px;
+        }
+        .add {
+          position: absolute;
+          top: 30px;
+          right: 128px;
         }
       }
       li:last-child {

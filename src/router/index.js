@@ -10,7 +10,7 @@ import Weather from '@/views/weather'
 import Soil from '@/views/soil'
 import Irrigation from '@/views/irrigation'
 // import Fertilizer from '@/views/fertilizer'
-import Crop from '@/views/fertilizer/crop'
+import CropCycle from '@/views/fertilizer/crop-cycle'
 import Cycle from '@/views/fertilizer/cycle'
 import Formula from '@/views/fertilizer/formula'
 // import Details from '@/views/fertilizer/details'
@@ -36,7 +36,7 @@ const router = new VueRouter({
         { name: 'soil', path: '/soil', component: Soil },
         { name: 'irrigation', path: '/irrigation', component: Irrigation },
         // { name: 'fertilizer', path: '/fertilizer', component: Fertilizer },
-        { name: 'crop', path: '/crop', component: Crop },
+        { name: 'crop', path: '/Crop-Cycle', component: CropCycle },
         { name: 'cycle', path: '/cycle', component: Cycle },
         { name: 'formula', path: '/formula', component: Formula },
         // { name: 'details', path: '/details', component: Details },
@@ -52,11 +52,11 @@ const router = new VueRouter({
 
 // 加前置守卫
 
-// router.beforeEach((to, from, next) => {
-//   if (to.path === '/login') return next()
-//   const user = window.sessionStorage.getItem('')
-//   if (user) return next()
-//   next('/login')
-// })
+router.beforeEach((to, from, next) => {
+  if (to.path === '/login') return next()
+  const user = window.sessionStorage.getItem('token')
+  if (user) return next()
+  next('/login')
+})
 
 export default router

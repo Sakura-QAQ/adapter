@@ -28,22 +28,16 @@
           <i class="el-icon-edit-outline"></i>
           <span slot="title">灌溉策略</span>
         </el-menu-item>
-        <!-- <el-menu-item index="/fertilizer">
-          <i class="el-icon-s-flag"></i>
-          <span slot="title">施肥策略</span>
-        </el-menu-item> -->
         <el-submenu index="/fertilizer">
           <template slot="title">
             <i class="el-icon-s-flag"></i>
             <span slot="title" style="font-size: 16px">施肥策略</span>
           </template>
           <el-menu-item-group title="管理">
-            <el-menu-item index="/crop" style="text-align:center;">作物管理</el-menu-item>
-            <el-menu-item index="/cycle" style="text-align:center;">周期管理</el-menu-item>
+            <el-menu-item index="/Crop-Cycle" style="text-align:center;padding-left: 65px;">作物周期管理</el-menu-item>
             <el-menu-item index="/passageway" style="text-align:center;">通道管理</el-menu-item>
           </el-menu-item-group>
           <el-menu-item-group title="配方">
-            <!-- <el-menu-item index="/details" style="text-align:center;">施肥配方</el-menu-item> -->
             <el-menu-item index="/formula" style="text-align:center;">配方管理</el-menu-item>
           </el-menu-item-group>
         </el-submenu>

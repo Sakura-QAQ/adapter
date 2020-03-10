@@ -1,22 +1,12 @@
 <template>
 <div class="cycle">
-  <div class="top-position">
-    <span>
-      选择施肥机:
-      <select name id>
-        <option value>1#施肥机</option>
-        <option value>2#施肥机</option>
-      </select>
-    </span>
-    <input class="submit" type="submit" value="确定" />
-  </div>
   <div class="cycle-container">
     <div class="fer-table">
       <div class="bg-title">
         <p>周期管理</p>
       </div>
       <div class="add-data">
-        添加周期:<input type="text" v-model="obj.time" />
+        添加周期:<input type="text" v-model="cycle.name" />
         <!-- 时长:<input type="text" v-model="obj.time" />
         数量:<input type="text" v-model="obj.type" /> -->
         <span>
@@ -39,8 +29,8 @@
               <td width="70">序号</td>
               <td width="70">周期</td>
               <td width="70">描述</td>
-              <td width="70">projectID</td>
-              <td width="70">状态</td>
+              <!-- <td width="70">projectID</td> -->
+              <!-- <td width="70">状态</td> -->
               <td width="120">操作</td>
             </tr>
           </thead>
@@ -49,8 +39,8 @@
               <td>{{index + 1}}</td>
               <td>{{item.name}}</td>
               <td>{{item.descr}}</td>
-              <td>{{item.projectId}}</td>
-              <td>{{item.isDel}}</td>
+              <!-- <td>{{item.projectId}}</td> -->
+              <!-- <td>{{item.isDel}}</td> -->
               <td>
                 <span class="edit" @click="editData(item)" style="cursor: pointer;">编辑</span>
                 &nbsp;
@@ -71,11 +61,13 @@ export default {
     return {
       find: 'find',
       flag: false,
-      obj: {
-        user: '',
-        // time: '',
-        // type: '',
-        id: ''
+      // 周期添加数据
+      cycle: {
+        id: '',
+        name: '',
+        descr: '',
+        projectId: '阿斯1111蒂芬',
+        isDel: 0
       },
       // 周期id
       cycleId: {
@@ -96,49 +88,50 @@ export default {
     // 获取周期
     async getCycle () {
       const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/period/queryByProjectId', this.projectId)
-      console.log(res)
+      // console.log(res)
       this.titles = res.data.data
     },
     // 增加数据
-    add () {
+    async add () {
+      await this.$http.post('http://192.168.1.202:10020/fertilizer/api/period/saveOrUpdate', this.cycle)
+      // 添加完成后清空
+      this.cycle = {
+        id: '',
+        name: '',
+        descr: '',
+        projectId: '阿斯1111蒂芬',
+        isDel: 0
+      }
+      this.getCycle()
       // 增加数据
       // 动态id
-      var _id =
-        Math.max.apply(
-          null,
-          this.titles.map(v => {
-            return v.id
-          })
-        ) + 1
+      // var _id =
+      //   Math.max.apply(
+      //     null,
+      //     this.titles.map(v => {
+      //       return v.id
+      //     })
+      //   ) + 1
 
-      // 判断增加数据是否全部为空
-      if (!this.obj.time) return
-      // 将添加的数据，增加到数组中
-      this.titles.push({
-        // user: this.obj.user,
-        time: this.obj.time,
-        // type: this.obj.type,
-        id: _id
-      })
-      // 添加完成后，将输入框清空
-      this.obj = {
-        // user: '',
-        time: '',
-        // type: '',
-        id: ''
-      }
+      // // 判断增加数据是否全部为空
+      // if (!this.obj.time) return
+      // // 将添加的数据，增加到数组中
+      // this.titles.push({
+      //   // user: this.obj.user,
+      //   time: this.obj.time,
+      //   // type: this.obj.type,
+      //   id: _id
+      // })
+      // // 添加完成后，将输入框清空
+      // this.obj = {
+      //   // user: '',
+      //   time: '',
+      //   // type: '',
+      //   id: ''
+      // }
     },
     // 删除数据
     async del (index) {
-      // 点击删除后，将删除数据的下标传入，进行删除
-      // if (confirm('确认删除？') === true) {
-      //   if (this.titles.length === 1) {
-      //     alert('至少保留一条数据')
-      //     return false
-      //   } else {
-      //     this.titles.splice(index, 1)
-      //   }
-      // }
       this.cycleId.id = this.titles[index].id
       await this.$http.post('http://192.168.1.202:10020/fertilizer/api/period/delete', this.cycleId)
       this.getCycle()
@@ -159,13 +152,6 @@ export default {
     },
     // 更新数据
     async updata () {
-      // 点击更新按钮后触发，将用对象中的ID值来判断，选中更改的对象，并将更改后的对象重新给到this.titles
-      // for (var i = 0; i < this.titles.length; i++) {
-      //   if (this.titles[i].id === this.edit.id) {
-      //     this.titles[i] = this.edit
-      //     this.flag = false
-      //   }
-      // }
       this.flag = false
       await this.$http.post('http://192.168.1.202:10020/fertilizer/api/period/saveOrUpdate', this.edit)
       this.getCycle()

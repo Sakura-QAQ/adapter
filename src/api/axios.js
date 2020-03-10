@@ -9,19 +9,14 @@ const instance = axios.create({
     if (data) {
       return JSONBig.parse(data)
     }
-    console.log(data)
     return data
   }]
-  // headers: {
-  //   Authorization: 'Bearer ' + JSON.parse(window.sessionStorage.getItem('token')).token
-  // }
 })
 
 instance.interceptors.request.use(config => {
   // 给头部加上认证信息
   const user = window.sessionStorage.getItem('token')
   // console.log(JSON.parse(user).token)
-
   if (user) {
     config.headers = {
       // Authorization: 'Bearer ' + JSON.parse(user).token
@@ -36,11 +31,25 @@ instance.interceptors.request.use(config => {
 // 响应拦截
 instance.interceptors.response.use(response => response, error => {
   // 回调之前做一些事
+  console.log(error)
   if (error.response && error.response.status === 401) {
     // hash 是url后#开始的字符串
     location.hash = '#/login'
   }
   return Promise.reject(error)
 })
+// instance.interceptors.response.use(res => {
+//   console.log(res)
+//   const code = res.data.code
+//   if (code === 401) {
+//     location.hash = '#/login'
+//   }
+//   if (code === 200) {
+//     location.hash = '#/chose'
+//   }
+//   return res.data
+// }, error => {
+//   return Promise.reject(error)
+// })
 
 export default instance

@@ -1,75 +1,78 @@
 <template>
 <div class="crop">
-  <div class="top-position">
-    <span>
-      选择施肥机:
-      <select name id>
-        <option value>1#施肥机</option>
-        <option value>2#施肥机</option>
-      </select>
-    </span>
-    <input class="submit" type="submit" value="确定" />
-  </div>
   <div class="crop-container">
     <div class="fer-table">
       <div class="bg-title">
         <p>通道列表</p>
       </div>
+      <div class="btn" style="text-align:right;margin:0 50px 15px 0;">
+        <input class="submit" type="button" value="提交" @click="updata">
+        <!-- <input type="button" value="清空" @click="clear"> -->
+      </div>
       <div class="pn-ltable">
         <table border="1" cellspacing="0" cellpadding="10" align="center">
           <thead  align="center">
             <tr>
-              <th width="120">序号</th>
-              <th width="120">通道</th>
-              <th width="120">操作</th>
+              <th width="80">序号</th>
+              <th width="200">通道</th>
+              <!-- <th width="120">操作</th> -->
             </tr>
           </thead>
           <tbody  align="center">
             <tr>
               <td>1</td>
-              <td>{{titles.channel1}}</td>
-              <td rowspan="9">
+              <!-- <td>{{plans.channel1}}</td> -->
+              <td><input type="text" v-model="plans.channel1"></td>
+              <!-- <td rowspan="9">
                 <span style="cursor: pointer;" @click="editData">编辑</span>
-              </td>
+              </td> -->
             </tr>
             <tr>
               <td>2</td>
-              <td>{{titles.channel2}}</td>
+              <!-- <td>{{plans.channel2}}</td> -->
+              <td><input type="text" v-model="plans.channel2"></td>
             </tr>
             <tr>
               <td>3</td>
-              <td>{{titles.channel3}}</td>
+              <!-- <td>{{plans.channel3}}</td> -->
+              <td><input type="text" v-model="plans.channel3"></td>
             </tr>
             <tr>
               <td>4</td>
-              <td>{{titles.channel4}}</td>
+              <!-- <td>{{plans.channel4}}</td> -->
+              <td><input type="text" v-model="plans.channel4"></td>
             </tr>
             <tr>
               <td>5</td>
-              <td>{{titles.channel5}}</td>
+              <!-- <td>{{plans.channel5}}</td> -->
+              <td><input type="text" v-model="plans.channel5"></td>
             </tr>
             <tr>
               <td>6</td>
-              <td>{{titles.channel6}}</td>
+              <!-- <td>{{plans.channel6}}</td> -->
+              <td><input type="text" v-model="plans.channel6"></td>
             </tr>
             <tr>
               <td>7</td>
-              <td>{{titles.channel7}}</td>
+              <!-- <td>{{plans.channel7}}</td> -->
+              <td><input type="text" v-model="plans.channel7"></td>
             </tr>
             <tr>
               <td>8</td>
-              <td>{{titles.channel8}}</td>
+              <!-- <td>{{plans.channel8}}</td> -->
+              <td><input type="text" v-model="plans.channel8"></td>
             </tr>
             <tr>
               <td>9</td>
-              <td>{{titles.channel9}}</td>
+              <!-- <td>{{plans.channel9}}</td> -->
+              <td><input type="text" v-model="plans.channel9"></td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <div class="modify">
+    <!-- <div class="modify">
       <div class="bg-title">
         <p>通道管理</p>
       </div>
@@ -89,7 +92,7 @@
         <div>通道9: <input type="text" v-model="edit.channel9"></div>
       </div>
 
-    </div>
+    </div> -->
   </div>
 </div>
 </template>
@@ -100,54 +103,43 @@ export default {
     return {
       find: 'find',
       flag: false,
-      titles: {},
       edit: {},
-      projectId: { projectId: 'channel' }
+      plans: {},
+      request: { projectId: '' }
     }
   },
-  async created () {
+  created () {
+    const projectId = JSON.parse(window.sessionStorage.getItem('projectId'))
+    this.request.projectId = projectId
     this.getway()
   },
   methods: {
     // 获取通道数据
     async getway () {
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/channel/queryByProjectId', this.projectId)
-      this.titles = res.data.data
+      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/channel/queryByProjectId', this.request)
+      console.log(res)
+      this.plans = res.data.data
       // console.log(res.data.data)
-    },
-    // 编辑数据
-    editData () {
-      // 将要编辑的数据传入
-      // 编辑层打开，显示
-      // this.flag = true
-      // 将要编辑的数据赋值给this.edit，绑定this.edit
-      this.edit = {
-        id: this.titles.id,
-        projectId: this.titles.projectId,
-        channel1: this.titles.channel1,
-        channel2: this.titles.channel2,
-        channel3: this.titles.channel3,
-        channel4: this.titles.channel4,
-        channel5: this.titles.channel5,
-        channel6: this.titles.channel6,
-        channel7: this.titles.channel7,
-        channel8: this.titles.channel8,
-        channel9: this.titles.channel9,
-        createTime: this.titles.createTime,
-        updateTime: this.titles.updateTime,
-        isDel: 0
-      }
     },
     // 更新数据
     async updata () {
-      // 点击更新按钮后触发，将用对象中的ID值来判断，选中更改的对象，并将更改后的对象重新给到this.titles
-      // for (var i = 0; i < this.titles.length; i++) {
-      //   if (this.titles[i].id === this.edit.id) {
-      //     this.titles[i] = this.edit
-      //     this.flag = false
-      //   }
-      // }
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/channel/saveOrUpdate', this.edit)
+      this.plans = {
+        id: this.plans.id,
+        projectId: this.plans.projectId,
+        channel1: this.plans.channel1,
+        channel2: this.plans.channel2,
+        channel3: this.plans.channel3,
+        channel4: this.plans.channel4,
+        channel5: this.plans.channel5,
+        channel6: this.plans.channel6,
+        channel7: this.plans.channel7,
+        channel8: this.plans.channel8,
+        channel9: this.plans.channel9,
+        createTime: this.plans.createTime,
+        updateTime: this.plans.updateTime,
+        isDel: this.plans.isDel
+      }
+      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/channel/saveOrUpdate', this.plans)
       console.log(res)
       this.getway()
     },
@@ -255,5 +247,4 @@ export default {
     }
   }
 }
-
 </style>

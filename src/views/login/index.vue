@@ -50,7 +50,7 @@ export default {
           try {
           // 拿到登录的结果
             const res = await this.$http.post('http://192.168.1.202:10010/sso/api/login', this.loginForm)
-            console.log(res.data)
+            // console.log(res.data)
             if (res.data.code === 100 && res.data.msg === '用户不存在') {
               this.$message.error('用户不存在')
               return false
@@ -58,11 +58,11 @@ export default {
               this.$message.error('密码错误')
               return false
             } else if (res.data.code === 200) {
-              console.log(res.data.data)
-              // 跳路由
-              this.$router.push('/chose')
+              // console.log(res.data.data)
               // 存数据
               window.sessionStorage.setItem('token', JSON.stringify(res.data.data))
+              // 跳路由
+              this.$router.push('/chose')
             }
           } catch (err) {
             // this.$message.error('服务器异常')
