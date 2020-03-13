@@ -3,33 +3,36 @@
   <!-- 有运行停止的切换按钮 -->
   <div class="irr-container">
     <div class="top-position">
-      <span>
-        选择施肥机:
-        <select>
-          <option></option>
-        </select>
-      </span>
+      <el-form :model="reqParams">
+        <el-form-item label="选择施肥机：">
+          <el-select v-model="reqParams.fertilizerId" @change="fn">
+            <el-option v-for="item in fertilizer" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
     </div>
     <div class="irrigation">
+      <!-- 策略列表 -->
       <div class="irr-form">
         <div class="bg-title">
           <p>策略列表</p>
         </div>
+        <div><input class="submit" type="button" value="添加" @click="clear"></div>
         <div class="pn-ltable">
-          <table border="1" cellspacing="0" cellpadding="10" align="center">
+          <table border="0" cellspacing="0" cellpadding="10" align="center">
             <thead align="center">
               <tr>
                 <td width="70">序号</td>
                 <td width="70">灌溉名称</td>
-                <td width="70">状态</td>
                 <td width="70">启动时间</td>
                 <td width="70">启动日期</td>
                 <td width="70">结束日期</td>
-                <td width="70">灌溉类型</td>
+                <td width="70">灌溉方式</td>
                 <td width="70">灌溉时长(秒)</td>
                 <td width="70">灌溉流量(m³)</td>
                 <td width="70">每隔</td>
                 <td width="70">配方</td>
+                <td width="70">状态</td>
                 <td width="120">操作</td>
               </tr>
             </thead>
@@ -37,7 +40,6 @@
               <tr v-for="(item, index) in titles" :key="index">
                 <td>{{index + 1}}</td>
                 <td>{{item.name}}</td>
-                <td>{{item.status}}</td>
                 <td>{{item.startTime}}</td>
                 <td>{{item.startDate}}</td>
                 <td>{{item.endDate}}</td>
@@ -45,7 +47,8 @@
                 <td>{{item.irrigationTime}}</td>
                 <td>{{item.irrigationVolume}}</td>
                 <td>{{item.intervalTime}}</td>
-                <td>{{item.formulaId}}</td>
+                <td>{{item.optionName}}</td>
+                <td>{{item.status}}</td>
                 <td>
                   <span class="edit" @click="editData(item)" style="cursor: pointer;">编辑</span>
                   &nbsp;
@@ -54,13 +57,14 @@
                     @click="del(index)"
                     style="cursor: pointer;"
                   >删除</span>
+                  <span style="cursor: pointer;">启动</span>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
-
+      <!-- 详情 -->
       <div class="show-form">
         <div class="bg-title">
           <p>详情</p>
@@ -68,8 +72,7 @@
         <div class="layer">
           <!-- 操作 -->
           <div class="handle">
-            <input class="submit" type="button" @click="add()" value="提交">&nbsp;
-            <input class="submit" type="button" @click="clear()" value="清空">
+            <input class="submit" type="button" @click="add()" value="提交">
           </div>
           <div class="information">
             <!-- 名称 -->
@@ -87,7 +90,7 @@
                   v-model="edit.startTime"
                   :picker-options="{
                     start: '07:30',
-                    step: '00:10',
+                    step: '00:01',
                     end: '18:30'
                   }"
                   placeholder="选择时间"
@@ -95,9 +98,9 @@
               </div>
               <div style="margin-left:50px;">
                 <el-radio-group v-model="radio" @change="start">
-                  <el-radio :label="0" style="padding-bottom:5px;">仅一次</el-radio>
+                  <el-radio :label="1" style="padding-bottom:5px;">仅一次</el-radio>
                   <br />
-                  <el-radio :label="1" >
+                  <el-radio :label="0" >
                     <div style="padding-bottom:5px;font-size: 14px;">
                       每隔
                       <input
@@ -141,14 +144,14 @@
               <div class="align">灌溉</div>
               <div style="margin-left:50px;">
                 <el-radio-group v-model="radio1">
-                  <el-radio :label="0">
+                  <el-radio :label="edit.irrigationTime">
                     灌溉时长:
-                    <input type="text" v-model="edit.irrigationTime" />
+                    <input type="text" v-model="edit.irrigationTime" />(秒)
                   </el-radio>
                   <br />
-                  <el-radio :label="1" style="padding-top:5px;">
+                  <el-radio :label="edit.irrigationVolume" style="padding-top:5px;">
                     灌溉流量:
-                    <input type="text" v-model="edit.irrigationVolume" />
+                    <input type="text" v-model="edit.irrigationVolume" />(m³)
                   </el-radio>
                 </el-radio-group>
               </div>
@@ -166,7 +169,8 @@
                   <el-option
                     v-for="item in options"
                     :key="item.id"
-                    :value="item.name"
+                    :value="item.id"
+                    :label="item.name"
                   >{{item.name}}</el-option>
                 </el-select>
               </div>
@@ -177,21 +181,11 @@
           <div class="bg-tag">
             <p>阀号</p>
           </div>
-          <!-- <ul class="valve">
-            <li v-for="(item, index) in 8" :key="index" :class="{changeColor : index ===  1}" @click="changeColor(index)">
-              <span>{{item}}#阀</span>
-            </li>
-          </ul> -->
-          <!-- <ul class="valve" v-show="isActive">
-            <li v-for="item in 56" :key="item">
-              <span>{{item + 8}}#阀</span>
-            </li>
-          </ul> -->
-          <!-- <collapse> -->
-          <!-- </collapse> -->
           <el-checkbox-group v-model="checkboxGroup" @change="changebox">
             <template v-for="(item, index) in 64">
-              <el-checkbox-button :label="index" :key="index" v-show="!index < 8">{{index + 1}}#阀</el-checkbox-button>
+              <el-checkbox-button :label="index" :key="index" v-show="cut(index)" >
+                <div class="valve_num" v-on:dblclick="editval($event)">阀</div>
+              </el-checkbox-button>
             </template>
           </el-checkbox-group>
           <div
@@ -217,9 +211,17 @@ export default {
       message1: '',
       message2: '',
       isActive: false,
-      content: '展开▼',
+      content: '更多阀号▼',
+      // 阀号
+      val: '',
       // 灌溉列表
       titles: [],
+      // 施肥机数据
+      fertilizer: [],
+      // 施肥机下拉框传的id
+      reqParams: {
+        fertilizerId: '6c539b84-6380-11ea-9f50-00d86189352f'
+      },
       // 循环计划单选
       radio: 0,
       // 灌溉的单选
@@ -232,7 +234,7 @@ export default {
         projectId: ''
       },
       // 日期和时间
-      datatime: '',
+      datatime: [],
       value2: '',
       planId: {
         id: null
@@ -265,31 +267,107 @@ export default {
   created () {
     const projectId = JSON.parse(window.sessionStorage.getItem('projectId'))
     this.request.projectId = projectId
-    this.getfertilizer()
-    this.getIrrigation()
+    // const fertilizerId = window.sessionStorage.getItem('fertilizerId')
+    // this.reqParams.fertilizerId = fertilizerId
     this.getfomula()
+    this.getfertilizer()
+  },
+  mounted () {
+    this.enterPage()
+    // this.getIrrigation()
   },
   methods: {
+    // 进入页面渲染
+    async enterPage () {
+      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/queryByFertilizerId', this.reqParams)
+      // this.titles = res.data.data
+      var options = this.options
+      var titles2 = res.data.data
+      for (var i = 0; i < titles2.length; i++) {
+        titles2[i].optionName = '已删除'
+        for (var j = 0; j < options.length; j++) {
+          if (titles2[i].formulaId === options[j].id) {
+            titles2[i].optionName = options[j].name
+          }
+        }
+        this.titles = titles2
+        if (titles2[i].status === 0) {
+          titles2[i].status = '不可用'
+        } else {
+          titles2[i].status = '可用'
+        }
+        if (titles2[i].irrigationType === 0) {
+          titles2[i].irrigationType = '时长'
+        } else {
+          titles2[i].irrigationType = '流量'
+        }
+      }
+    },
+    // 切换施肥机
+    async fn () {
+      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/queryByFertilizerId', this.reqParams)
+      // console.log(this.reqParams.fertilizerId)
+      this.titles = res.data.data
+      var options = this.options
+      var titles2 = res.data.data
+      for (var i = 0; i < titles2.length; i++) {
+        titles2[i].optionName = '已删除'
+        for (var j = 0; j < options.length; j++) {
+          if (titles2[i].formulaId === options[j].id) {
+            titles2[i].optionName = options[j].name
+          }
+        }
+        // this.titles = titles2
+        if (titles2[i].status === 0) {
+          titles2[i].status = '不可用'
+        } else {
+          titles2[i].status = '可用'
+        }
+        if (titles2[i].irrigationType === 0) {
+          titles2[i].irrigationType = '时长'
+        } else {
+          titles2[i].irrigationType = '流量'
+        }
+      }
+      this.getfertilizer()
+    },
     // 循环计划监控
     start (value) {
-      // this.edit.onlyOnce = this.radio
-      // console.log(this.edit.onlyOnce)
-      // console.log(value)
       if (this.radio === 0) {
         this.day = 0
         this.hours = 0
         this.mins = 0
       }
     },
-    // 获取灌溉列表
-    async getIrrigation () {
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/queryByProjectId', this.request)
-      this.titles = res.data.data
-    },
     // 获取施肥机列表
     async getfertilizer () {
-      await this.$http.post('http://192.168.1.202:10020/fertilizer/api/fertilizer/queryByProjectId', this.request)
-      // console.log(res)
+      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/fertilizer/queryByProjectId', this.request)
+      this.fertilizer = res.data.data
+    },
+    // 获取灌溉策略列表
+    async getIrrigation () {
+      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/queryByProjectId', this.request)
+      var options = this.options
+      var titles2 = res.data.data
+      for (var i = 0; i < titles2.length; i++) {
+        titles2[i].optionName = '已删除'
+        for (var j = 0; j < options.length; j++) {
+          if (titles2[i].formulaId === options[j].id) {
+            titles2[i].optionName = options[j].name
+          }
+        }
+        this.titles = titles2
+        if (titles2[i].status === 0) {
+          titles2[i].status = '不可用'
+        } else {
+          titles2[i].status = '可用'
+        }
+        if (titles2[i].irrigationType === 0) {
+          titles2[i].irrigationType = '时长'
+        } else {
+          titles2[i].irrigationType = '流量'
+        }
+      }
     },
     // 获取配方列表
     async getfomula () {
@@ -305,38 +383,28 @@ export default {
       this.edit.intervalTime = all
       this.edit.valveNumbers = JSON.stringify(this.checkboxGroup)
       this.edit.projectId = this.request.projectId
-      // this.edit = {
-      //   id: this.edit.id,
-      //   name: this.edit.name,
-      //   formulaId: this.edit.formulaId,
-      //   projectId: this.request.projectId,
-      //   fertilizerId: this.edit.fertilizerId,
-      //   status: this.edit.status,
-      //   startTime: this.edit.startTime,
-      //   onlyOnce: this.edit.onlyOnce,
-      //   intervalTime: this.edit.intervalTime,
-      //   startDate: this.edit.startDate,
-      //   endDate: this.edit.endDate,
-      //   irrigationType: this.edit.irrigationType,
-      //   irrigationTime: this.edit.irrigationTime,
-      //   irrigationVolume: this.edit.irrigationVolume,
-      //   valveNumbers: this.edit.valveNumbers,
-      //   nextExeTime: this.edit.nextExeTime,
-      //   createTime: this.edit.createTime,
-      //   updateTime: this.edit.updateTime,
-      //   isDel: this.edit.isDel
-      // }
+      if (this.edit.status === '不可用') {
+        this.edit.status = 0
+      } else if (this.edit.status === '可用') {
+        this.edit.status = 1
+      }
+      if (this.edit.irrigationType === '时长') {
+        this.edit.irrigationType = 0
+      } else if (this.edit.irrigationType === '流量') {
+        this.edit.irrigationType = 1
+      }
       const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/saveOrUpdate', this.edit)
       console.log(res)
-      // this.edit = {}
       this.day = 0
       this.hours = 0
       this.mins = 0
       this.checkboxGroup = []
-      this.getIrrigation()
+      this.edit = {}
+      this.datatime = []
+      this.enterPage()
     },
     changebox () {
-      console.log(this.checkboxGroup)
+      // console.log(this.checkboxGroup)
       this.edit.valveNumbers = this.checkboxGroup
     },
     // 删除数据
@@ -366,7 +434,7 @@ export default {
       this.hours = parseInt((item.intervalTime % (24 * 60)) / 60)
       this.mins = (item.intervalTime % (24 * 60)) % 60
       // this.radio = this.edit.onlyOnce
-
+      this.datatime.unshift(item.startDate, item.endDate)
       this.edit = {
         id: item.id,
         name: item.name,
@@ -390,7 +458,7 @@ export default {
       }
       const valnum = JSON.parse(this.edit.valveNumbers)
       this.checkboxGroup = valnum
-      console.log(this.edit)
+      // console.log(this.edit)
     },
     // // 清空
     clear () {
@@ -399,15 +467,24 @@ export default {
       this.hours = 0
       this.mins = 0
       this.checkboxGroup = []
+      this.datatime = []
     },
-    // 展开/折叠
+    // 阀索引函数条件
+    cut (index) {
+      if (this.isActive === false) {
+        return index < 8
+      } else if (this.isActive === true) {
+        return !index < 8
+      }
+    },
+    // 通过阀索引函数条件进行展开/折叠
     lock () {
-      if (!this.isActive) {
+      if (this.isActive === false) {
         this.isActive = true
-        this.content = '折叠▲'
+        this.content = '隐藏阀号▲'
       } else {
         this.isActive = false
-        this.content = '展开▼'
+        this.content = '更多阀号▼'
       }
     },
     // 日期选择监控
@@ -415,15 +492,43 @@ export default {
       console.log(this.datatime)
       this.edit.startDate = this.datatime[0]
       this.edit.endDate = this.datatime[1]
+    },
+    editval (e) {
+      console.log(e.target.textContent)
+      e.target.textContent = 8
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
+.top-position {
+  /deep/ .el-input__inner {
+    width: 150px;
+    height: 35px;
+    border: none;
+    background-color: #2a3b49;
+    border-radius: 0;
+    color: #fff;
+  }
+  /deep/ .el-date-editor.el-input,
+  .el-date-editor {
+    width: 155px;
+  }
+  /deep/ .el-input__icon {
+    line-height: 35px;
+  }
+  /deep/ .el-radio__label {
+    color: #97b1c9;
+  }
+  /deep/ .el-form-item__label {
+    color: #fff;
+  }
+}
 .irrigation {
   display: flex;
   justify-content: space-evenly;
+
   .irr-form {
     position: relative;
     width: 880px;
@@ -455,6 +560,11 @@ export default {
       overflow: auto;
       margin: 0 auto;
       padding: 0 20px;
+    }
+    .submit {
+      position: absolute;
+      right: 30px;
+      top: 10px;
     }
   }
 
@@ -569,7 +679,15 @@ export default {
           background: transparent;
           color: #6989a5;
           margin-bottom: 8px;
-          padding: 12px 0;
+          padding: 0 0;
+
+          .valve_num {
+            width:75px;
+            height:35px;
+            line-height: 35px;
+            text-align: center;
+            background:transparent;
+          }
         }
         .is-checked {
 
@@ -578,47 +696,6 @@ export default {
             border: 1px solid transparent;
           }
         }
-      }
-    }
-  }
-
-  .flag-form {
-    width: 80%;
-    height: 80%;
-    position: fixed;
-    top: 120px;
-    background: rgba(1, 1, 1, 0.5);
-    .layer {
-      width: 50%;
-      height: 50%;
-      background-color: #000;
-      margin: 0 auto;
-      border: 1px solid #3c5061;
-      margin-top: 150px;
-
-      .information {
-        div {
-          display: inline-block;
-        }
-        > div {
-          padding-top: 10px;
-        }
-      }
-
-      /deep/ .el-input__inner {
-        width: 150px;
-        height: 35px;
-        border: none;
-        background-color: #2a3b49;
-        border-radius: 0;
-        color: #fff;
-      }
-      /deep/ .el-date-editor.el-input,
-      .el-date-editor.el-input__inner {
-        width: 155px;
-      }
-      /deep/ .el-input__icon {
-        line-height: 35px;
       }
     }
   }

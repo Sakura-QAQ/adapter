@@ -14,7 +14,7 @@
           <el-checkbox :value="true">我已阅读并同意用户协议和隐私条款</el-checkbox>
         </el-form-item>
         <el-form-item>
-          <el-button style="width:48%" type="primary" @click="login">登 录</el-button>
+          <el-button style="width:48%" type="primary" @click="login" :loading="loading">登 录</el-button>
           <el-button style="width:48%" type="primary" plain @click="registe">注册</el-button>
         </el-form-item>
       </el-form>
@@ -26,6 +26,7 @@
 export default {
   data () {
     return {
+      loading: false,
       loginForm: {
         name: '13145217573',
         password: 'a123456789'
@@ -43,6 +44,8 @@ export default {
 
   methods: {
     login () {
+      // loading
+      this.loading = true
       // 对整个表单进行校验
       this.$refs.loginForm.validate(async valid => {
         if (valid) {
@@ -65,8 +68,11 @@ export default {
               this.$router.push('/chose')
             }
           } catch (err) {
-            // this.$message.error('服务器异常')
-            console.log(err)
+            this.$message.error('服务器异常')
+            // console.log(err)
+            if (err) {
+              this.loading = false
+            }
           }
         }
       })
@@ -101,6 +107,10 @@ export default {
       display: block;
       width: 200px;
       margin: 10px auto;
+    }
+    /deep/ .el-icon-loading {
+      color: #fff;
+      font-size: 14px;
     }
   }
 }

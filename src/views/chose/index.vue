@@ -2,14 +2,6 @@
   <div class="login-container">
       <!-- <img src="../../assets/images/logo.png" alt /> -->
     <div class="login-box">
-      <!-- 项目选择 -->
-      <!-- <div class="chose">
-        请选择项目:
-        <el-select v-model="projectID" placeholder="请选择" @change="check">
-          <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id"></el-option>
-        </el-select>
-        <el-button type="primary" autofocus @click="next">确定</el-button>
-      </div> -->
       <!-- 项目列表 -->
       <el-table
         :data="options"

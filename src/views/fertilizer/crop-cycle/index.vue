@@ -7,12 +7,16 @@
           <p>作物管理</p>
         </div>
         <div class="add-data">
-          添加作物:<input type="text" v-model="crops.name" />
-          <span>
-            <button @click="add()">增加</button>
-          </span>
+          <!-- 添加作物:<input type="text" v-model="crops.name" /> -->
+          <input class="submit" type="button" value="添加" @click="flag1=true" >
         </div>
-        <div class="layer" v-if="flag1">
+        <div v-if="flag1" class="layer-box">
+          <!-- <input type="text" v-model="crops.name" /><input class="submit" type="button" @click="add" value="完成添加"> -->
+          <el-input placeholder="请输入作物" v-model="crops.name" clearable></el-input>
+          <input class="submit" type="button" @click="add" value="确定">&nbsp;
+          <input class="submit" type="button" @click="flag1=false" value="取消">
+        </div>
+        <!-- <div class="layer" v-if="flag1">
           <div class="mask">
             <div class="content">
               编辑作物:<input type="text" v-model="edit.name" />
@@ -20,9 +24,9 @@
               <button @click="flag1=false">取消</button>
             </div>
           </div>
-        </div>
+        </div> -->
         <div class="list">
-          <table border="1" cellspacing="0" cellpadding="10" align="center">
+          <!-- <table border="1" cellspacing="0" cellpadding="10" align="center">
             <thead  align="center">
               <tr>
                 <td width="70">序号</td>
@@ -41,7 +45,29 @@
                 </td>
               </tr>
             </tbody>
-          </table>
+          </table> -->
+          <el-table
+            :data="productList.slice((reqParams.currentPage-1)*reqParams.PageSize,reqParams.currentPage*reqParams.PageSize)"
+            style="width: 100%">
+            <el-table-column
+              prop="name"
+              label="名称"
+              width="70">
+            </el-table-column>
+            <el-table-column
+              label="120">
+              编辑
+            </el-table-column>
+          </el-table>
+            <el-pagination
+              layout="prev, pager, next"
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page="reqParams.currentPage"
+              :page-sizes="reqParams.pageSizes"
+              :page-size="reqParams.PageSize"
+              :total="reqParams.totalCount"
+            ></el-pagination>
         </div>
       </div>
     </div>
@@ -52,10 +78,11 @@
           <p>周期管理</p>
         </div>
         <div class="add-data">
-          添加周期:<input type="text" v-model="cycle.name" />
+          <!-- 添加周期:<input type="text" v-model="cycle.name" />
           <span>
             <button @click="addCycle()">增加</button>
-          </span>
+          </span> -->
+          <input class="submit" type="button" value="添加">
         </div>
         <div class="layer" v-if="flag2">
           <div class="mask">
@@ -99,7 +126,16 @@
 export default {
   data () {
     return {
-      find: 'find',
+      reqParams: {
+        // 默认显示第几页
+        currentPage: 1,
+        // 总条数，根据接口获取数据长度(注意：这里不能为空)
+        totalCount: 1,
+        // 个数选择器（可修改）
+        pageSizes: [1, 2, 3, 4],
+        // 默认每页显示的条数（可修改）
+        PageSize: 5
+      },
       flag1: false,
       // add请求作物数据
       crops: {
@@ -148,10 +184,20 @@ export default {
     this.request.projectId = projectId
   },
   methods: {
+    handleSizeChange (val) {
+      // 改变每页显示的条数
+      this.reqParams.PageSize = val
+      this.reqParams.currentPage = 1
+    },
+    handleCurrentChange (newPage) {
+      // 提交当前页码给后台才能获取对应的数据
+      this.reqParams.currentPage = newPage
+    },
     // 作物管理部分
     // 获取作物列表
     async getcrops () {
       const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/crop/queryByProjectId', this.request)
+      this.reqParams.totalCount = res.data.data.length
       this.productList = res.data.data
     },
     async add () {
@@ -162,6 +208,8 @@ export default {
         isDel: this.crops.isDel
       }
       await this.$http.post('http://192.168.1.202:10020/fertilizer/api/crop/add', this.crops)
+      this.crops.name = ''
+      this.flag1 = false
       this.getcrops()
     },
     // 删除数据
@@ -248,10 +296,11 @@ export default {
     .fer-table {
       position: relative;
       width: 670px;
+      height: 500px;
       border: 1px solid #5c7b95;
       border-radius: 20px;
       background: #000;
-      padding: 40px 20px;
+      padding: 60px 0 40px 0;
       margin-top: 30px;
 
       .bg-title {
@@ -272,12 +321,33 @@ export default {
           font-weight: 800;
         }
       }
-
       .add-data {
-        text-align: center;
+        // text-align: center;
+        position: absolute;
+        right: 40px;
+        top: 10px;
       }
-      .layer {
+      .layer-box {
+        z-index: 200;
         text-align: center;
+        position: absolute;
+        width: 600px;
+        height: 80%;
+        background-color: rgba(85, 92, 98, 0.9);
+        border: 1px solid #666;
+        border-radius: 15px;
+        margin: 0 0 0 32px;
+
+        /deep/ .el-input {
+          margin: 10% 10px 0 0;
+          width: 150px;
+          font-size: 16px;
+        }
+      }
+      .list {
+        .box {
+          text-align: center;
+        }
       }
     }
   }
@@ -288,7 +358,7 @@ export default {
       border: 1px solid #5c7b95;
       border-radius: 20px;
       background: #000;
-      padding: 40px 20px;
+      padding: 60px 0 40px 0;
       margin-top: 30px;
 
       .bg-title {
@@ -311,7 +381,9 @@ export default {
       }
 
       .add-data {
-        text-align: center;
+        position: absolute;
+        right: 30px;
+        top: 10px;
       }
       .layer {
         text-align: center;

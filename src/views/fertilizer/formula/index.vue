@@ -5,12 +5,14 @@
       <div>
         <p>配方列表</p>
       </div>
+      <div><input class="submit" type="button" value="添加" @click="clear"></div>
       <table class="pn-ltable" border="1" cellspacing="0" cellpadding="10" align="center">
         <thead>
           <tr>
             <th width="70">配方名称</th>
             <th width="70">作物</th>
             <th width="70">周期</th>
+            <th width="70">周期天数</th>
             <th width="70">EC基数</th>
             <th width="70">EC目标</th>
             <th width="70">PH目标</th>
@@ -20,7 +22,8 @@
         <tbody class="pn-ltbody" align="center">
           <tr v-for="(item, index) in titles" :key="index">
             <td>{{item.name}}</td>
-            <td>{{item.cropId}}</td>
+            <td>{{item.cropName}}</td>
+            <td>{{item.cycleName}}</td>
             <td>{{item.periodDay}}</td>
             <td>{{item.ecBase}}</td>
             <td>{{item.ecTarget}}</td>
@@ -48,14 +51,14 @@
         <li class="check-time">
           <span>
             选择作物:
-            <select @change="fn($event)" v-model="edit.cropId">
-              <option v-for="item in crop" :value="item.name" :label="item.name" :key="item.id">{{item.name}}</option>
+            <select v-model="edit.cropId">
+              <option v-for="item in crop" :value="item.id" :label="item.name" :key="item.id">{{item.name}}</option>
             </select>
           </span>
           <span>
             选择周期:
-            <select @change="cycleindex($event)" v-model="edit.periodId">
-              <option v-for="item in cycle" :value="item.name" :key="item.id">{{item.name}}</option>
+            <select v-model="edit.periodId">
+              <option v-for="item in cycle" :value="item.id" :label="item.name" :key="item.id">{{item.name}}</option>
             </select>
           </span>
           <span>
@@ -146,29 +149,52 @@ export default {
   },
   created () {
     this.getchannel()
-    this.getcrop()
-    this.getcycle()
-    this.getfomula()
     const projectId = JSON.parse(window.sessionStorage.getItem('projectId'))
     this.request.projectId = projectId
   },
+  beforeMount () {
+    this.getcrop()
+    this.getcycle()
+  },
+  mounted () {
+    this.getfomula()
+  },
   methods: {
+    // 获取作物
+    async getcrop () {
+      const crop = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/crop/queryByProjectId', this.request)
+      // console.log(crop)
+      this.crop = crop.data.data
+    },
     // 渲染配方列表
     async getfomula () {
       const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/formula/queryByProjectId', this.request)
-      // console.log(res)
-      this.titles = res.data.data
+      var crop2 = this.crop
+      var cycle2 = this.cycle
+      var titles2 = res.data.data
+      for (var i = 0; i < titles2.length; i++) {
+        titles2[i].cropName = '已删除'
+        titles2[i].cycleName = '已删除'
+        for (var j = 0; j < crop2.length; j++) {
+          if (titles2[i].cropId === crop2[j].id) {
+            titles2[i].cropName = crop2[j].name
+          }
+        }
+        for (var l = 0; l < cycle2.length; l++) {
+          if (titles2[i].periodId === cycle2[l].id) {
+            titles2[i].cycleName = cycle2[l].name
+          }
+        }
+      }
+      this.titles = titles2
+      // this.titles = res.data.data
     },
     // 获取施肥通道
     async getchannel () {
       const way = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/channel/queryByProjectId', this.request)
       this.channel = way.data.data
     },
-    // 获取作物
-    async getcrop () {
-      const crop = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/crop/queryByProjectId', this.request)
-      this.crop = crop.data.data
-    },
+    // 获取到作物id赋值给列表
     // 获取周期
     async getcycle () {
       const cycle = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/period/queryByProjectId', this.request)
@@ -181,13 +207,13 @@ export default {
       this.getfomula()
     },
     // 获取索引
-    fn (event) {
-      console.log(event.target.value)
-    },
+    // fn (event) {
+    //   console.log(event.target.value)
+    // },
     // 获取周期索引
-    cycleindex (event) {
-      console.log(event.target.value)
-    },
+    // cycleindex (event) {
+    //   console.log(event.target.value)
+    // },
     // 编辑
     editData (item) {
       this.edit = {
@@ -236,6 +262,28 @@ export default {
       await this.$http.post('http://192.168.1.202:10020/fertilizer/api/formula/saveOrUpdate', this.edit)
       this.edit = {}
       this.getfomula()
+    },
+    clear () {
+      this.edit = {
+        id: null,
+        projectId: null,
+        name: null,
+        cropId: null,
+        periodId: null,
+        periodDay: null,
+        ecBase: null,
+        ecTarget: null,
+        phTarget: null,
+        channel1: 0,
+        channel2: 0,
+        channel3: 0,
+        channel4: 0,
+        channel5: 0,
+        channel6: 0,
+        channel7: 0,
+        channel8: 0,
+        channel9: 0
+      }
     }
   }
 }
@@ -252,7 +300,7 @@ export default {
     border: 1px solid #5c7b95;
     background-color: #000;
     border-radius: 10px;
-    padding: 60px 0px;
+    padding: 70px 0 60px 0;
 
     div:nth-child(1) {
       position: absolute;
@@ -273,12 +321,11 @@ export default {
     }
 
     div:nth-child(2) {
-      display: flex;
-      justify-content: space-evenly;
-      flex-wrap: wrap;
-      padding-top: 50px;
-      height: 140px;
-      padding-left: 20px;
+      position: absolute;
+      top: 30px;
+      right: 42px;
+      // text-align: right;
+
     }
 
     div:nth-child(3) {

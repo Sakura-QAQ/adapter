@@ -59,6 +59,13 @@
       <el-header class="my-header">
         <span class="el-icon-s-fold" @click="toggleMenu()"></span>
         <span class="text">北京蓝洋益海科技有限公司</span>
+          <el-form class="area" :model="reqParams">
+            <el-form-item label="切换园区：">
+              <el-select v-model="reqParams.projectId">
+                <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-form>
         <el-dropdown style="float:right;color:#fff">
           <span class="el-dropdown-link">
             <img style="vertical-align:middle" width="30" height="30" :src="avatar" alt />
@@ -83,12 +90,25 @@
 export default {
   data () {
     return {
+      options: [],
+      reqParams: {
+        projectId: null
+      },
       collapse: false,
       avatar: '',
       name: ''
     }
   },
+  created () {
+    this.getProject()
+    const projectId = JSON.parse(window.sessionStorage.getItem('projectId'))
+    this.reqParams.projectId = projectId
+  },
   methods: {
+    async getProject () {
+      const res = await this.$http.post('http://192.168.1.202:10010/sso/api/getLoginInfo')
+      this.options = res.data.data.projectList
+    },
     toggleMenu () {
       this.collapse = !this.collapse
     }
@@ -129,6 +149,42 @@ export default {
     .text {
       vertical-align: middle;
       padding-left: 10px;
+    }
+    /deep/ .area {
+      display: inline-block;
+      margin-left: 100px;
+      .el-form-item {
+        margin-bottom: 0;
+        .el-form-item__label {
+          padding: 12px 0 0 0;
+          color: #fff;
+          font-size: 16px;
+        }
+        .el-form-item__content {
+          display: inline-block;
+        }
+        .el-input__inner {
+          width: 150px;
+          height: 35px;
+          border: none;
+          background-color: #2a3b49;
+          border-radius: 0;
+          color: #fff;
+        }
+        .el-date-editor.el-input,
+        .el-date-editor {
+          width: 155px;
+        }
+        .el-input__icon {
+          line-height: 35px;
+        }
+        .el-radio__label {
+          color: #97b1c9;
+        }
+        .el-form-item__label {
+          color: #fff;
+        }
+      }
     }
   }
 }
