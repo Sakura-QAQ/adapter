@@ -8,57 +8,33 @@
         </div>
         <div class="add-data">
           <!-- 添加作物:<input type="text" v-model="crops.name" /> -->
-          <input class="submit" type="button" value="添加" @click="flag1=true" >
+          <input class="submit" type="button" value="添加" @click="flag1=true" />
         </div>
         <div v-if="flag1" class="layer-box">
-          <!-- <input type="text" v-model="crops.name" /><input class="submit" type="button" @click="add" value="完成添加"> -->
           <el-input placeholder="请输入作物" v-model="crops.name" clearable></el-input>
-          <input class="submit" type="button" @click="add" value="确定">&nbsp;
-          <input class="submit" type="button" @click="flag1=false" value="取消">
+          <input class="submit" type="button" @click="add" value="确定" />&nbsp;
+          <input class="submit" type="button" @click="flag1=false" value="取消" />
         </div>
-        <!-- <div class="layer" v-if="flag1">
-          <div class="mask">
-            <div class="content">
-              编辑作物:<input type="text" v-model="edit.name" />
-              <button @click="updata">更新</button>
-              <button @click="flag1=false">取消</button>
-            </div>
-          </div>
-        </div> -->
+        <div v-if="flagEdit" class="layer-box">
+          <el-input placeholder="要编辑的作物" v-model="edit.name" clearable></el-input>
+          <input class="submit" type="button" @click="updata" value="确定" />&nbsp;
+          <input class="submit" type="button" @click="flagEdit=false" value="取消" />
+        </div>
         <div class="list">
-          <!-- <table border="1" cellspacing="0" cellpadding="10" align="center">
-            <thead  align="center">
-              <tr>
-                <td width="70">序号</td>
-                <td width="70">作物</td>
-                <td width="120">操作</td>
-              </tr>
-            </thead>
-            <tbody  align="center">
-              <tr v-for="(item,index) in productList" :key="index">
-                <td>{{index + 1}}</td>
-                <td>{{item.name}}</td>
-                <td>
-                  <span class="edit" @click="editData(item)" style="cursor: pointer;">编辑</span>
-                  &nbsp;
-                  <span class="delete" @click="del(index)" style="cursor: pointer;">删除</span>
-                </td>
-              </tr>
-            </tbody>
-          </table> -->
           <el-table
             :data="productList.slice((reqParams.currentPage-1)*reqParams.PageSize,reqParams.currentPage*reqParams.PageSize)"
-            style="width: 100%">
-            <el-table-column
-              prop="name"
-              label="名称"
-              width="70">
-            </el-table-column>
-            <el-table-column
-              label="120">
-              编辑
+            style="width: 500px"
+          >
+            <el-table-column label="序号" type="index" width="125" align="center"></el-table-column>
+            <el-table-column prop="name" label="名称" width="125" align="center"></el-table-column>
+            <el-table-column label="操作" width="250" align="center">
+              <template slot-scope="scope">
+                <el-button size="mini" @click="editData(scope.$index, scope.row)">编辑</el-button>
+                <el-button size="mini" type="danger" @click="del(scope.$index, scope.row)">删除</el-button>
+              </template>
             </el-table-column>
           </el-table>
+          <div class="pager">
             <el-pagination
               layout="prev, pager, next"
               @size-change="handleSizeChange"
@@ -68,6 +44,7 @@
               :page-size="reqParams.PageSize"
               :total="reqParams.totalCount"
             ></el-pagination>
+          </div>
         </div>
       </div>
     </div>
@@ -78,44 +55,46 @@
           <p>周期管理</p>
         </div>
         <div class="add-data">
-          <!-- 添加周期:<input type="text" v-model="cycle.name" />
-          <span>
-            <button @click="addCycle()">增加</button>
-          </span> -->
-          <input class="submit" type="button" value="添加">
+          <input class="submit" type="button" value="添加" @click="flag2=true" />
         </div>
         <div class="layer" v-if="flag2">
-          <div class="mask">
-            <div class="content">
-              周期:<input type="text" v-model="edit.name" />
-              <button @click="upCycle">更新</button>
-              <button @click="flag2=false">取消</button>
-            </div>
-          </div>
+          <el-input placeholder="周期名称" v-model="cycle.name" clearable></el-input>
+          <el-input type="textarea" :rows="2" placeholder="周期描述" v-model="cycle.descr"></el-input>
+          <input class="submit" type="button" @click="addCycle" value="确定" />&nbsp;
+          <input class="submit" type="button" @click="flag2=false" value="取消" />
         </div>
-        <div class="pn-ltable">
-          <table border="1" cellspacing="0" cellpadding="10" align="center">
-            <thead  align="center">
-              <tr>
-                <td width="70">序号</td>
-                <td width="70">周期</td>
-                <td width="70">描述</td>
-                <td width="120">操作</td>
-              </tr>
-            </thead>
-            <tbody  align="center">
-              <tr v-for="(item,index) in titles" :key="index">
-                <td>{{index + 1}}</td>
-                <td>{{item.name}}</td>
-                <td>{{item.descr}}</td>
-                <td>
-                  <span class="edit" @click="editCycle(item)" style="cursor: pointer;">编辑</span>
-                  &nbsp;
-                  <span class="delete" @click="delCycle(index)" style="cursor: pointer;">删除</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="layer" v-if="flagEdit2">
+          <el-input placeholder="周期名称" v-model="edit1.name" clearable></el-input>
+          <el-input type="textarea" :rows="2" placeholder="周期描述" v-model="edit1.descr"></el-input>
+          <input class="submit" type="button" @click="updataCycle" value="确定" />&nbsp;
+          <input class="submit" type="button" @click="flagEdit2=false" value="取消" />
+        </div>
+        <div class="list">
+          <el-table
+            :data="titles.slice((reqParams1.currentPage-1)*reqParams1.PageSize,reqParams1.currentPage*reqParams1.PageSize)"
+            style="width: 600px"
+            >
+            <el-table-column label="序号" type="index" width="125" align="center"></el-table-column>
+            <el-table-column prop="name" label="名称" width="125" align="center"></el-table-column>
+            <el-table-column prop="descr" label="描述" width="200" align="center"></el-table-column>
+            <el-table-column label="操作" width="150" align="center">
+              <template slot-scope="scope">
+                <el-button size="mini" @click="editCycle(scope.$index, scope.row)">编辑</el-button>
+                <el-button size="mini" type="danger" @click="delCycle(scope.$index, scope.row)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <div class="pager">
+            <el-pagination
+              layout="prev, pager, next"
+              @size-change="handleSizeChange1"
+              @current-change="handleCurrentChange1"
+              :current-page="reqParams1.currentPage"
+              :page-sizes="reqParams1.pageSizes"
+              :page-size="reqParams1.PageSize"
+              :total="reqParams1.totalCount"
+            ></el-pagination>
+          </div>
         </div>
       </div>
     </div>
@@ -132,11 +111,18 @@ export default {
         // 总条数，根据接口获取数据长度(注意：这里不能为空)
         totalCount: 1,
         // 个数选择器（可修改）
-        pageSizes: [1, 2, 3, 4],
+        pageSizes: [1, 2],
         // 默认每页显示的条数（可修改）
         PageSize: 5
       },
+      reqParams1: {
+        currentPage: 1,
+        totalCount: 1,
+        pageSizes: [1, 2],
+        PageSize: 5
+      },
       flag1: false,
+      flagEdit: false,
       // add请求作物数据
       crops: {
         id: '',
@@ -154,7 +140,6 @@ export default {
       request: { projectId: '' },
       // 作物数据
       productList: [],
-
       // 周期部分
       // 周期add添加数据
       cycle: {
@@ -164,7 +149,10 @@ export default {
         projectId: '',
         isDel: 0
       },
+      // 编辑的周期
+      edit1: {},
       flag2: false,
+      flagEdit2: false,
       // 周期id
       cycleId: {
         id: ''
@@ -196,7 +184,10 @@ export default {
     // 作物管理部分
     // 获取作物列表
     async getcrops () {
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/crop/queryByProjectId', this.request)
+      const res = await this.$http.post(
+        'http://192.168.1.202:10020/fertilizer/api/crop/queryByProjectId',
+        this.request
+      )
       this.reqParams.totalCount = res.data.data.length
       this.productList = res.data.data
     },
@@ -207,7 +198,10 @@ export default {
         projectId: this.request.projectId,
         isDel: this.crops.isDel
       }
-      await this.$http.post('http://192.168.1.202:10020/fertilizer/api/crop/add', this.crops)
+      await this.$http.post(
+        'http://192.168.1.202:10020/fertilizer/api/crop/add',
+        this.crops
+      )
       this.crops.name = ''
       this.flag1 = false
       this.getcrops()
@@ -215,37 +209,56 @@ export default {
     // 删除数据
     async del (index) {
       this.cropsID.id = this.productList[index].id
-      await this.$http.post('http://192.168.1.202:10020/fertilizer/api/crop/delete', this.cropsID)
+      await this.$http.post(
+        'http://192.168.1.202:10020/fertilizer/api/crop/delete',
+        this.cropsID
+      )
       this.getcrops()
     },
     // 编辑数据
-    editData (item) {
+    editData (index, row) {
       // 将要编辑的数据传入
       // 编辑层打开，显示
-      this.flag1 = true
-      // 将要编辑的数据赋值给this.edit，绑定this.edit
+      this.flagEdit = true
+      // // 将要编辑的数据赋值给this.edit，绑定this.edit
       this.edit = {
-        id: item.id,
-        name: item.name,
-        projectId: item.projectId,
-        isDel: item.isDel
+        id: row.id,
+        name: row.name,
+        projectId: row.projectId,
+        isDel: row.isDel
       }
     },
     // 更新数据
     async updata () {
-      this.flag1 = false
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/crop/update', this.edit)
+      this.flagEdit = false
+      const res = await this.$http.post(
+        'http://192.168.1.202:10020/fertilizer/api/crop/update',
+        this.edit
+      )
       console.log(res)
       this.getcrops()
     },
 
     // 周期管理部分
     // 获取周期列表
+    handleSizeChange1 (val) {
+      // 改变每页显示的条数
+      this.reqParams1.PageSize = val
+      this.reqParams1.currentPage = 1
+    },
+    handleCurrentChange1 (newPage) {
+      // 提交当前页码给后台才能获取对应的数据
+      this.reqParams1.currentPage = newPage
+    },
     async getCycle () {
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/period/queryByProjectId', this.request)
+      const res = await this.$http.post(
+        'http://192.168.1.202:10020/fertilizer/api/period/queryByProjectId',
+        this.request
+      )
+      this.reqParams1.totalCount = res.data.data.length
       this.titles = res.data.data
     },
-    // 增加数据
+    // 增加(编辑)数据
     async addCycle () {
       this.cycle = {
         id: this.cycle.id,
@@ -254,34 +267,46 @@ export default {
         projectId: this.request.projectId,
         isDel: this.cycle.isDel
       }
-      await this.$http.post('http://192.168.1.202:10020/fertilizer/api/period/saveOrUpdate', this.cycle)
+      await this.$http.post(
+        'http://192.168.1.202:10020/fertilizer/api/period/saveOrUpdate',
+        this.cycle
+      )
+      this.flag2 = false
       // 添加完成后清空
+      this.cycle.name = ''
+      this.cycle.descr = ''
       this.getCycle()
     },
     // 删除数据
     async delCycle (index) {
       this.cycleId.id = this.titles[index].id
-      await this.$http.post('http://192.168.1.202:10020/fertilizer/api/period/delete', this.cycleId)
+      await this.$http.post(
+        'http://192.168.1.202:10020/fertilizer/api/period/delete',
+        this.cycleId
+      )
       this.getCycle()
     },
     // 编辑数据
-    editCycle (item) {
+    editCycle (index, row) {
       // 将要编辑的数据传入
       // 编辑层打开，显示
-      this.flag2 = true
+      this.flagEdit2 = true
       // 将要编辑的数据赋值给this.edit，绑定this.edit
-      this.edit = {
-        id: item.id,
-        name: item.name,
-        descr: item.descr,
-        projectId: item.projectId,
-        isDel: item.isDel
+      this.edit1 = {
+        id: row.id,
+        name: row.name,
+        descr: row.descr,
+        projectId: row.projectId,
+        isDel: row.isDel
       }
     },
-    // 更新数据
-    async upCycle () {
-      this.flag2 = false
-      await this.$http.post('http://192.168.1.202:10020/fertilizer/api/period/saveOrUpdate', this.edit)
+    // 更新周期
+    async updataCycle () {
+      this.flagEdit2 = false
+      await this.$http.post(
+        'http://192.168.1.202:10020/fertilizer/api/period/saveOrUpdate',
+        this.edit1
+      )
       this.getCycle()
     }
   }
@@ -309,7 +334,7 @@ export default {
         left: 21%;
         width: 380px;
         height: 50px;
-        background:url(../../../assets/images/bg0.png) no-repeat;
+        background: url(../../../assets/images/bg0.png) no-repeat;
         background-size: contain;
 
         p {
@@ -339,13 +364,43 @@ export default {
         margin: 0 0 0 32px;
 
         /deep/ .el-input {
-          margin: 10% 10px 0 0;
+          margin: 20% 10px 0 0;
           width: 150px;
           font-size: 16px;
         }
       }
       .list {
-        .box {
+        text-align: center;
+        /deep/ .el-table::before {
+          height: 0;
+        }
+        /deep/ .el-table {
+          margin: 0 auto;
+          // margin: 10px 0;
+          background-color: transparent;
+          th {
+            border: 0;
+            background-color: transparent;
+          }
+          tr {
+            border: 0;
+            background-color: transparent;
+          }
+          tr:hover > td {
+            background-color: rgba(85, 92, 98, 0.9);;
+          }
+          td {
+            // border-bottom: 1px solid #666;
+            border: none;
+            // background-color: transparent;
+          }
+        }
+
+        .pager {
+          // position: absolute;
+          // bottom: 12%;
+          // left: 36%;
+          margin-top: 12px;
           text-align: center;
         }
       }
@@ -355,6 +410,7 @@ export default {
     .fer-table {
       position: relative;
       width: 670px;
+      height: 500px;
       border: 1px solid #5c7b95;
       border-radius: 20px;
       background: #000;
@@ -367,7 +423,7 @@ export default {
         left: 21%;
         width: 380px;
         height: 50px;
-        background:url(../../../assets/images/bg0.png) no-repeat;
+        background: url(../../../assets/images/bg0.png) no-repeat;
         background-size: contain;
 
         p {
@@ -379,14 +435,66 @@ export default {
           font-weight: 800;
         }
       }
-
       .add-data {
         position: absolute;
-        right: 30px;
+        right: 40px;
         top: 10px;
       }
       .layer {
+        z-index: 200;
         text-align: center;
+        position: absolute;
+        width: 600px;
+        height: 80%;
+        background-color: rgba(85, 92, 98, 0.9);
+        border: 1px solid #666;
+        border-radius: 15px;
+        margin: 0 0 0 32px;
+
+        /deep/ .el-input {
+          margin: 20% 10px 0 0;
+          width: 150px;
+          font-size: 16px;
+        }
+        /deep/ .el-textarea__inner {
+          width: 300px;
+          font-size: 16px;
+          margin: 10px auto;
+        }
+      }
+      .list {
+        text-align: center;
+        /deep/ .el-table::before {
+          height: 0;
+        }
+        /deep/ .el-table {
+          margin: 0 auto;
+          background-color: transparent;
+          th {
+            border: 0;
+            background-color: transparent;
+          }
+          tr {
+            border: 0;
+            background-color: transparent;
+          }
+          tr:hover > td {
+            background-color: rgba(85, 92, 98, 0.9);
+          }
+          td {
+            // border-bottom: 1px solid #666;
+            border: none;
+            // background-color: transparent;
+          }
+        }
+
+        .pager {
+          // position: absolute;
+          // bottom: 12%;
+          // left: 36%;
+          margin-top: 12px;
+          text-align: center;
+        }
       }
     }
   }

@@ -6,7 +6,7 @@ const instance = axios.create({
   // 配置对象 基准路径 外部信息
   baseURL: '',
   // 设置超时的连接时间
-  timeout: 1000,
+  // timeout: 1000,
   transformResponse: [(data) => {
     // 对data进行任意格式的转换
     if (data) {

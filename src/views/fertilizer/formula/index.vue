@@ -2,11 +2,11 @@
 <div class="formula">
   <div class="fer-container">
     <div class="fer-plan">
-      <div>
+      <div class="bg-title">
         <p>配方列表</p>
       </div>
-      <div><input class="submit" type="button" value="添加" @click="clear"></div>
-      <table class="pn-ltable" border="1" cellspacing="0" cellpadding="10" align="center">
+      <div class="add-data"><input class="submit" type="button" value="添加" @click="clear"></div>
+      <!-- <table class="pn-ltable" border="1" cellspacing="0" cellpadding="10" align="center">
         <thead>
           <tr>
             <th width="70">配方名称</th>
@@ -34,7 +34,38 @@
             </td>
           </tr>
         </tbody>
-      </table>
+      </table> -->
+      <div class="list">
+        <el-table
+          :data="titles.slice((reqParamsFl.currentPage-1)*reqParamsFl.PageSize,reqParamsFl.currentPage*reqParamsFl.PageSize)"
+          style="width:730px"
+        >
+          <el-table-column label="序号" type="index" width="70" align="center"></el-table-column>
+          <el-table-column prop="name" label="配方名称" width="70" align="center"></el-table-column>
+          <el-table-column prop="cropName" label="作物名称" width="70" align="center"></el-table-column>
+          <el-table-column prop="cycleName" label="周期名称" width="70" align="center"></el-table-column>
+          <el-table-column prop="periodDay" label="周期天数" width="70" align="center"></el-table-column>
+          <el-table-column prop="ecBase" label="Ec基数" width="70" align="center"></el-table-column>
+          <el-table-column prop="ecTarget" label="Ec目标值" width="70" align="center"></el-table-column>
+          <el-table-column prop="phTarget" label="PH目标值" width="70" align="center"></el-table-column>
+          <el-table-column label="操作" width="150" align="center">
+            <template slot-scope="scope">
+              <el-button size="mini" @click="editData(scope.$index, scope.row)">编辑</el-button>
+              <el-button size="mini" type="danger" @click="del(scope.$index, scope.row)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <div class="pager">
+          <el-pagination
+            layout="prev, pager, next"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="reqParamsFl.currentPage"
+            :page-size="reqParamsFl.PageSize"
+            :total="reqParamsFl.totalCount"
+          ></el-pagination>
+        </div>
+      </div>
     </div>
     <div class="fer-table">
       <div class="bg-title">
@@ -124,6 +155,17 @@
 export default {
   data () {
     return {
+      // 分页
+      reqParamsFl: {
+        // 默认显示第几页
+        currentPage: 1,
+        // 总条数，根据接口获取数据长度(注意：这里不能为空)
+        totalCount: 1,
+        // 个数选择器（可修改）
+        pageSizes: [1, 2, 3, 4],
+        // 默认每页显示的条数（可修改）
+        PageSize: 5
+      },
       // 项目id
       request: {
         projectId: ''
@@ -148,18 +190,28 @@ export default {
     }
   },
   created () {
+    this.getcrop()
+    this.getcycle()
     this.getchannel()
     const projectId = JSON.parse(window.sessionStorage.getItem('projectId'))
     this.request.projectId = projectId
   },
-  beforeMount () {
-    this.getcrop()
-    this.getcycle()
-  },
   mounted () {
-    this.getfomula()
+    let that = this
+    setTimeout(() => {
+      that.getfomula()
+    }, 150)
   },
   methods: {
+    handleSizeChange (val) {
+      // 改变每页显示的条数
+      this.reqParamsFl.PageSize = val
+      this.reqParamsFl.currentPage = 1
+    },
+    handleCurrentChange (newPage) {
+      // 提交当前页码给后台才能获取对应的数据
+      this.reqParamsFl.currentPage = newPage
+    },
     // 获取作物
     async getcrop () {
       const crop = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/crop/queryByProjectId', this.request)
@@ -187,7 +239,7 @@ export default {
         }
       }
       this.titles = titles2
-      // this.titles = res.data.data
+      this.reqParamsFl.totalCount = res.data.data.length
     },
     // 获取施肥通道
     async getchannel () {
@@ -215,26 +267,26 @@ export default {
     //   console.log(event.target.value)
     // },
     // 编辑
-    editData (item) {
+    editData (index, row) {
       this.edit = {
-        id: item.id,
-        projectId: item.projectId,
-        name: item.name,
-        cropId: item.cropId,
-        periodId: item.periodId,
-        periodDay: item.periodDay,
-        ecBase: item.ecBase,
-        ecTarget: item.ecTarget,
-        phTarget: item.phTarget,
-        channel1: item.channel1,
-        channel2: item.channel2,
-        channel3: item.channel3,
-        channel4: item.channel4,
-        channel5: item.channel5,
-        channel6: item.channel6,
-        channel7: item.channel7,
-        channel8: item.channel8,
-        channel9: item.channel9
+        id: row.id,
+        projectId: row.projectId,
+        name: row.name,
+        cropId: row.cropId,
+        periodId: row.periodId,
+        periodDay: row.periodDay,
+        ecBase: row.ecBase,
+        ecTarget: row.ecTarget,
+        phTarget: row.phTarget,
+        channel1: row.channel1,
+        channel2: row.channel2,
+        channel3: row.channel3,
+        channel4: row.channel4,
+        channel5: row.channel5,
+        channel6: row.channel6,
+        channel7: row.channel7,
+        channel8: row.channel8,
+        channel9: row.channel9
       }
     },
     // 更新和提交
@@ -302,7 +354,7 @@ export default {
     border-radius: 10px;
     padding: 70px 0 60px 0;
 
-    div:nth-child(1) {
+    .bg-title {
       position: absolute;
       top: -25px;
       left: 21%;
@@ -319,26 +371,44 @@ export default {
         font-weight: 800;
       }
     }
-
-    div:nth-child(2) {
+    .add-data {
       position: absolute;
       top: 30px;
       right: 42px;
-      // text-align: right;
-
     }
-
-    div:nth-child(3) {
-      padding-left: 20px;
-      .list-group {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-around;
-
-        .list-group-item {
-          height: 40px;
-          line-height: 40px;
+    .list {
+      text-align: center;
+      /deep/ .el-table::before {
+        height: 0;
+      }
+      /deep/ .el-table {
+        margin: 0 auto;
+        // margin: 10px 0;
+        background-color: transparent;
+        th {
+          border: 0;
+          background-color: transparent;
         }
+        tr {
+          border: 0;
+          background-color: transparent;
+        }
+        tr:hover > td {
+          background-color: rgba(85, 92, 98, 0.9);;
+        }
+        td {
+          // border-bottom: 1px solid #666;
+          border: none;
+          // background-color: transparent;
+        }
+      }
+
+      .pager {
+        // position: absolute;
+        // bottom: 12%;
+        // left: 36%;
+        margin-top: 12px;
+        text-align: center;
       }
     }
   }

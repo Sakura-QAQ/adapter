@@ -18,51 +18,43 @@
           <p>策略列表</p>
         </div>
         <div><input class="submit" type="button" value="添加" @click="clear"></div>
-        <div class="pn-ltable">
-          <table border="0" cellspacing="0" cellpadding="10" align="center">
-            <thead align="center">
-              <tr>
-                <td width="70">序号</td>
-                <td width="70">灌溉名称</td>
-                <td width="70">启动时间</td>
-                <td width="70">启动日期</td>
-                <td width="70">结束日期</td>
-                <td width="70">灌溉方式</td>
-                <td width="70">灌溉时长(秒)</td>
-                <td width="70">灌溉流量(m³)</td>
-                <td width="70">每隔</td>
-                <td width="70">配方</td>
-                <td width="70">状态</td>
-                <td width="120">操作</td>
-              </tr>
-            </thead>
-            <tbody align="center">
-              <tr v-for="(item, index) in titles" :key="index">
-                <td>{{index + 1}}</td>
-                <td>{{item.name}}</td>
-                <td>{{item.startTime}}</td>
-                <td>{{item.startDate}}</td>
-                <td>{{item.endDate}}</td>
-                <td>{{item.irrigationType}}</td>
-                <td>{{item.irrigationTime}}</td>
-                <td>{{item.irrigationVolume}}</td>
-                <td>{{item.intervalTime}}</td>
-                <td>{{item.optionName}}</td>
-                <td>{{item.status}}</td>
-                <td>
-                  <span class="edit" @click="editData(item)" style="cursor: pointer;">编辑</span>
-                  &nbsp;
-                  <span
-                    class="delete"
-                    @click="del(index)"
-                    style="cursor: pointer;"
-                  >删除</span>
-                  <span style="cursor: pointer;">启动</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="list">
+          <el-table
+            :data="titles.slice((reqParamsIrr.currentPage-1)*reqParamsIrr.PageSize,reqParamsIrr.currentPage*reqParamsIrr.PageSize)"
+            style="width:790px"
+            highlight-current-row
+            @current-change="ChangeAuto"
+          >
+            <el-table-column label="序号" type="index" width="70" align="center"></el-table-column>
+            <el-table-column prop="name" label="策略名称" width="70" align="center"></el-table-column>
+            <el-table-column prop="startTime" label="起始时间" width="70" align="center"></el-table-column>
+            <!-- <el-table-column prop="startDate" label="起始日期" width="70" align="center"></el-table-column>
+            <el-table-column prop="endDate" label="结束日期" width="70" align="center"></el-table-column> -->
+            <el-table-column prop="irrigationType" label="灌溉类型" width="70" align="center"></el-table-column>
+            <el-table-column prop="irrigationTime" label="灌溉时长" width="70" align="center"></el-table-column>
+            <el-table-column prop="irrigationVolume" label="灌溉流量" width="70" align="center"></el-table-column>
+            <!-- <el-table-column prop="intervalTime" label="每隔" width="70" align="center"></el-table-column> -->
+            <el-table-column prop="optionName" label="配方" width="70" align="center"></el-table-column>
+            <el-table-column prop="status" label="状态" width="70" align="center"></el-table-column>
+            <el-table-column label="操作" width="210" align="center">
+              <template slot-scope="scope">
+                <el-button size="mini" @click="editData(scope.$index, scope.row)">详情</el-button>
+                <el-button size="mini" type="danger" @click="del(scope.$index, scope.row)">删除</el-button>
+                <el-button size="mini" type="primary"  @click="setCurrent(scope.row)">启动</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <div class="pager">
+            <el-pagination
+              layout="prev, pager, next"
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page="reqParamsIrr.currentPage"
+              :page-size="reqParamsIrr.PageSize"
+              :total="reqParamsIrr.totalCount"
+            ></el-pagination>
         </div>
+      </div>
       </div>
       <!-- 详情 -->
       <div class="show-form">
@@ -98,9 +90,9 @@
               </div>
               <div style="margin-left:50px;">
                 <el-radio-group v-model="radio" @change="start">
-                  <el-radio :label="1" style="padding-bottom:5px;">仅一次</el-radio>
+                  <el-radio :label="0" style="padding-bottom:5px;">仅一次</el-radio>
                   <br />
-                  <el-radio :label="0" >
+                  <el-radio :label="1" >
                     <div style="padding-bottom:5px;font-size: 14px;">
                       每隔
                       <input
@@ -143,13 +135,13 @@
             <div>
               <div class="align">灌溉</div>
               <div style="margin-left:50px;">
-                <el-radio-group v-model="radio1">
-                  <el-radio :label="edit.irrigationTime">
+                <el-radio-group v-model="radio1" @change="irr()">
+                  <el-radio :label="0">
                     灌溉时长:
                     <input type="text" v-model="edit.irrigationTime" />(秒)
                   </el-radio>
                   <br />
-                  <el-radio :label="edit.irrigationVolume" style="padding-top:5px;">
+                  <el-radio :label="1" style="padding-top:5px;">
                     灌溉流量:
                     <input type="text" v-model="edit.irrigationVolume" />(m³)
                   </el-radio>
@@ -184,7 +176,7 @@
           <el-checkbox-group v-model="checkboxGroup" @change="changebox">
             <template v-for="(item, index) in 64">
               <el-checkbox-button :label="index" :key="index" v-show="cut(index)" >
-                <div class="valve_num" v-on:dblclick="editval($event)">阀</div>
+                <div class="valve_num" v-on:dblclick="editval($event)">{{index + 1}}阀</div>
               </el-checkbox-button>
             </template>
           </el-checkbox-group>
@@ -199,10 +191,19 @@
 </template>
 
 <script>
-// import collapse from '@/collapse'
 export default {
   data () {
     return {
+      reqParamsIrr: {
+        // 默认显示第几页
+        currentPage: 1,
+        // 总条数，根据接口获取数据长度(注意：这里不能为空)
+        totalCount: 1,
+        // 个数选择器（可修改）
+        pageSizes: [1, 2, 3, 4],
+        // 默认每页显示的条数（可修改）
+        PageSize: 5
+      },
       day: 0,
       hours: 0,
       mins: 0,
@@ -249,7 +250,7 @@ export default {
         fertilizerId: '',
         status: 0,
         startTime: null,
-        onlyOnce: 1,
+        onlyOnce: 0,
         intervalTime: null,
         startDate: null,
         endDate: null,
@@ -261,7 +262,8 @@ export default {
         createTime: null,
         updateTime: null,
         isDel: 0
-      }
+      },
+      currentRow: null
     }
   },
   created () {
@@ -273,10 +275,30 @@ export default {
     this.getfertilizer()
   },
   mounted () {
-    this.enterPage()
+    let that = this
+    setTimeout(() => {
+      that.enterPage()
+    }, 300)
     // this.getIrrigation()
   },
   methods: {
+    setCurrent (row) {
+      // this.$refs.singleTable.setCurrentRow(row)
+      console.log(row)
+    },
+    ChangeAuto (val) {
+      this.currentRow = val
+      console.log(1)
+    },
+    handleSizeChange (val) {
+      // 改变每页显示的条数
+      this.reqParamsFl.PageSize = val
+      this.reqParamsFl.currentPage = 1
+    },
+    handleCurrentChange (newPage) {
+      // 提交当前页码给后台才能获取对应的数据
+      this.reqParamsFl.currentPage = newPage
+    },
     // 进入页面渲染
     async enterPage () {
       const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/queryByFertilizerId', this.reqParams)
@@ -332,11 +354,26 @@ export default {
       this.getfertilizer()
     },
     // 循环计划监控
-    start (value) {
+    start () {
       if (this.radio === 0) {
-        this.day = 0
-        this.hours = 0
-        this.mins = 0
+        let data = {
+          onlyOnce: 1
+        }
+        this.edit.onlyOnce = data.onlyOnce
+        // console.log(this.edit.onlyOnce)
+      } else if (this.radio === 1) {
+        let data = {
+          onlyOnce: 0
+        }
+        this.edit.onlyOnce = data.onlyOnce
+      }
+    },
+    // 灌溉计划监控
+    irr () {
+      if (this.radio1 === 0) {
+        this.edit.irrigationType = '时长'
+      } else if (this.radio1 === 1) {
+        this.edit.irrigationType = '流量'
       }
     },
     // 获取施肥机列表
@@ -349,6 +386,7 @@ export default {
       const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/queryByProjectId', this.request)
       var options = this.options
       var titles2 = res.data.data
+      this.reqParamsIrr = res.data.data.length
       for (var i = 0; i < titles2.length; i++) {
         titles2[i].optionName = '已删除'
         for (var j = 0; j < options.length; j++) {
@@ -383,6 +421,7 @@ export default {
       this.edit.intervalTime = all
       this.edit.valveNumbers = JSON.stringify(this.checkboxGroup)
       this.edit.projectId = this.request.projectId
+      this.edit.fertilizerId = this.reqParams.fertilizerId
       if (this.edit.status === '不可用') {
         this.edit.status = 0
       } else if (this.edit.status === '可用') {
@@ -399,7 +438,7 @@ export default {
       this.hours = 0
       this.mins = 0
       this.checkboxGroup = []
-      this.edit = {}
+      // this.edit = {}
       this.datatime = []
       this.enterPage()
     },
@@ -423,41 +462,56 @@ export default {
       this.getIrrigation()
     },
     // 编辑数据
-    editData (item) {
+    editData (index, row) {
       // 将要编辑的数据传入
       // 编辑层打开，显示
       // this.flag = true
       // 将要编辑的数据赋值给this.edit，绑定this.edit
       // this.edit.valveNumbers = this.checkboxGroup
       // console.log(item.intervalTime)
-      this.day = parseInt(item.intervalTime / (24 * 60))
-      this.hours = parseInt((item.intervalTime % (24 * 60)) / 60)
-      this.mins = (item.intervalTime % (24 * 60)) % 60
-      // this.radio = this.edit.onlyOnce
-      this.datatime.unshift(item.startDate, item.endDate)
+      this.day = parseInt(row.intervalTime / (24 * 60))
+      this.hours = parseInt((row.intervalTime % (24 * 60)) / 60)
+      this.mins = (row.intervalTime % (24 * 60)) % 60
+      // = this.radio = this.edit.
       this.edit = {
-        id: item.id,
-        name: item.name,
-        formulaId: item.formulaId,
-        projectId: item.projectId,
-        fertilizerId: item.fertilizerId,
-        status: item.status,
-        startTime: item.startTime,
-        onlyOnce: item.onlyOnce,
-        intervalTime: item.intervalTime,
-        startDate: item.startDate,
-        endDate: item.endDate,
-        irrigationType: item.irrigationType,
-        irrigationTime: item.irrigationTime,
-        irrigationVolume: item.irrigationVolume,
-        valveNumbers: item.valveNumbers,
-        nextExeTime: item.nextExeTime,
-        createTime: item.createTime,
-        updateTime: item.updateTime,
-        isDel: item.isDel
+        id: row.id,
+        name: row.name,
+        formulaId: row.formulaId,
+        projectId: row.projectId,
+        fertilizerId: row.fertilizerId,
+        status: row.status,
+        startTime: row.startTime,
+        onlyOnce: row.onlyOnce,
+        intervalTime: row.intervalTime,
+        startDate: row.startDate,
+        endDate: row.endDate,
+        irrigationType: row.irrigationType,
+        irrigationTime: row.irrigationTime,
+        irrigationVolume: row.irrigationVolume,
+        valveNumbers: row.valveNumbers,
+        nextExeTime: row.nextExeTime,
+        createTime: row.createTime,
+        updateTime: row.updateTime,
+        isDel: row.isDel
+      }
+      if (this.edit.onlyOnce === 1) {
+        this.radio = 0
+      } else if (this.edit.onlyOnce === 0) {
+        this.radio = 1
+      }
+      if (this.edit.irrigationType === '时长') {
+        this.radio1 = 0
+      } else if (this.edit.irrigationType === '流量') {
+        this.radio1 = 1
+      }
+      if (this.datatime.length === 2) {
+        return false
+      } else {
+        this.datatime.unshift(row.startDate, row.endDate)
       }
       const valnum = JSON.parse(this.edit.valveNumbers)
       this.checkboxGroup = valnum
+
       // console.log(this.edit)
     },
     // // 清空
@@ -555,7 +609,6 @@ export default {
         font-weight: 800;
       }
     }
-
     .pn-ltable {
       overflow: auto;
       margin: 0 auto;
@@ -565,6 +618,38 @@ export default {
       position: absolute;
       right: 30px;
       top: 10px;
+    }
+    .list {
+      text-align: center;
+      /deep/ .el-table::before {
+        height: 0;
+      }
+      /deep/ .el-table {
+        // margin: 10px 0;
+        margin: 0 auto;
+        background-color: transparent;
+        th {
+          border: 0;
+          background-color: transparent;
+        }
+        tr {
+          border: 0;
+          background-color: transparent;
+        }
+        tr:hover > td {
+          background-color: rgba(85, 92, 98, 0.9);;
+        }
+        td {
+          // border-bottom: 1px solid #666;
+          border: none;
+          // background-color: transparent;
+        }
+      }
+
+      .pager {
+        margin-top: 12px;
+        text-align: center;
+      }
     }
   }
 
