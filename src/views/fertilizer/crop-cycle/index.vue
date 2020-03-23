@@ -165,6 +165,7 @@ export default {
       }
     }
   },
+
   created () {
     this.getcrops()
     this.getCycle()
@@ -180,6 +181,12 @@ export default {
     handleCurrentChange (newPage) {
       // 提交当前页码给后台才能获取对应的数据
       this.reqParams.currentPage = newPage
+      // if (this.reqParams.totalCount === (this.reqParams.currentPage - 1) * this.pageSize && this.reqParams.PageSize !== 0) {
+      //   this.reqParams.currentPage -= 1
+      //   // this.getcrops()// 获取列表数据
+      //   // console.log(1)
+      //   console.log(this.reqParams.currentPage)
+      // }
     },
     // 作物管理部分
     // 获取作物列表
@@ -198,22 +205,37 @@ export default {
         projectId: this.request.projectId,
         isDel: this.crops.isDel
       }
-      await this.$http.post(
+      const res = await this.$http.post(
         'http://192.168.1.202:10020/fertilizer/api/crop/add',
         this.crops
       )
+      if (res.data.code === 200) {
+        this.$message.success('添加成功')
+      } else {
+        this.$message.error('添加失败')
+      }
       this.crops.name = ''
       this.flag1 = false
       this.getcrops()
     },
     // 删除数据
-    async del (index) {
-      this.cropsID.id = this.productList[index].id
-      await this.$http.post(
-        'http://192.168.1.202:10020/fertilizer/api/crop/delete',
-        this.cropsID
-      )
-      this.getcrops()
+    async del (index, row) {
+      this.cropsID.id = row.id
+      this.$confirm('此操作将永久删除该作物, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(async () => {
+          await this.$http.post(
+            'http://192.168.1.202:10020/fertilizer/api/crop/delete',
+            this.cropsID
+          )
+          // 删除成功
+          this.$message.success('删除成功')
+          this.getcrops()
+        })
+        .catch(() => {})
     },
     // 编辑数据
     editData (index, row) {
@@ -235,8 +257,14 @@ export default {
         'http://192.168.1.202:10020/fertilizer/api/crop/update',
         this.edit
       )
-      console.log(res)
-      this.getcrops()
+      // console.log(res)
+      if (res.data.code === 200) {
+        this.$message.success('修改成功')
+        this.getcrops()
+      } else {
+        this.$message.error('修改失败')
+        this.getcrops()
+      }
     },
 
     // 周期管理部分
@@ -267,10 +295,15 @@ export default {
         projectId: this.request.projectId,
         isDel: this.cycle.isDel
       }
-      await this.$http.post(
+      const res = await this.$http.post(
         'http://192.168.1.202:10020/fertilizer/api/period/saveOrUpdate',
         this.cycle
       )
+      if (res.data.code === 200) {
+        this.$message.success('添加成功')
+      } else {
+        this.$message.error('添加失败')
+      }
       this.flag2 = false
       // 添加完成后清空
       this.cycle.name = ''
@@ -278,13 +311,23 @@ export default {
       this.getCycle()
     },
     // 删除数据
-    async delCycle (index) {
-      this.cycleId.id = this.titles[index].id
-      await this.$http.post(
-        'http://192.168.1.202:10020/fertilizer/api/period/delete',
-        this.cycleId
-      )
-      this.getCycle()
+    async delCycle (index, row) {
+      this.cycleId.id = row.id
+      this.$confirm('此操作将永久删除该周期, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(async () => {
+          await this.$http.post(
+            'http://192.168.1.202:10020/fertilizer/api/period/delete',
+            this.cycleId
+          )
+          // 删除成功
+          this.$message.success('删除成功')
+          this.getCycle()
+        })
+        .catch(() => {})
     },
     // 编辑数据
     editCycle (index, row) {
@@ -303,13 +346,20 @@ export default {
     // 更新周期
     async updataCycle () {
       this.flagEdit2 = false
-      await this.$http.post(
+      const res = await this.$http.post(
         'http://192.168.1.202:10020/fertilizer/api/period/saveOrUpdate',
         this.edit1
       )
-      this.getCycle()
+      if (res.data.code === 200) {
+        this.$message.success('修改成功')
+        this.getCycle()
+      } else {
+        this.$message.error('修改失败')
+        this.getCycle()
+      }
     }
   }
+
 }
 </script>
 
@@ -393,6 +443,13 @@ export default {
             // border-bottom: 1px solid #666;
             border: none;
             // background-color: transparent;
+          }
+          .cell {
+            .el-button {
+              background-color: rgba(91, 112, 129, 0.9);
+              border: 1px solid transparent;
+              color: #eee;
+            }
           }
         }
 
@@ -485,6 +542,13 @@ export default {
             // border-bottom: 1px solid #666;
             border: none;
             // background-color: transparent;
+          }
+          .cell {
+            .el-button {
+              background-color: rgba(91, 112, 129, 0.9);
+              border: 1px solid transparent;
+              color: #eee;
+            }
           }
         }
 

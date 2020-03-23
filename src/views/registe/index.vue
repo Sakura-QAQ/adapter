@@ -2,11 +2,10 @@
   <div class="registe-container">
     <!-- 注册表单 -->
     <el-card class="registe-box">
-      <img src="../../assets/images/logo.png" alt />
 
       <div>
-        <p style="color:#fff;font-size:32px;margin:30px 0;">欢迎注册蓝海科技登录账号</p>
-        <p style="color:#fff;margin-bottom:20px;">已有账号？<a href="#/login" style="color:#ccc;font-size:18px;"> 立即登录</a></p>
+        <p style="color:#fff;font-size:32px;margin:30px 0;">欢迎注册施肥机账号</p>
+        <p style="color:#fff;margin-bottom:20px;">已有账号？<el-link type="info" href="#/login" style="color:#ccc;font-size:18px;"> 立即登录</el-link></p>
       </div>
 
       <el-form
@@ -14,7 +13,7 @@
         status-icon
         :rules="Regrules"
         ref="RegForm"
-        label-width="130px"
+        label-width="120px"
         class="demo-RegForm"
       >
         <el-form-item label="账号" prop="name">
@@ -43,6 +42,7 @@
           <el-button @click="resetForm('RegForm')">重置</el-button>
         </el-form-item>
       </el-form>
+      <img src="../../assets/images/logo.png" alt />
     </el-card>
   </div>
 </template>
@@ -134,12 +134,13 @@ export default {
 
   .registe-box {
     width: 600px;
-    height: 800px;
+    height: 750px;
     position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    background-color: transparent;
+    // background-color: rgba(155, 140, 140, 0.6);
+    background-color: rgba(6,17,47,.6);
     border: none;
     text-align: center;
     color: #fff;

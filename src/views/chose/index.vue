@@ -4,19 +4,18 @@
     <div class="login-box">
       <!-- 项目列表 -->
       <el-table
+        :show-header="false"
         :data="options"
         style="width: 100%">
         <el-table-column
           prop="name"
-          label="项目名称"
           width="250">
         </el-table-column>
         <el-table-column
           prop="descr"
-          label="项目描述"
           width="350">
         </el-table-column>
-        <el-table-column label="操作">
+        <el-table-column>
           <template slot-scope="scope">
             <el-button
               size="mini"
@@ -34,7 +33,8 @@ export default {
   data () {
     return {
       options: [],
-      projectID: ''
+      projectID: '',
+      activeName: '1'
     }
   },
   created () {
@@ -44,6 +44,7 @@ export default {
     async getlogin () {
       const res = await this.$http.post('http://192.168.1.202:10010/sso/api/getLoginInfo')
       this.options = res.data.data.projectList
+      console.log(this.options)
     },
     pushIn (index, row) {
       window.sessionStorage.setItem('projectId', JSON.stringify(row.id))
@@ -79,7 +80,7 @@ export default {
     left: 50%;
     top: 40%;
     transform: translate(-50%, -50%);
-    background-color: transparent;
+    // background-color: transparent;
     text-align: center;
     color: #fff;
 

@@ -1,7 +1,8 @@
 <template>
   <div class="login-container">
+    <!-- <img src="../../assets/images/cover.png" alt=""> -->
     <el-card class="login-box">
-      <img src="../../assets/images/logo.png" alt />
+      <p>欢迎登陆智能施肥机管理系统</p>
       <!-- 登录表单 -->
       <el-form ref="loginForm" :status-icon="true" :model="loginForm" :rules="loginRules">
         <el-form-item prop="name">
@@ -18,6 +19,11 @@
           <el-button style="width:48%" type="primary" plain @click="registe">注册</el-button>
         </el-form-item>
       </el-form>
+      <img src="../../assets/images/logo.png" alt />
+      <div class="lt"></div>
+      <div class="lb"></div>
+      <div class="rt"></div>
+      <div class="rb"></div>
     </el-card>
   </div>
 </template>
@@ -61,14 +67,13 @@ export default {
               this.$message.error('密码错误')
               return false
             } else if (res.data.code === 200) {
-              // console.log(res.data.data)
               // 存数据
               window.sessionStorage.setItem('token', JSON.stringify(res.data.data))
               // 跳路由
               this.$router.push('/chose')
             }
           } catch (err) {
-            this.$message.error('服务器异常')
+            this.$message.error('网络异常')
             // console.log(err)
             if (err) {
               this.loading = false
@@ -77,8 +82,8 @@ export default {
         }
       })
     },
-    registe () {
-      this.$router.push('/registe')
+    async registe () {
+      await this.$router.push('/registe')
     }
   }
 }
@@ -95,13 +100,14 @@ export default {
   // 背景图定位 / 背景图尺寸
   background: url(../../assets/images/demo-1-bg.jpg) no-repeat center / cover;
   .login-box {
-    width: 400px;
-    // height: 350px;
+    width: 600px;
+    height: 450px;
+    position: relative;
     position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    background-color: transparent;
+    background-color: rgba(6,17,47,.7);
     border: none;
     img {
       display: block;
@@ -111,6 +117,63 @@ export default {
     /deep/ .el-icon-loading {
       color: #fff;
       font-size: 14px;
+    }
+    p {
+      color: #fff;
+      font-size: 32px;
+      text-align: center;
+      margin: 20px 0;
+      font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+    }
+    .rt {
+      z-index: 100;
+      position: absolute;
+      right: 0px;
+      top: 0px;
+      width: 40px;
+      height: 40px;
+      border-top: 2px solid #fff;
+      border-right: 2px solid #fff;
+    }
+    .rb {
+      z-index: 100;
+      position: absolute;
+      bottom: 0px;
+      right: 0px;
+      width: 40px;
+      height: 40px;
+      border-bottom: 2px solid #fff;
+      border-right: 2px solid #fff;
+    }
+    .lt {
+      z-index: 100;
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      width: 40px;
+      height: 40px;
+      border-left: 2px solid #fff;
+      border-top: 2px solid #fff;
+    }
+    .lb {
+      z-index: 100;
+      position: absolute;
+      left: 0px;
+      bottom: 0px;
+      width: 40px;
+      height: 40px;
+      border-left: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+    }
+  }
+  .cover {
+    // background: url('../../assets/images/cover.png') no-repeat center / cover;
+    position: absolute;
+    right: 0;
+    top: 0;
+    img {
+      width: 800px;
+      height: 300px;
     }
   }
 }

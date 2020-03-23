@@ -24,14 +24,42 @@ Vue.use(VueRouter)
 const router = new VueRouter({
   // 配置路由规则
   routes: [
-    { name: 'login', path: '/login', component: Login },
-    { name: 'registe', path: '/registe', component: Registe },
-    { name: 'chose', path: '/chose', component: Chose },
+    {
+      name: 'login',
+      path: '/login',
+      meta: {
+        index: 0
+      },
+      component: Login
+    },
+    {
+      name: 'registe',
+      path: '/registe',
+      meta: {
+        index: 1
+      },
+      component: Registe
+    },
+    {
+      name: 'chose',
+      path: '/chose',
+      meta: {
+        index: 2
+      },
+      component: Chose
+    },
     {
       path: '/',
       component: Home,
       children: [
-        { name: 'welcome', path: '/', component: Welcome },
+        {
+          name: 'welcome',
+          path: '/',
+          meta: {
+            index: 3
+          },
+          component: Welcome
+        },
         { name: 'weather', path: '/weather', component: Weather },
         { name: 'soil', path: '/soil', component: Soil },
         { name: 'irrigation', path: '/irrigation', component: Irrigation },
@@ -54,6 +82,7 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.path === '/login') return next()
+  if (to.path === '/registe') return next()
   const user = window.sessionStorage.getItem('token')
   if (user) return next()
   next('/login')

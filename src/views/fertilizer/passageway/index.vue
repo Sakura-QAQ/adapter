@@ -117,7 +117,6 @@ export default {
     // 获取通道数据
     async getway () {
       const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/channel/queryByProjectId', this.request)
-      console.log(res)
       this.plans = res.data.data
       // console.log(res.data.data)
     },
@@ -140,7 +139,12 @@ export default {
         isDel: this.plans.isDel
       }
       const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/channel/saveOrUpdate', this.plans)
-      console.log(res)
+      // console.log(res)
+      if (res.data.code === 200) {
+        this.$message.success('修改成功')
+      } else {
+        this.$message.error('修改失败')
+      }
       this.getway()
     },
     // 清空

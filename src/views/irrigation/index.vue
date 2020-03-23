@@ -22,7 +22,6 @@
           <el-table
             :data="titles.slice((reqParamsIrr.currentPage-1)*reqParamsIrr.PageSize,reqParamsIrr.currentPage*reqParamsIrr.PageSize)"
             style="width:790px"
-            highlight-current-row
             @current-change="ChangeAuto"
           >
             <el-table-column label="序号" type="index" width="70" align="center"></el-table-column>
@@ -169,14 +168,23 @@
             </div>
           </div>
         </div>
+        <div class="editbox" v-if="flagVal">
+          <div class="vals">
+            阀号名称:<el-input v-model="Valsname"></el-input>
+          </div>
+          <div class="vals-btn">
+            <input class="submit" type="button" value="修改" @click="modifyVal">&nbsp;
+            <input class="submit" type="button" value="取消" @click="flagVal=false">
+          </div>
+        </div>
         <div class="control-valve">
           <div class="bg-tag">
             <p>阀号</p>
           </div>
           <el-checkbox-group v-model="checkboxGroup" @change="changebox">
-            <template v-for="(item, index) in 64">
+            <template v-for="(item, index) in Vals">
               <el-checkbox-button :label="index" :key="index" v-show="cut(index)" >
-                <div class="valve_num" v-on:dblclick="editval($event)">{{index + 1}}阀</div>
+                <div class="valve_num" v-on:dblclick="editval($event, index)">{{item}}</div>
               </el-checkbox-button>
             </template>
           </el-checkbox-group>
@@ -208,20 +216,25 @@ export default {
       hours: 0,
       mins: 0,
       curIndex: false,
-      message: '',
-      message1: '',
-      message2: '',
       isActive: false,
       content: '更多阀号▼',
       // 阀号
-      val: '',
+      Vals: [],
+      Valsname: '',
+      ValsIndex: null,
+      // 阀号弹出层
+      flagVal: false,
       // 灌溉列表
       titles: [],
       // 施肥机数据
       fertilizer: [],
       // 施肥机下拉框传的id
       reqParams: {
-        fertilizerId: '6c539b84-6380-11ea-9f50-00d86189352f'
+        fertilizerId: ''
+      },
+      // 阀号id(施肥机id)
+      ValId: {
+        id: ''
       },
       // 循环计划单选
       radio: 0,
@@ -250,11 +263,11 @@ export default {
         fertilizerId: '',
         status: 0,
         startTime: null,
-        onlyOnce: 0,
+        onlyOnce: 1,
         intervalTime: null,
         startDate: null,
         endDate: null,
-        irrigationType: null,
+        irrigationType: 0,
         irrigationTime: null,
         irrigationVolume: null,
         valveNumbers: '',
@@ -264,22 +277,26 @@ export default {
         isDel: 0
       },
       currentRow: null
+      // 胡涛的施肥机id
+      // id: {
+      //   id: '70a8c935-5d11-11ea-9f50-00d86189352f'
+      // }
     }
   },
   created () {
     const projectId = JSON.parse(window.sessionStorage.getItem('projectId'))
     this.request.projectId = projectId
-    // const fertilizerId = window.sessionStorage.getItem('fertilizerId')
-    // this.reqParams.fertilizerId = fertilizerId
     this.getfomula()
     this.getfertilizer()
+    // 获取阀号
   },
   mounted () {
     let that = this
     setTimeout(() => {
       that.enterPage()
-    }, 300)
-    // this.getIrrigation()
+      that.getValve()
+      this.ValId.id = this.reqParams.fertilizerId
+    }, 200)
   },
   methods: {
     setCurrent (row) {
@@ -288,16 +305,16 @@ export default {
     },
     ChangeAuto (val) {
       this.currentRow = val
-      console.log(1)
     },
     handleSizeChange (val) {
       // 改变每页显示的条数
-      this.reqParamsFl.PageSize = val
-      this.reqParamsFl.currentPage = 1
+      this.reqParamsIrr.PageSize = val
+      this.reqParamsIrr.currentPage = 1
     },
     handleCurrentChange (newPage) {
       // 提交当前页码给后台才能获取对应的数据
-      this.reqParamsFl.currentPage = newPage
+      this.reqParamsIrr.currentPage = newPage
+      // console.log(newPage)
     },
     // 进入页面渲染
     async enterPage () {
@@ -324,11 +341,11 @@ export default {
           titles2[i].irrigationType = '流量'
         }
       }
+      this.reqParamsIrr.totalCount = res.data.data.length
     },
     // 切换施肥机
     async fn () {
       const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/queryByFertilizerId', this.reqParams)
-      // console.log(this.reqParams.fertilizerId)
       this.titles = res.data.data
       var options = this.options
       var titles2 = res.data.data
@@ -351,7 +368,8 @@ export default {
           titles2[i].irrigationType = '流量'
         }
       }
-      this.getfertilizer()
+      this.ValId.id = this.reqParams.fertilizerId
+      this.getValve()
     },
     // 循环计划监控
     start () {
@@ -380,13 +398,13 @@ export default {
     async getfertilizer () {
       const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/fertilizer/queryByProjectId', this.request)
       this.fertilizer = res.data.data
+      this.reqParams.fertilizerId = this.fertilizer[0].id
     },
     // 获取灌溉策略列表
     async getIrrigation () {
       const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/queryByProjectId', this.request)
       var options = this.options
       var titles2 = res.data.data
-      this.reqParamsIrr = res.data.data.length
       for (var i = 0; i < titles2.length; i++) {
         titles2[i].optionName = '已删除'
         for (var j = 0; j < options.length; j++) {
@@ -433,13 +451,13 @@ export default {
         this.edit.irrigationType = 1
       }
       const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/saveOrUpdate', this.edit)
-      console.log(res)
-      this.day = 0
-      this.hours = 0
-      this.mins = 0
-      this.checkboxGroup = []
-      // this.edit = {}
-      this.datatime = []
+      // console.log(res)
+      if (res.data.code === 200) {
+        this.$message.success('处理成功')
+      } else {
+        this.$message.error('处理失败')
+      }
+      this.clear()
       this.enterPage()
     },
     changebox () {
@@ -447,19 +465,20 @@ export default {
       this.edit.valveNumbers = this.checkboxGroup
     },
     // 删除数据
-    async del (index) {
-      // 点击删除后，将删除数据的下标传入，进行删除
-      // if (confirm('是否删除') === true) {
-      //   if (this.titles.length === 1) {
-      //     alert('至少保留一条数据')
-      //     return false
-      //   } else {
-      //     this.titles.splice(index, 1)
-      //   }
-      // }
-      this.planId.id = this.titles[index].id
-      await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/delete', this.planId)
-      this.getIrrigation()
+    async del (index, row) {
+      this.planId.id = row.id
+      this.$confirm('此操作将永久删除该策略, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(async () => {
+          await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/delete', this.planId)
+          // 删除成功
+          this.$message.success('删除成功')
+          this.enterPage()
+        })
+        .catch(() => {})
     },
     // 编辑数据
     editData (index, row) {
@@ -469,6 +488,8 @@ export default {
       // 将要编辑的数据赋值给this.edit，绑定this.edit
       // this.edit.valveNumbers = this.checkboxGroup
       // console.log(item.intervalTime)
+      // 赋值之前先清空上一个
+      this.clear()
       this.day = parseInt(row.intervalTime / (24 * 60))
       this.hours = parseInt((row.intervalTime % (24 * 60)) / 60)
       this.mins = (row.intervalTime % (24 * 60)) % 60
@@ -504,22 +525,45 @@ export default {
       } else if (this.edit.irrigationType === '流量') {
         this.radio1 = 1
       }
-      if (this.datatime.length === 2) {
-        return false
-      } else {
-        this.datatime.unshift(row.startDate, row.endDate)
-      }
+      // if (this.datatime.length === 2) {
+      //   return false
+      // } else {
+      //   this.datatime.unshift(row.startDate, row.endDate)
+      // }
+      this.datatime.unshift(row.startDate, row.endDate)
       const valnum = JSON.parse(this.edit.valveNumbers)
       this.checkboxGroup = valnum
 
       // console.log(this.edit)
     },
-    // // 清空
+    // 清空后添加
     clear () {
-      this.edit = {}
+      this.edit = {
+        id: '',
+        name: '',
+        formulaId: '',
+        projectId: '',
+        fertilizerId: '',
+        status: 0,
+        startTime: '00:00',
+        onlyOnce: 1,
+        intervalTime: null,
+        startDate: null,
+        endDate: null,
+        irrigationType: 0,
+        irrigationTime: 0,
+        irrigationVolume: null,
+        valveNumbers: '',
+        nextExeTime: null,
+        createTime: null,
+        updateTime: null,
+        isDel: 0
+      }
       this.day = 0
       this.hours = 0
       this.mins = 0
+      this.radio = 0
+      this.radio1 = 0
       this.checkboxGroup = []
       this.datatime = []
     },
@@ -547,9 +591,34 @@ export default {
       this.edit.startDate = this.datatime[0]
       this.edit.endDate = this.datatime[1]
     },
-    editval (e) {
-      console.log(e.target.textContent)
-      e.target.textContent = 8
+    // 获取阀名
+    async getValve () {
+      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/fertilizer/queryValveAlias', this.ValId)
+      const strs = res.data.data
+      this.Vals = strs.split(',')
+    },
+    // 编辑阀名
+    editval (e, index) {
+      this.flagVal = true
+      this.Valsname = this.Vals[index]
+      this.ValsIndex = index
+    },
+    // 修改阀名
+    async modifyVal () {
+      this.flagVal = false
+      let i = this.ValsIndex
+      this.Vals[i] = this.Valsname
+      let valve = {
+        id: this.ValId.id,
+        valveAlias: this.Vals.join(',')
+      }
+      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/fertilizer/updateValveAlias', valve)
+      if (res.data.code === 200) {
+        this.$message.success('处理成功')
+      } else {
+        this.$message.error('处理失败')
+      }
+      this.getValve()
     }
   }
 }
@@ -644,6 +713,13 @@ export default {
           border: none;
           // background-color: transparent;
         }
+        .cell {
+          .el-button {
+            background-color: rgba(82, 102, 119, 0.9);
+            border: 1px solid transparent;
+            color: #eee;
+          }
+        }
       }
 
       .pager {
@@ -732,7 +808,29 @@ export default {
         color: #97b1c9;
       }
     }
+    .editbox {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 638px;
+      height: 270px;
+      background-color: rgba(85, 92, 98, 0.9);
+      margin: 32px 16px;
+      .vals {
+        margin-left: 200px;
+        /deep/ .el-input {
+          width: 150px;
+          text-align: center;
+          margin: 100px 0 0 10px;
+        }
+      }
+      .vals-btn {
+        margin-top: 15px;
+        text-align: center;
+      }
+    }
     .control-valve {
+      margin-top: 70px;
       .valve {
         display: flex;
         justify-content: space-evenly;

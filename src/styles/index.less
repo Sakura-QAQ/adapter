@@ -1,11 +1,64 @@
-body,dd,div,dl,dt,h1,h2,h3,h4,h5,h6,input,li,ol,p,ul,i{margin:0;padding:0;text-decoration:none;box-sizing:border-box;font-style:normal;font-family:"微软雅黑";font-size:16px;color:#97b1c9}
-.clearfix::after,.clearfix::before{content:"";display:table}
-.clearfix::after{clear:both}
-.clearfix{*zoom:1}
-li{list-style:none}
-a{text-decoration:none;color:#000}
-img{border:0 none;vertical-align:middle}
-textarea{outline:0;border:0 none}
+body,
+dd,
+div,
+dl,
+dt,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+input,
+li,
+ol,
+p,
+ul,
+i {
+  margin: 0;
+  padding: 0;
+  text-decoration: none;
+  box-sizing: border-box;
+  font-style: normal;
+  font-family: "微软雅黑";
+  font-size: 16px;
+  // color: #97b1c9
+  // color: #fff
+}
+
+.clearfix::after,
+.clearfix::before {
+  content: "";
+  display: table
+}
+
+.clearfix::after {
+  clear: both
+}
+
+.clearfix {
+  *zoom: 1
+}
+
+li {
+  list-style: none
+}
+
+a {
+  text-decoration: none;
+  color: #000
+}
+
+img {
+  border: 0 none;
+  vertical-align: middle
+}
+
+textarea {
+  outline: 0;
+  border: 0 none
+}
+
 input {
   width: 80px;
   height: 25px;
@@ -22,6 +75,7 @@ input {
   font-size: 18px;
   vertical-align: middle;
 }
+
 input:-webkit-autofill,
 textarea:-webkit-autofill,
 select:-webkit-autofill {
@@ -31,6 +85,7 @@ select:-webkit-autofill {
   background-image: none;
   transition: background-color 50000s ease-in-out 0s;
 }
+
 select {
   height: 30px;
   padding: 0 15px;
@@ -40,12 +95,14 @@ select {
   background-color: rgba(41, 58, 72);
   // vertical-align: middle;
 }
+
 .submit {
   width: 80px;
   height: 30px;
   color: #fff;
   background-color: #6888a4;
 }
+
 .el-menu-item {
   font-size: 16px;
 }
@@ -53,7 +110,13 @@ select {
 .el-container {
   background: url(../assets/images/bg.png) no-repeat center / cover;
   color: #fff;
+  background-color: #fff;
 }
+
+.my-header {
+  background: #000;
+}
+
 .top-position {
   background: linear-gradient(to right, #213b53, transparent);
   height: 40px;

@@ -6,48 +6,18 @@
         <p>配方列表</p>
       </div>
       <div class="add-data"><input class="submit" type="button" value="添加" @click="clear"></div>
-      <!-- <table class="pn-ltable" border="1" cellspacing="0" cellpadding="10" align="center">
-        <thead>
-          <tr>
-            <th width="70">配方名称</th>
-            <th width="70">作物</th>
-            <th width="70">周期</th>
-            <th width="70">周期天数</th>
-            <th width="70">EC基数</th>
-            <th width="70">EC目标</th>
-            <th width="70">PH目标</th>
-            <th width="70">操作</th>
-          </tr>
-        </thead>
-        <tbody class="pn-ltbody" align="center">
-          <tr v-for="(item, index) in titles" :key="index">
-            <td>{{item.name}}</td>
-            <td>{{item.cropName}}</td>
-            <td>{{item.cycleName}}</td>
-            <td>{{item.periodDay}}</td>
-            <td>{{item.ecBase}}</td>
-            <td>{{item.ecTarget}}</td>
-            <td>{{item.phTarget}}</td>
-            <td>
-              <span class="edit" @click="editData(item)" style="cursor: pointer;">编辑</span>&nbsp;
-              <span class="edit" @click="del(index)" style="cursor: pointer;">删除</span>
-            </td>
-          </tr>
-        </tbody>
-      </table> -->
       <div class="list">
         <el-table
           :data="titles.slice((reqParamsFl.currentPage-1)*reqParamsFl.PageSize,reqParamsFl.currentPage*reqParamsFl.PageSize)"
-          style="width:730px"
+          style="width:760px"
         >
-          <el-table-column label="序号" type="index" width="70" align="center"></el-table-column>
-          <el-table-column prop="name" label="配方名称" width="70" align="center"></el-table-column>
-          <el-table-column prop="cropName" label="作物名称" width="70" align="center"></el-table-column>
-          <el-table-column prop="cycleName" label="周期名称" width="70" align="center"></el-table-column>
-          <el-table-column prop="periodDay" label="周期天数" width="70" align="center"></el-table-column>
+          <el-table-column prop="name" label="配方" width="120" align="center"></el-table-column>
+          <el-table-column prop="cropName" label="作物" width="90" align="center"></el-table-column>
+          <el-table-column prop="cycleName" label="周期" width="70" align="center"></el-table-column>
+          <el-table-column prop="periodDay" label="天数" width="70" align="center"></el-table-column>
           <el-table-column prop="ecBase" label="Ec基数" width="70" align="center"></el-table-column>
-          <el-table-column prop="ecTarget" label="Ec目标值" width="70" align="center"></el-table-column>
-          <el-table-column prop="phTarget" label="PH目标值" width="70" align="center"></el-table-column>
+          <el-table-column prop="ecTarget" label="Ec目标值" width="90" align="center"></el-table-column>
+          <el-table-column prop="phTarget" label="PH目标值" width="95" align="center"></el-table-column>
           <el-table-column label="操作" width="150" align="center">
             <template slot-scope="scope">
               <el-button size="mini" @click="editData(scope.$index, scope.row)">编辑</el-button>
@@ -77,7 +47,7 @@
           <input class="submit" type="button" value="提交" @click="updata" />
         </li>
         <li>
-          配方名称: <input type="text" v-model="edit.name">
+          配方名称: <input type="text" style="width:138px;" v-model="edit.name">
         </li>
         <li class="check-time">
           <span>
@@ -160,11 +130,11 @@ export default {
         // 默认显示第几页
         currentPage: 1,
         // 总条数，根据接口获取数据长度(注意：这里不能为空)
-        totalCount: 1,
+        totalCount: 0,
         // 个数选择器（可修改）
         pageSizes: [1, 2, 3, 4],
         // 默认每页显示的条数（可修改）
-        PageSize: 5
+        PageSize: 6
       },
       // 项目id
       request: {
@@ -203,6 +173,12 @@ export default {
     }, 150)
   },
   methods: {
+    tableRowClassName (row, rowIndex) {
+      if (rowIndex % 2 !== 1) {
+        return 'success-row'
+      }
+      return ''
+    },
     handleSizeChange (val) {
       // 改变每页显示的条数
       this.reqParamsFl.PageSize = val
@@ -252,20 +228,26 @@ export default {
       const cycle = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/period/queryByProjectId', this.request)
       this.cycle = cycle.data.data
     },
-    // 删除作物
-    async del (index) {
-      this.fomulaId.id = this.titles[index].id
-      await this.$http.post('http://192.168.1.202:10020/fertilizer/api/formula/delete', this.fomulaId)
-      this.getfomula()
+    // 删除
+    async del (index, row) {
+      // let that = this
+      this.fomulaId.id = row.id
+      this.$confirm('此操作将永久删除该配方, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(async () => {
+          await this.$http.post('http://192.168.1.202:10020/fertilizer/api/formula/delete', this.fomulaId)
+          // 删除成功
+          // this.$message.success('删除成功')
+          let totalPage = Math.ceil((this.reqParamsFl.totalCount) / this.reqParamsFl.PageSize)
+          let currentPage = this.reqParamsFl.currentPage > totalPage ? totalPage : this.reqParamsFl.currentPage
+          this.reqParamsFl.currentPage = currentPage < 1 ? 1 : currentPage
+          this.getfomula()
+        })
+        .catch(() => {})
     },
-    // 获取索引
-    // fn (event) {
-    //   console.log(event.target.value)
-    // },
-    // 获取周期索引
-    // cycleindex (event) {
-    //   console.log(event.target.value)
-    // },
     // 编辑
     editData (index, row) {
       this.edit = {
@@ -311,9 +293,15 @@ export default {
         channel8: this.edit.channel8,
         channel9: this.edit.channel9
       }
-      await this.$http.post('http://192.168.1.202:10020/fertilizer/api/formula/saveOrUpdate', this.edit)
+      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/formula/saveOrUpdate', this.edit)
+      if (res.data.code === 200) {
+        this.$message.success('处理成功')
+        this.getfomula()
+      } else {
+        this.$message.error('处理失败')
+        this.getfomula()
+      }
       this.edit = {}
-      this.getfomula()
     },
     clear () {
       this.edit = {
@@ -353,6 +341,7 @@ export default {
     background-color: #000;
     border-radius: 10px;
     padding: 70px 0 60px 0;
+    color: #fff;
 
     .bg-title {
       position: absolute;
@@ -385,6 +374,7 @@ export default {
         margin: 0 auto;
         // margin: 10px 0;
         background-color: transparent;
+        color: #fff;
         th {
           border: 0;
           background-color: transparent;
@@ -393,13 +383,30 @@ export default {
           border: 0;
           background-color: transparent;
         }
+        tr:nth-child(odd) {
+          background-color: rgba(43, 45, 47, 0.9);
+        }
+        tr:nth-child(even) {
+          background-color: rgba(55, 59, 63, 0.9);
+        }
         tr:hover > td {
-          background-color: rgba(85, 92, 98, 0.9);;
+          background-color: rgba(55, 59, 63, 0.9);;
         }
         td {
           // border-bottom: 1px solid #666;
           border: none;
           // background-color: transparent;
+        }
+        thead {
+          color: #eee;
+          background-color: rgba(55, 59, 63, 0.9);
+        }
+        .cell {
+          .el-button {
+            background-color: rgba(91, 112, 129, 0.9);
+            border: 1px solid transparent;
+            color: #eee;
+          }
         }
       }
 
@@ -416,10 +423,10 @@ export default {
   .fer-table {
     position: relative;
     width: 670px;
-    height: 500px;
+    height: 572px;
     border: 1px solid #5c7b95;
-    border-radius: 20px;
-    background: #000;
+    border-radius: 10px;
+    background: rgba(19, 18, 18, 0.8);
     padding-top: 60px;
     margin-top: 30px;
 
@@ -444,7 +451,7 @@ export default {
     ul {
       padding: 0 15px;
       li {
-        margin-bottom: 10px;
+        margin-bottom: 25px;
 
         .submit {
           position: absolute;
@@ -467,6 +474,10 @@ export default {
             margin: 10px 15px;
           }
         }
+      }
+      select {
+        height: 30px;
+        line-height: 30px;
       }
     }
   }
