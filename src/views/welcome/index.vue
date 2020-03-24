@@ -709,7 +709,7 @@ export default {
     }
     .weather {
       width: 800px;
-      height: 415px;
+      height: 420px;
       background-color:  rgb(49, 58, 68);
       position: relative;
       .topCard {
