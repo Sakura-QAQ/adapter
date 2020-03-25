@@ -43,7 +43,6 @@
       </div>
       <ul>
         <li>
-          <!-- <input class="add" type="submit" value="添加" @click="add" /> -->
           <input class="submit" type="button" value="提交" @click="updata" />
         </li>
         <li>
@@ -294,6 +293,8 @@ export default {
         channel9: this.edit.channel9
       }
       const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/formula/saveOrUpdate', this.edit)
+      console.log(res)
+
       if (res.data.code === 200) {
         this.$message.success('处理成功')
         this.getfomula()

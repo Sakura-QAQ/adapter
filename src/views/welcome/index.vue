@@ -834,7 +834,7 @@ export default {
     }
     .leftCard {
       float: left;
-      width: 30%;
+      width: 19%;
       height: 740px;
       background-color: rgba(64,64,64,0.5);
       .bgfont {
@@ -850,17 +850,17 @@ export default {
           margin-top: 12px;
 
           .icons {
-            width: 35%;
+            width: 42%;
             height: 80px;
             border-radius: 5px;
-            font-size: 1.5rem;
+            font-size: 1.45rem;
             border-right: 1px solid RGB(101,133,159);
             float: left;
             font-weight: 800;
             background-color: RGB(54,76,95);
           }
           .content {
-            width: 65%;
+            width: 58%;
             height: 80px;
             border-radius: 5px;
             font-size: 1.3rem;
@@ -872,7 +872,7 @@ export default {
     }
     .bargraph {
       float: left;
-      width: 70%;
+      width: 81%;
       height: 740px;
     }
     .btn {
@@ -904,7 +904,7 @@ export default {
     }
     .leftCard {
       float: left;
-      width: 30%;
+      width: 19%;
       height: 740px;
       background-color: rgba(64,64,64,0.5);
       .bgfont {
@@ -920,17 +920,17 @@ export default {
           margin-top: 12px;
 
           .icons {
-            width: 35%;
+            width: 42%;
             height: 80px;
             border-radius: 5px;
-            font-size: 1.5rem;
+            font-size: 1.45rem;
             border-right: 1px solid RGB(101,133,159);
             float: left;
             font-weight: 800;
             background-color: RGB(54,76,95);
           }
           .content {
-            width: 65%;
+            width: 58%;
             height: 80px;
             border-radius: 5px;
             font-size: 1.3rem;
@@ -942,7 +942,7 @@ export default {
     }
     .bargraph {
       float: left;
-      width: 70%;
+      width: 81%;
       height: 740px;
     }
     .btn {
@@ -974,7 +974,7 @@ export default {
     }
     .leftCard {
       float: left;
-      width: 30%;
+      width: 19%;
       height: 740px;
       background-color: rgba(64,64,64,0.5);
       .bgfont {
@@ -990,17 +990,17 @@ export default {
           margin-top: 12px;
 
           .icons {
-            width: 35%;
+            width: 42%;
             height: 80px;
             border-radius: 5px;
-            font-size: 1.5rem;
+            font-size: 1.45rem;
             border-right: 1px solid RGB(101,133,159);
             float: left;
             font-weight: 800;
             background-color: RGB(54,76,95);
           }
           .content {
-            width: 65%;
+            width: 58%;
             height: 80px;
             border-radius: 5px;
             font-size: 1.3rem;
@@ -1012,7 +1012,7 @@ export default {
     }
     .bargraph {
       float: left;
-      width: 70%;
+      width: 81%;
       height: 740px;
     }
     .btn {

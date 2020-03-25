@@ -277,10 +277,6 @@ export default {
         isDel: 0
       },
       currentRow: null
-      // 胡涛的施肥机id
-      // id: {
-      //   id: '70a8c935-5d11-11ea-9f50-00d86189352f'
-      // }
     }
   },
   created () {
@@ -319,7 +315,6 @@ export default {
     // 进入页面渲染
     async enterPage () {
       const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/queryByFertilizerId', this.reqParams)
-      // this.titles = res.data.data
       var options = this.options
       var titles2 = res.data.data
       for (var i = 0; i < titles2.length; i++) {
