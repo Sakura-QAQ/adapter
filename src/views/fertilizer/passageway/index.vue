@@ -71,28 +71,6 @@
         </table>
       </div>
     </div>
-
-    <!-- <div class="modify">
-      <div class="bg-title">
-        <p>通道管理</p>
-      </div>
-      <div class="btn">
-        <input type="button" value="修改" @click="updata">&nbsp;
-        <input type="button" value="清空" @click="clear">
-      </div>
-      <div class="passway">
-        <div>通道1: <input type="text" v-model="edit.channel1"></div>
-        <div>通道2: <input type="text" v-model="edit.channel2"></div>
-        <div>通道3: <input type="text" v-model="edit.channel3"></div>
-        <div>通道4: <input type="text" v-model="edit.channel4"></div>
-        <div>通道5: <input type="text" v-model="edit.channel5"></div>
-        <div>通道6: <input type="text" v-model="edit.channel6"></div>
-        <div>通道7: <input type="text" v-model="edit.channel7"></div>
-        <div>通道8: <input type="text" v-model="edit.channel8"></div>
-        <div>通道9: <input type="text" v-model="edit.channel9"></div>
-      </div>
-
-    </div> -->
   </div>
 </div>
 </template>

@@ -20,7 +20,7 @@
           </div>
           <el-checkbox-group class="checkFl" v-model="checkboxGroup">
             <template v-for="(item, index) in Vals">
-              <el-checkbox-button :label="index" :key="index" v-show="index < 8">
+              <el-checkbox-button :label="index" :key="index" v-show="index < 12">
                 <div class="valve_num">{{item}}</div>
               </el-checkbox-button>
             </template>
@@ -28,36 +28,68 @@
         </div>
       </div>
       <div class="leftCard">
-        <div>西红柿定值</div>
-        <div>西红柿定值</div>
-        <div>西红柿定值</div>
-        <div>西红柿定值</div>
-        <div>西红柿定值</div>
-        <div>西红柿定值</div>
-        <div>西红柿定值</div>
+        <div v-for="item in fomulaCrop" :key="item.id" @click="showData(item)">{{item.formula.name}}</div>
       </div>
       <div class="rightCard">
         <div class="topData">
           <div class="date">
             <div class="title">起止日期：</div>
             <div class="starts">
-              <span>2020.03.05</span>&nbsp;
+              <span>{{mathData.startDate}}</span>&nbsp;
               <i>至</i>&nbsp;
-              <span>2020.03.06</span>
+              <span>{{mathData.endDate}}</span>
             </div>
           </div>
           <div class="target">
-            <div>0.5</div>
+            <div>{{mathData.ecBase}}</div>
             <div>EC基础值</div>
           </div>
           <div class="target">
-            <div>0.7</div>
+            <div>{{mathData.ecTarget}}</div>
             <div>EC目标值</div>
           </div>
           <div class="target">
-            <div>14</div>
+            <div>{{mathData.phTarget}}</div>
             <div>PH目标值</div>
           </div>
+          <ul>
+            <li>
+              <span>{{plans.channel1}}：</span>
+              <span>{{mathData.channel1}}</span>
+            </li>
+            <li>
+              <span>{{plans.channel2}}：</span>
+              <span>{{mathData.channel2}}</span>
+            </li>
+            <li>
+              <span>{{plans.channel3}}：</span>
+              <span>{{mathData.channel3}}</span>
+            </li>
+            <li>
+              <span>{{plans.channel4}}：</span>
+              <span>{{mathData.channel4}}</span>
+            </li>
+            <li>
+              <span>{{plans.channel5}}：</span>
+              <span>{{mathData.channel5}}</span>
+            </li>
+            <li>
+              <span>{{plans.channel6}}：</span>
+              <span>{{mathData.channel6}}</span>
+            </li>
+            <li>
+              <span>{{plans.channel7}}：</span>
+              <span>{{mathData.channel7}}</span>
+            </li>
+            <li>
+              <span>{{plans.channel8}}：</span>
+              <span>{{mathData.channel8}}</span>
+            </li>
+            <li>
+              <span>{{plans.channel9}}：</span>
+              <span>{{mathData.channel9}}</span>
+            </li>
+          </ul>
         </div>
         <div class="Mainbody">
           <div class="title">作业排期表</div>
@@ -103,7 +135,7 @@
         <div class="formData">
           <div>
             <span class="just">灌溉方式：</span>
-            <el-radio-group v-model="radio1">
+            <el-radio-group v-model="radio1" @change="start">
               <el-radio :label="0">
                 灌溉时长
               </el-radio>
@@ -114,33 +146,35 @@
           </div>
           <div>
             <span class="ML">灌溉量：</span>
-            <input class="text" type="text">{{irr}}
+            <!-- 灌溉时长 -->
+            <div v-show="irrFlag.time">
+              <input class="text" type="text" v-model="irrData.irrTime">
+            </div>
+            <!-- 灌溉量 -->
+            <div v-show="irrFlag.Volume">
+              <input class="text" type="text" v-model="irrData.irrVolume">
+            </div>
+            {{irr}}
           </div>
           <div>
             <span>启动时间：</span>
             <el-form :model="dynamicValidateForm" ref="dynamicValidateForm" label-width="100px" class="demo-dynamic">
-              <el-form-item prop="email">
-                <el-date-picker
-                  v-model="dynamicValidateForm.email"
-                  type="datetime"
-                  placeholder="选择日期时间">
-                </el-date-picker>
-              </el-form-item>
               <el-form-item
                 v-for="(domain, index) in dynamicValidateForm.domains"
                 :key="domain.key"
                 :prop="'domains.' + index + '.value'"
+                 @change="push(index)"
               >
-                <el-date-picker v-model="domain.value" type="datetime" placeholder="选择日期时间"></el-date-picker>
+                <el-date-picker v-model="domain.value" type="datetime" placeholder="选择日期时间"  value-format="yyyy-MM-dd HH:mm:ss"
+                ></el-date-picker>
                 <el-button @click.prevent="removeDomain(domain)" size="small" class="delete">删除</el-button>
               </el-form-item>
               <el-form-item>
-                <!-- <el-button type="primary" size="small" @click="submitForm(item)">提交</el-button> -->
                 <el-button size="small" @click="addDomain">新增</el-button>
               </el-form-item>
               <div class="fixBtn">
                 <input class="submit" type="button" value="返回" @click="ReTurn">
-                <input class="submit" type="button" value="提交">
+                <input class="submit" type="button" value="提交" @click="addList">
               </div>
             </el-form>
           </div>
@@ -154,11 +188,12 @@
 export default {
   data () {
     return {
+      // 增加的时间
       dynamicValidateForm: {
-        domains: [{
-          value: ''
-        }],
-        email: ''
+        domains: [
+          { value: '' }
+        ]
+        // email: ''
       },
       // 项目(园区)id
       request: {
@@ -175,6 +210,57 @@ export default {
       },
       // 大棚数据
       area: [],
+      // 作物配方绑定列表
+      fomulaCrop: [],
+      // 通道列表
+      plans: {
+        channel1: '通道',
+        channel2: '通道',
+        channel3: '通道',
+        channel4: '通道',
+        channel5: '通道',
+        channel6: '通道',
+        channel7: '通道',
+        channel8: '通道',
+        channel9: '通道'
+      },
+      // ec ph 通道默认数据
+      mathData: {
+        startDate: '(年--月--日)',
+        endDate: '(年--月--日)',
+        ecBase: 0,
+        ecTarget: 0,
+        phTarget: 0,
+        channel1: 0,
+        channel2: 0,
+        channel3: 0,
+        channel4: 0,
+        channel5: 0,
+        channel6: 0,
+        channel7: 0,
+        channel8: 0,
+        channel9: 0
+      },
+      // 灌溉切换
+      irrData: {
+        //  时长
+        irrTime: 0,
+        // 灌溉量
+        irrVolume: 0
+      },
+      // 隐藏显示灌溉框
+      irrFlag: {
+        time: true,
+        Volume: false
+      },
+      addData: {
+        formulaId: '',
+        exeTimeList: [],
+        irrigationType: 0,
+        irrigationTime: 0,
+        irrigationVolume: 0,
+        fertilizerId: ''
+      },
       // 施肥机名称
       fertilizerName: '',
       // 阀号
@@ -223,6 +309,7 @@ export default {
       // 施肥机id queryById
       const resQuery = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/area/queryById', this.areaId)
       const ferid = resQuery.data.data.fertilizerId
+      this.addData.fertilizerId = resQuery.data.data.fertilizerId
       // 公用的施肥机id在这里
       const fers = {
         id: ferid
@@ -238,25 +325,82 @@ export default {
       const strs = queryVals.data.data
       this.Vals = strs.split(',')
 
-      // 通过施肥机id查灌溉列表
-      // 192.168.1.202:10020/fertilizer/api/irrigation/queryByFertilizerId
-      const fertilizerId = {
-        fertilizerId: fers.id
+      // 配方绑定列表
+      let ID = {
+        areaId: this.areaId.id
       }
-      const irrList = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/queryByFertilizerId', fertilizerId)
-      console.log(irrList)
+      const fomulaCrop = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/area/queryFormulaLinkByAreaId', ID)
+      this.fomulaCrop = fomulaCrop.data.data
+
+      // 通道
+      const plans = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/channel/queryByProjectId', this.request)
+      this.plans = plans.data.data
     },
-    // changebox () {
-    //   console.log(this.checkboxGroup)
-    // },
     // 获取施肥机列表
     async getarea () {
       // const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/area/queryById', id)
       // console.log(res)
     },
+    // 点击展示详细数据
+    showData (item) {
+      this.addData.formulaId = item.formulaId
+      this.mathData = {
+        startDate: item.startDate,
+        endDate: item.endDate,
+        ecBase: item.formula.ecBase,
+        ecTarget: item.formula.ecTarget,
+        phTarget: item.formula.phTarget,
+        channel1: item.formula.channel1,
+        channel2: item.formula.channel2,
+        channel3: item.formula.channel3,
+        channel4: item.formula.channel4,
+        channel5: item.formula.channel5,
+        channel6: item.formula.channel6,
+        channel7: item.formula.channel7,
+        channel8: item.formula.channel8,
+        channel9: item.formula.channel9
+      }
+    },
     // 打开弹出层
     fog () {
       this.flagHidden = true
+    },
+    // 循环监控计划
+    start () {
+      if (this.radio1 === 1) {
+        this.irrFlag.time = false
+        this.irrFlag.Volume = true
+        this.irrData.irrTime = 0
+        this.irr = 'm³'
+      } else {
+        this.irrFlag.time = true
+        this.irrFlag.Volume = false
+        this.irrData.irrVolume = 0
+        this.irr = '分钟'
+      }
+    },
+    // 添加作业排期
+    async addList () {
+      let arr = this.dynamicValidateForm.domains
+      for (let index = 0; index < arr.length; index++) {
+        const element = arr[index].value
+        this.addData.exeTimeList.push(element)
+      }
+
+      let list = {
+        formulaId: this.addData.formulaId,
+        areaId: this.areaId.id,
+        projectId: this.request.projectId,
+        fertilizerId: this.addData.fertilizerId,
+        valveNumbers: JSON.stringify(this.checkboxGroup),
+        irrigationType: this.radio1,
+        irrigationTime: Number(this.irrData.irrTime),
+        irrigationVolume: Number(this.irrData.irrVolume),
+        exeTimeList: this.addData.exeTimeList,
+        dtuCode: '1'
+      }
+      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/addIrriSchedule', list)
+      console.log(res)
     },
     // 返回弹出层
     ReTurn () {
@@ -416,6 +560,7 @@ export default {
         font-size: 20px;
         color: #ccc;
         border-radius: 10px;
+        cursor: pointer;
       }
     }
     .rightCard {
@@ -423,7 +568,7 @@ export default {
       width: 1300px;
       margin-top: 20px;
       .topData {
-        height: 250px;
+        height: 200px;
         background-color: #242c3b;
         >div {
           float: left;
@@ -445,12 +590,12 @@ export default {
           }
         }
         .target {
-          margin-left: 104px;
+          margin-left: 90px;
 
           div:first-child {
-            width: 150px;
-            height: 150px;
-            line-height: 150px;
+            width: 110px;
+            height: 110px;
+            line-height: 110px;
             border-radius: 50%;
             text-align: center;
             border: 1px solid #546d9d;
@@ -464,6 +609,21 @@ export default {
             height: 40px;
             line-height: 40px;
             text-align: center;
+          }
+        }
+        ul {
+          display: inline-block;
+          width: 520px;
+          height: 150px;
+          margin-left: 90px;
+          li {
+            margin: 15px 0 0 0;
+            float: left;
+            span {
+              display: inline-block;
+              width: 80px;
+              height: 25px;
+            }
           }
         }
       }
@@ -610,6 +770,11 @@ export default {
           /deep/ .el-radio__label {
             color: #97b1c9;
             font-size: 18px;
+          }
+        }
+        div:nth-child(2) {
+          > div {
+            display: inline-block;
           }
         }
         div:nth-child(3) {

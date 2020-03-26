@@ -280,6 +280,7 @@ export default {
         periodId: this.edit.periodId,
         periodDay: this.edit.periodDay,
         ecBase: this.edit.ecBase,
+        desc: this.edit.desc,
         ecTarget: this.edit.ecTarget,
         phTarget: this.edit.phTarget,
         channel1: this.edit.channel1,
