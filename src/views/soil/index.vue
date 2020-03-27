@@ -214,9 +214,15 @@ export default {
     const projectId = JSON.parse(window.sessionStorage.getItem('projectId'))
     this.request.projectId = projectId
     this.getareas()
-    this.getcrop()
-    this.getcycle()
-    this.getfomulaOrchanner()
+  },
+  mounted () {
+    let that = this
+    setTimeout(() => {
+      that.getcrop()
+      that.getcycle()
+      that.getfomulaOrchanner()
+      that.getfomulaLink()
+    }, 200)
   },
   methods: {
     tableRowClassName ({ row, rowIndex }) {
@@ -241,7 +247,7 @@ export default {
           await this.$http.post('http://192.168.1.202:10020/fertilizer/api/area/deleteFormulaLink', ID)
           // 删除成功
           this.$message.success('删除成功')
-          this.getareas()
+          this.getfomulaLink()
         })
         .catch(() => {})
     },
@@ -251,14 +257,15 @@ export default {
       const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/area/queryByProjectId', this.request)
       this.area = res.data.data
       this.areaId.id = this.area[0].id
-
+    },
+    // 配方列表
+    async getfomulaLink () {
       // 配方绑定列表
       let ID = {
         areaId: this.areaId.id
       }
       const fomulaCrop = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/area/queryFormulaLinkByAreaId', ID)
       this.tableData = fomulaCrop.data.data
-      this.getareas()
     },
     // 作物
     async getcrop () {
@@ -314,10 +321,11 @@ export default {
     },
     // 编辑
     async edit (index, row) {
-      this.areaId.id = row.areaId
-      this.formulaId = row.formulaId
-      this.sort = row.sort
-      this.datatime.unshift(row.startDate, row.endDate)
+      // this.areaId.id = row.areaId
+      // this.formulaId = row.formulaId
+      // this.sort = row.sort
+      // this.datatime.unshift(row.startDate, row.endDate)
+      console.log(row.formulaId)
     },
     async submitForm () {
       let form = {
@@ -332,6 +340,7 @@ export default {
       if (res === undefined) {
         this.$message.error('一个配方只能插一次')
       }
+      this.getfomulaLink()
     }
   }
 }

@@ -20,27 +20,27 @@
             <div class="bgfont">
               <div class="bgline">
                 <div class="icons">PH</div>
-                <div class="content">0.8</div>
+                <div class="content">6.8</div>
               </div>
               <div class="bgline">
                 <div class="icons">EC</div>
-                <div class="content">2</div>
+                <div class="content">2613</div>
               </div>
               <div class="bgline">
                 <div class="icons">流量</div>
-                <div class="content">1000</div>
+                <div class="content">11.5</div>
               </div>
               <div class="bgline">
                 <div class="icons">累计流量</div>
-                <div class="content">15000</div>
+                <div class="content">6.8</div>
               </div>
               <div class="bgline">
                 <div class="icons">液位</div>
-                <div class="content">10/L</div>
+                <div class="content">10.1</div>
               </div>
               <div class="bgline">
                 <div class="icons">压力</div>
-                <div class="content">100KP</div>
+                <div class="content">2.3</div>
               </div>
               <div class="bgline">
                 <div class="icons">负压</div>
@@ -62,19 +62,19 @@
             <!-- <img src="../../assets/images/cut_img/juxing.png" alt=""> -->
             <div class="bgline">
               <div class="icons">温度</div>
-              <div class="content">25/℃</div>
+              <div class="content">22</div>
             </div>
             <div class="bgline">
               <div class="icons">湿度</div>
-              <div class="content">10/%</div>
+              <div class="content">24</div>
             </div>
             <div class="bgline">
               <div class="icons">光照</div>
-              <div class="content">0.5</div>
+              <div class="content">11434</div>
             </div>
             <div class="bgline">
               <div class="icons">CO2</div>
-              <div class="content">2/ml</div>
+              <div class="content">328</div>
             </div>
             <div class="bgline">
               <div class="icons">风向</div>
@@ -82,7 +82,7 @@
             </div>
             <div class="bgline">
               <div class="icons">风速</div>
-              <div class="content">10 m/s</div>
+              <div class="content">0.8</div>
             </div>
           </div>
         </div>
@@ -99,11 +99,11 @@
             <!-- <img src="../../assets/images/cut_img/juxing.png" alt=""> -->
             <div class="bgline">
               <div class="icons">土温1</div>
-              <div class="content">12</div>
+              <div class="content">17</div>
             </div>
             <div class="bgline">
               <div class="icons">土湿2</div>
-              <div class="content">0.8</div>
+              <div class="content">14</div>
             </div>
             <div class="bgline">
               <div class="icons">土温2</div>
@@ -111,15 +111,15 @@
             </div>
             <div class="bgline">
               <div class="icons">土湿2</div>
-              <div class="content">12 KPa</div>
+              <div class="content">15</div>
             </div>
             <div class="bgline">
               <div class="icons">PH</div>
-              <div class="content">0.8</div>
+              <div class="content">6.4</div>
             </div>
             <div class="bgline">
               <div class="icons">EC</div>
-              <div class="content">0.1</div>
+              <div class="content">1.7</div>
             </div>
           </div>
         </div>
@@ -357,7 +357,7 @@ export default {
           type: 'category',
           // name: 'x', y轴的标题
           // splitLine: { show: false }, 标题展示或不展示
-          data: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
+          data: ['15:00', '15:10', '15:20', '15:30', '15:40', '15:50', '16:00', '16:10', '16:20', '16:30', '16:40', '16:50']
         },
         grid: {
           left: '1%',
@@ -368,14 +368,14 @@ export default {
         yAxis: {
           type: 'category',
           // name: 'y', x轴的标题
-          // splitLine: { show: true },标题展示或不展示
+          // splitLine: { show: true },线展示或不展示
           data: ['10%', '20%', '30%', '40%', '50%', '60%', '70%', '80%', '90%', '100%']
         },
         series: [
           {
             name: 'PH',
             type: 'line',
-            data: [3.5, 2.4, 1.52, 1.25, 4.7, 5.5, 4.3, 0.23, 0.69, 0.25, 0.36, 0.56],
+            data: [3.5, 2.4, 2.52, 2.25, 2.7, 2.5, 4.3, 1.23, 1.69, 1.25, 1.36, 1.56],
             // 浮点
             showSymbol: true,
             symbolSize: 5
@@ -383,7 +383,7 @@ export default {
           {
             name: 'EC',
             type: 'line',
-            data: [1, 0.2, 1.4, 3.8, 1.16, 2.32, 0.64, 1.28, 5.6, 3.25, 3.63, 1.65, 5.12],
+            data: [6, 5.2, 5.4, 5.8, 5.16, 5.32, 5.64, 5.28, 5.6, 5.25, 5.63, 5.65, 5.12],
             // itemStyle: {
             //   normal: {
             //     lineStyle: {
@@ -409,7 +409,7 @@ export default {
         },
         xAxis: {
           type: 'category',
-          data: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
+          data: ['15:00', '15:10', '15:20', '15:30', '15:40', '15:50', '16:00', '16:10', '16:20', '16:30', '16:40', '16:50']
         },
         grid: {
           left: '1%',
@@ -449,7 +449,7 @@ export default {
         },
         xAxis: {
           type: 'category',
-          data: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
+          data: ['15:00', '15:10', '15:20', '15:30', '15:40', '15:50', '16:00', '16:10', '16:20', '16:30', '16:40', '16:50']
         },
         grid: {
           left: '1%',
@@ -472,7 +472,7 @@ export default {
           {
             name: '土湿2',
             type: 'line',
-            data: [1, 0.2, 0.4, 0.8, 0.16, 0.32, 0.64, 1.28, 5.6, 0.25, 0.63, 0.65, 0.12],
+            data: [1, 0.2, 0.4, 0.8, 0.16, 0.32, 0.64, 1.28, 1.6, 0.25, 0.63, 0.65, 0.12],
             showSymbol: true,
             symbolSize: 5
           }

@@ -100,18 +100,30 @@
               style="width: 100%"
               :row-class-name="tableRowClassName">
               <el-table-column
-                prop="date"
-                label="日期"
-                width="180">
+                prop="exeTime"
+                label="执行时间"
+                width="200">
               </el-table-column>
               <el-table-column
-                prop="name"
-                label="姓名"
-                width="180">
+                prop="irrigationVolume"
+                label="灌溉量"
+                width="120">
               </el-table-column>
               <el-table-column
-                prop="address"
-                label="地址">
+                prop="irrigationTime"
+                label="灌溉时长"
+                width="120">
+              </el-table-column>
+              <el-table-column
+                prop="status"
+                label="状态">
+              </el-table-column>
+              <el-table-column label="操作">
+                <template slot-scope="scope">
+                  <span @click="del(scope.$index, scope.row)">删除</span>
+                  &nbsp;
+                  <span @click="editData(scope.$index, scope.row)">编辑</span>
+                </template>
               </el-table-column>
             </el-table>
           </div>
@@ -122,6 +134,66 @@
       </div>
     </div>
     <div class="hiddenData" v-if="flagHidden">
+      <div class="Data-add">
+        <div class="vavles">
+          <el-checkbox-group class="checkFl" v-model="checkboxGroup">
+            <template v-for="(item, index) in 8">
+              <el-checkbox-button :label="index" :key="index">
+                <div class="valve_num">{{item}}</div>
+              </el-checkbox-button>
+            </template>
+          </el-checkbox-group>
+        </div>
+        <div class="formData">
+          <div>
+            <span class="just">灌溉方式：</span>
+            <el-radio-group v-model="radio1" @change="start">
+              <el-radio :label="0">
+                灌溉时长
+              </el-radio>
+              <el-radio :label="1">
+                灌溉流量
+              </el-radio>
+            </el-radio-group>
+          </div>
+          <div>
+            <span class="ML">灌溉量：</span>
+            <!-- 灌溉时长 -->
+            <div v-show="irrFlag.time">
+              <input class="text" type="text" v-model="irrData.irrTime">
+            </div>
+            <!-- 灌溉量 -->
+            <div v-show="irrFlag.Volume">
+              <input class="text" type="text" v-model="irrData.irrVolume">
+            </div>
+            {{irr}}
+          </div>
+          <div>
+            <span>启动时间：</span>
+            <el-form :model="dynamicValidateForm" ref="dynamicValidateForm" label-width="100px" class="demo-dynamic">
+              <el-form-item
+                v-for="(domain, index) in dynamicValidateForm.domains"
+                :key="domain.key"
+                :prop="'domains.' + index + '.value'"
+                 @change="push(index)"
+              >
+                <el-date-picker v-model="domain.value" type="datetime" placeholder="选择日期时间"  value-format="yyyy-MM-dd HH:mm:ss"
+                ></el-date-picker>
+                <el-button @click.prevent="removeDomain(domain)" size="small" class="delete">删除</el-button>
+              </el-form-item>
+              <el-form-item>
+                <el-button size="small" @click="addDomain">新增</el-button>
+              </el-form-item>
+              <div class="fixBtn">
+                <input class="submit" type="button" value="返回" @click="ReTurn">
+                <input class="submit" type="button" value="提交" @click="addList">
+              </div>
+            </el-form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hiddenData" v-if="flagHidden2">
       <div class="Data-add">
         <div class="vavles">
           <el-checkbox-group class="checkFl" v-model="checkboxGroup">
@@ -193,7 +265,6 @@ export default {
         domains: [
           { value: '' }
         ]
-        // email: ''
       },
       // 项目(园区)id
       request: {
@@ -208,6 +279,10 @@ export default {
       areaId: {
         id: ''
       },
+      // 监听id
+      ChangeAreaID: '',
+      // 默认列表id
+      enterID: '',
       // 大棚数据
       area: [],
       // 作物配方绑定列表
@@ -255,6 +330,7 @@ export default {
       },
       addData: {
         formulaId: '',
+        areaFormulaLinkId: '',
         exeTimeList: [],
         irrigationType: 0,
         irrigationTime: 0,
@@ -271,25 +347,10 @@ export default {
       radio1: 0,
       flagShow: true,
       flagHidden: false,
+      flagHidden2: false,
       value: '',
       value1: '',
-      tableData: [{
-        date: '2016-05-02',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }, {
-        date: '2016-05-04',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }, {
-        date: '2016-05-01',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }, {
-        date: '2016-05-03',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }],
+      tableData: [],
       idarea: ''
     }
   },
@@ -298,19 +359,35 @@ export default {
     this.request.projectId = projectId
     this.getareas()
   },
+  mounted () {
+    let that = this
+    setTimeout(() => {
+      that.getfomulalist()
+      that.QueryFer()
+      that.getpassway()
+    }, 200)
+    setTimeout(() => {
+      that.enterpage()
+    }, 300)
+  },
   methods: {
     // 获取大棚数据
     async getareas () {
-      // 获取园区第一条数据
       const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/area/queryByProjectId', this.request)
       this.area = res.data.data
       this.areaId.id = this.area[0].id
-
+    },
+    // 通过areaID查询施肥机ID
+    async QueryFer () {
       // 施肥机id queryById
-      const resQuery = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/area/queryById', this.areaId)
-      const ferid = resQuery.data.data.fertilizerId
+      let IDfer = {
+        id: this.areaId.id
+      }
+      const resQuery = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/area/queryById', IDfer)
+
       this.addData.fertilizerId = resQuery.data.data.fertilizerId
-      // 公用的施肥机id在这里
+      // 公用的施肥机id
+      const ferid = resQuery.data.data.fertilizerId
       const fers = {
         id: ferid
       }
@@ -318,32 +395,54 @@ export default {
       const QueryFer = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/fertilizer/queryById', fers)
       this.fertilizerName = QueryFer.data.data.name
 
-      // 获取阀被选中的阀索引并赋值
-      this.checkboxGroup = JSON.parse(this.area[0].fertilizerValves)
       // 获取施肥机对应的阀号
       const queryVals = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/fertilizer/queryValveAlias', fers)
       const strs = queryVals.data.data
       this.Vals = strs.split(',')
-
-      // 配方绑定列表
+    },
+    // 通过areaID获取配方绑定列表
+    async getfomulalist () {
       let ID = {
         areaId: this.areaId.id
       }
       const fomulaCrop = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/area/queryFormulaLinkByAreaId', ID)
       this.fomulaCrop = fomulaCrop.data.data
-
+    },
+    // 进入页面默认值
+    async enterpage () {
+      this.addData.formulaId = this.fomulaCrop[0].formulaId
+      this.addData.areaFormulaLinkId = this.fomulaCrop[0].id
+      this.mathData = {
+        startDate: this.fomulaCrop[0].startDate,
+        endDate: this.fomulaCrop[0].endDate,
+        ecBase: this.fomulaCrop[0].formula.ecBase,
+        ecTarget: this.fomulaCrop[0].formula.ecTarget,
+        phTarget: this.fomulaCrop[0].formula.phTarget,
+        channel1: this.fomulaCrop[0].formula.channel1,
+        channel2: this.fomulaCrop[0].formula.channel2,
+        channel3: this.fomulaCrop[0].formula.channel3,
+        channel4: this.fomulaCrop[0].formula.channel4,
+        channel5: this.fomulaCrop[0].formula.channel5,
+        channel6: this.fomulaCrop[0].formula.channel6,
+        channel7: this.fomulaCrop[0].formula.channel7,
+        channel8: this.fomulaCrop[0].formula.channel8,
+        channel9: this.fomulaCrop[0].formula.channel9
+      }
+      let areaFormulaLinkId = {
+        areaFormulaLinkId: this.fomulaCrop[0].id
+      }
+      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/queryByAreaFormulaLinkId', areaFormulaLinkId)
+      this.tableData = res.data.data
+    },
+    async getpassway () {
       // 通道
       const plans = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/channel/queryByProjectId', this.request)
       this.plans = plans.data.data
     },
-    // 获取施肥机列表
-    async getarea () {
-      // const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/area/queryById', id)
-      // console.log(res)
-    },
     // 点击展示详细数据
-    showData (item) {
+    async showData (item) {
       this.addData.formulaId = item.formulaId
+      this.addData.areaFormulaLinkId = item.id
       this.mathData = {
         startDate: item.startDate,
         endDate: item.endDate,
@@ -360,6 +459,11 @@ export default {
         channel8: item.formula.channel8,
         channel9: item.formula.channel9
       }
+      let areaFormulaLinkId = {
+        areaFormulaLinkId: item.id
+      }
+      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/queryByAreaFormulaLinkId', areaFormulaLinkId)
+      this.tableData = res.data.data
     },
     // 打开弹出层
     fog () {
@@ -379,15 +483,26 @@ export default {
         this.irr = '分钟'
       }
     },
+    clear () {
+      this.addData.exeTimeList = []
+    },
+    async getItem (loop) {
+      let areaFormulaLinkId = {
+        areaFormulaLinkId: loop
+      }
+      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/queryByAreaFormulaLinkId', areaFormulaLinkId)
+      this.tableData = res.data.data
+    },
     // 添加作业排期
     async addList () {
+      this.clear()
       let arr = this.dynamicValidateForm.domains
-      for (let index = 0; index < arr.length; index++) {
-        const element = arr[index].value
-        this.addData.exeTimeList.push(element)
-      }
-
+      var brr = arr.map(item => {
+        return item.value
+      })
+      this.addData.exeTimeList = brr
       let list = {
+        areaFormulaLinkId: this.addData.areaFormulaLinkId,
         formulaId: this.addData.formulaId,
         areaId: this.areaId.id,
         projectId: this.request.projectId,
@@ -396,11 +511,12 @@ export default {
         irrigationType: this.radio1,
         irrigationTime: Number(this.irrData.irrTime),
         irrigationVolume: Number(this.irrData.irrVolume),
-        exeTimeList: this.addData.exeTimeList,
-        dtuCode: '1'
+        exeTimeList: this.addData.exeTimeList
       }
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/addIrriSchedule', list)
-      console.log(res)
+      await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/addIrriSchedule', list)
+      this.flagHidden = false
+      this.getItem(this.addData.areaFormulaLinkId)
+      this.clear()
     },
     // 返回弹出层
     ReTurn () {
@@ -415,18 +531,6 @@ export default {
       }
       return ''
     },
-    // 表单提交
-    submitForm (item) {
-      // this.$refs[formName].validate((valid) => {
-      //   if (valid) {
-      //     alert('submit!')
-      //   } else {
-      //     console.log('error submit!!')
-      //     return false
-      //   }
-      // })
-      console.log(item)
-    },
     // 移除时间段
     removeDomain (item) {
       var index = this.dynamicValidateForm.domains.indexOf(item)
@@ -440,6 +544,45 @@ export default {
         value: '',
         key: Date.now()
       })
+    },
+    // 删除
+    del (index, row) {
+      let ID = {
+        id: row.id
+      }
+      this.$confirm('此操作将永久删除该策略, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(async () => {
+          await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/delete', ID)
+          // 删除成功
+          this.$message.success('删除成功')
+          this.getItem(this.addData.areaFormulaLinkId)
+        })
+        .catch(() => {})
+    },
+    editData (index, row) {
+      this.addData.areaFormulaLinkId = row.id
+      this.addData.formulaId = row.formulaId
+      this.areaId.id = row.areaId.id
+      this.request.projectId = row.projectId
+      this.addData.fertilizerId = row.fertilizerId
+
+      let list = {
+        areaFormulaLinkId: row.id,
+        formulaId: row.formulaId,
+        areaId: row.areaId,
+        projectId: row.projectId,
+        fertilizerId: row.fertilizerId,
+        valveNumbers: row.valveNumbers,
+        irrigationType: row.irrigationType,
+        irrigationTime: row.irrigationTime,
+        irrigationVolume: row.irrigationVolume,
+        exeTimeList: row.exeTime
+      }
+      console.log(list)
     }
   }
 }
@@ -629,12 +772,12 @@ export default {
       }
       .Mainbody {
         position: relative;
-        height: 410px;
+        height: 470px;
         margin-top: 20px;
         background-color: #232733;
         padding-top: 40px;
         .tableData {
-          width: 750px;
+          width: 80%;
           margin: 0 auto;
           /deep/ .el-table::before {
             height: 0;

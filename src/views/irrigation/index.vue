@@ -364,6 +364,7 @@ export default {
         }
       }
       this.ValId.id = this.reqParams.fertilizerId
+
       this.getValve()
     },
     // 循环计划监控
