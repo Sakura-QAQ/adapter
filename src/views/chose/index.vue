@@ -44,7 +44,7 @@ export default {
     async getlogin () {
       const res = await this.$http.post('http://192.168.1.202:10010/sso/api/getLoginInfo')
       this.options = res.data.data.projectList
-      console.log(this.options)
+      // console.log(this.options)
     },
     pushIn (index, row) {
       window.sessionStorage.setItem('projectId', JSON.stringify(row.id))

@@ -1,6 +1,6 @@
 <template>
   <el-container class="home-container">
-    <el-aside class="my-aside" :width="collapse?'64px':'200px'">
+    <el-aside class="my-aside" :width="collapse?'64px':'220px'">
       <div class="logo" :class="{close:collapse}"></div>
       <el-menu
         router
@@ -18,11 +18,11 @@
         </el-menu-item>
         <el-menu-item index="/weather">
           <i class="el-icon-s-opportunity"></i>
-          <span slot="title">气象站</span>
+          <span slot="title">历史数据</span>
         </el-menu-item>
         <el-menu-item index="/soil">
           <i class="el-icon-tickets"></i>
-          <span slot="title">土壤墒情</span>
+          <span slot="title">配方绑定</span>
         </el-menu-item>
         <el-menu-item index="/irrigation">
           <i class="el-icon-edit-outline"></i>
@@ -31,14 +31,14 @@
         <el-submenu index="/fertilizer">
           <template slot="title">
             <i class="el-icon-s-flag"></i>
-            <span slot="title" style="font-size: 16px">施肥策略</span>
+            <span slot="title">施肥策略</span>
           </template>
           <el-menu-item-group title="管理">
-            <el-menu-item index="/Crop-Cycle" style="text-align:center;padding-left: 65px;">作物周期管理</el-menu-item>
-            <el-menu-item index="/passageway" style="text-align:center;">通道管理</el-menu-item>
+            <el-menu-item index="/Crop-Cycle" style="padding-left: 64px;">作物周期管理</el-menu-item>
+            <el-menu-item index="/passageway" style="padding-left: 64px;">通道管理</el-menu-item>
           </el-menu-item-group>
           <el-menu-item-group title="配方">
-            <el-menu-item index="/formula" style="text-align:center;">配方管理</el-menu-item>
+            <el-menu-item index="/formula" style="padding-left: 64px;">配方管理</el-menu-item>
           </el-menu-item-group>
         </el-submenu>
         <el-menu-item index="/statistic">
@@ -54,19 +54,19 @@
           <span slot="title">测试页</span>
         </el-menu-item>
       </el-menu>
+      <div class="logo-5g"></div>
     </el-aside>
     <el-container>
       <el-header class="my-header">
         <span class="el-icon-s-fold" @click="toggleMenu()"></span>
-        <span class="text">北京蓝洋益海科技有限公司</span>
-          <el-form class="area" :model="reqParams">
-            <el-form-item label="切换园区：">
-              <el-select v-model="reqParams.projectId">
-                <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-form>
-        <el-dropdown style="float:right;color:#fff">
+        <el-form class="area" :model="reqParams">
+          <el-form-item label="切换园区：">
+            <el-select v-model="reqParams.projectId" @change="areaTab">
+              <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <el-dropdown style="float:right;color:#fff" @command="handleCommand">
           <span class="el-dropdown-link">
             <img style="vertical-align:middle" width="30" height="30" :src="avatar" alt />
             <b style="vertical-align:middle;padding-left:5px">admin</b>
@@ -77,6 +77,8 @@
             <el-dropdown-item icon="el-icon-lock" command="logout">退出登录</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
+        <span class="text">北京蓝洋益海科技有限公司</span>
+        <span class="hT">水肥一体化集群施肥机</span>
       </el-header>
       <el-main>
         <!-- 二级路由显示的位置 -->
@@ -88,6 +90,7 @@
 
 <script>
 export default {
+  inject: ['reload'],
   data () {
     return {
       options: [],
@@ -111,6 +114,17 @@ export default {
     },
     toggleMenu () {
       this.collapse = !this.collapse
+    },
+    logout () {
+      window.sessionStorage.removeItem('token')
+      this.$router.push('/login')
+    },
+    handleCommand (command) {
+      this[command]()
+    },
+    areaTab () {
+      window.sessionStorage.setItem('projectId', JSON.stringify(this.reqParams.projectId))
+      this.reload()
     }
   }
 }
@@ -124,6 +138,7 @@ export default {
   width: 100%;
   height: 100%;
   .my-aside {
+    position: relative;
     background: #002033;
     .logo {
       width: 100%;
@@ -131,28 +146,63 @@ export default {
       background: url(../../assets/images/logo.png) no-repeat center / 140px
         auto;
     }
+    .logo-5g {
+      position: absolute;
+      bottom: 8%;
+      left: 20%;
+      width: 120px;
+      height: 120px;
+      background: url(../../assets/images/5G.png) no-repeat;
+      background-size: 120px 120px;
+    }
     .close {
       background-image: url(../../assets/images/logo_min.png);
       background-size: 36px auto;
     }
-    /deep/ .el-menu-item-group__title {
-      font-size: 14px;
+    /deep/ .el-menu {
+      margin-top: 15px;
+      padding-left: 10px;
+      .el-submenu {
+        .el-submenu__title {
+          font-weight: 800;
+          font-size: 18px;
+          span {
+            padding-left: 10px;
+          }
+        }
+        .el-menu-item-group {
+          .el-menu-item-group__title {
+            font-size: 16px;
+            padding-left: 60px !important;
+          }
+        }
+      }
+
+      .el-menu-item {
+        font-size: 18px;
+        font-weight: 800;
+        span {
+          padding-left: 10px;
+        }
+      }
     }
   }
   .my-header {
     border-bottom: 1px solid #ddd;
     line-height: 60px;
+    background-color: #002033;
     .el-icon-s-fold {
       font-size: 26px;
       vertical-align: middle;
     }
     .text {
       vertical-align: middle;
-      padding-left: 10px;
+      padding-right: 20px;
+      float: right;
     }
     /deep/ .area {
       display: inline-block;
-      margin-left: 100px;
+      margin-left: 55px;
       .el-form-item {
         margin-bottom: 0;
         .el-form-item__label {
@@ -185,6 +235,13 @@ export default {
           color: #fff;
         }
       }
+    }
+    .hT {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      font-weight: 800;
+      font-size: 28px;
     }
   }
 }

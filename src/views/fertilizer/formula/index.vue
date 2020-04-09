@@ -1,5 +1,5 @@
 <template>
-<div class="formula">
+<div class="container">
   <div class="fer-container">
     <div class="fer-plan">
       <div class="bg-title">
@@ -12,20 +12,18 @@
           style="width:760px"
         >
           <el-table-column prop="name" label="配方" width="120" align="center"></el-table-column>
-          <el-table-column prop="cropName" label="作物" width="90" align="center"></el-table-column>
-          <el-table-column prop="cycleName" label="周期" width="70" align="center"></el-table-column>
-          <el-table-column prop="periodDay" label="天数" width="70" align="center"></el-table-column>
+          <el-table-column prop="descr" label="描述" width="230" align="center"></el-table-column>
           <el-table-column prop="ecBase" label="Ec基数" width="70" align="center"></el-table-column>
           <el-table-column prop="ecTarget" label="Ec目标值" width="90" align="center"></el-table-column>
           <el-table-column prop="phTarget" label="PH目标值" width="95" align="center"></el-table-column>
           <el-table-column label="操作" width="150" align="center">
             <template slot-scope="scope">
               <el-button size="mini" @click="editData(scope.$index, scope.row)">编辑</el-button>
-              <el-button size="mini" type="danger" @click="del(scope.$index, scope.row)">删除</el-button>
+              <el-button size="mini" @click="del(scope.$index, scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
-        <div class="pager">
+        <div class="pager" v-show="reqParamsFl.totalCount > 6">
           <el-pagination
             layout="prev, pager, next"
             @size-change="handleSizeChange"
@@ -45,9 +43,6 @@
         <li>
           <input class="submit" type="button" value="提交" @click="updata" />
         </li>
-        <li>
-          配方名称: <input type="text" style="width:138px;" v-model="edit.name">
-        </li>
         <li class="check-time">
           <span>
             选择作物:
@@ -61,10 +56,10 @@
               <option v-for="item in cycle" :value="item.id" :label="item.name" :key="item.id">{{item.name}}</option>
             </select>
           </span>
-          <span>
+          <!-- <span>
             周期:
             <input type="text" v-model="edit.periodDay" /> 天
-          </span>
+          </span> -->
         </li>
         <li>
           <span>
@@ -81,6 +76,14 @@
             PH目标值:
             <input type="number" v-model="edit.phTarget" />
           </span>
+        </li>
+        <li>
+          <span class="descr">配方描述: </span>
+          &nbsp;
+          <el-input
+            type="textarea"
+            v-model="edit.descr">
+          </el-input>
         </li>
         <li>
           施肥通道:
@@ -249,13 +252,14 @@ export default {
     },
     // 编辑
     editData (index, row) {
+      console.log(row)
       this.edit = {
         id: row.id,
         projectId: row.projectId,
-        name: row.name,
+        descr: row.descr,
         cropId: row.cropId,
         periodId: row.periodId,
-        periodDay: row.periodDay,
+        // periodDay: row.periodDay,
         ecBase: row.ecBase,
         ecTarget: row.ecTarget,
         phTarget: row.phTarget,
@@ -275,10 +279,10 @@ export default {
       this.edit = {
         id: this.edit.id,
         projectId: this.request.projectId,
-        name: this.edit.name,
+        descr: this.edit.descr,
         cropId: this.edit.cropId,
         periodId: this.edit.periodId,
-        periodDay: this.edit.periodDay,
+        // periodDay: this.edit.periodDay,
         ecBase: this.edit.ecBase,
         desc: this.edit.desc,
         ecTarget: this.edit.ecTarget,
@@ -309,10 +313,10 @@ export default {
       this.edit = {
         id: null,
         projectId: null,
-        name: null,
+        // name: null,
         cropId: null,
         periodId: null,
-        periodDay: null,
+        // periodDay: null,
         ecBase: null,
         ecTarget: null,
         phTarget: null,
@@ -332,154 +336,197 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.fer-container {
-  display: flex;
-  justify-content: space-evenly;
-  .fer-plan {
-    position: relative;
-    width: 800px;
-    margin-top: 28px;
-    border: 1px solid #5c7b95;
-    background-color: #000;
-    border-radius: 10px;
-    padding: 70px 0 60px 0;
-    color: #fff;
+.container{
+  width: 100%;
+  height: 100%;
+  position: relative;
+  .fer-container {
+    position: absolute;
+    margin: auto;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 1625px;
+    height: 825px;
+    // border: 1px solid #6989a5;
+    border-radius: 15px;
+    // background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: space-evenly;
+    padding-top: 44px;
+    .fer-plan {
+      position: relative;
+      width: 840px;
+      height: 602px;
+      margin-top: 28px;
+      border: 1px solid #5c7b95;
+      background-color: #000;
+      border-radius: 10px;
+      padding: 80px 0 60px 0;
+      color: #fff;
 
-    .bg-title {
-      position: absolute;
-      top: -25px;
-      left: 21%;
-      width: 380px;
-      height: 50px;
-      background: url(../../../assets/images/bg0.png) no-repeat;
-      background-size: contain;
-
-      p {
-        line-height: 50px;
-        text-align: center;
-        color: #fff;
-        font-size: 26px;
-        font-weight: 800;
-      }
-    }
-    .add-data {
-      position: absolute;
-      top: 30px;
-      right: 42px;
-    }
-    .list {
-      text-align: center;
-      /deep/ .el-table::before {
-        height: 0;
-      }
-      /deep/ .el-table {
-        margin: 0 auto;
-        // margin: 10px 0;
-        background-color: transparent;
-        color: #fff;
-        th {
-          border: 0;
-          background-color: transparent;
-        }
-        tr {
-          border: 0;
-          background-color: transparent;
-        }
-        tr:nth-child(odd) {
-          background-color: rgba(43, 45, 47, 0.9);
-        }
-        tr:nth-child(even) {
-          background-color: rgba(55, 59, 63, 0.9);
-        }
-        tr:hover > td {
-          background-color: rgba(55, 59, 63, 0.9);;
-        }
-        td {
-          // border-bottom: 1px solid #666;
-          border: none;
-          // background-color: transparent;
-        }
-        thead {
-          color: #eee;
-          background-color: rgba(55, 59, 63, 0.9);
-        }
-        .cell {
-          .el-button {
-            background-color: rgba(91, 112, 129, 0.9);
-            border: 1px solid transparent;
-            color: #eee;
-          }
-        }
-      }
-
-      .pager {
-        // position: absolute;
-        // bottom: 12%;
-        // left: 36%;
-        margin-top: 12px;
-        text-align: center;
-      }
-    }
-  }
-
-  .fer-table {
-    position: relative;
-    width: 670px;
-    height: 572px;
-    border: 1px solid #5c7b95;
-    border-radius: 10px;
-    background: rgba(19, 18, 18, 0.8);
-    padding-top: 60px;
-    margin-top: 30px;
-
-    .bg-title {
-      position: absolute;
-      top: -25px;
-      left: 21%;
-      width: 380px;
-      height: 50px;
-      background: url(../../../assets/images/bg0.png) no-repeat;
-      background-size: contain;
-
-      p {
+      .bg-title {
+        position: absolute;
+        top: -25px;
+        left: 21%;
+        width: 380px;
         height: 50px;
-        line-height: 50px;
-        text-align: center;
-        color: #fff;
-        font-size: 26px;
-        font-weight: 800;
+        background: url(../../../assets/images/bg0.png) no-repeat;
+        background-size: contain;
+
+        p {
+          line-height: 50px;
+          text-align: center;
+          color: #fff;
+          font-size: 26px;
+          font-weight: 800;
+        }
+      }
+      .add-data {
+        position: absolute;
+        top: 30px;
+        right: 42px;
+      }
+      .list {
+        height: 460px;
+        width: 800px;
+        margin: 0 auto;
+        padding-top: 28px;
+        // background-color: #232733;
+        border-radius: 10px;
+        /deep/ .el-table::before {
+          height: 0;
+        }
+        /deep/ .el-table {
+          margin: 0 auto;
+          // margin: 10px 0;
+          background-color: transparent;
+          color: #fff;
+          th {
+            border: 0;
+            background-color: transparent;
+          }
+          tr {
+            border: 0;
+            background-color: transparent;
+          }
+          tr:nth-child(odd) {
+            background-color: rgba(43, 45, 47, 0.9);
+          }
+          tr:nth-child(even) {
+            background-color: rgba(55, 59, 63, 0.9);
+          }
+          tr:hover > td {
+            background-color: rgba(90, 96, 102, 0.9);;
+          }
+          td {
+            // border-bottom: 1px solid #666;
+            border: none;
+            // background-color: transparent;
+          }
+          thead {
+            color: #eee;
+            background-color: rgba(91, 112, 129, 0.9);
+          }
+          // 按钮样式
+          // .cell {
+          //   .el-button {
+          //     background-color: rgba(91, 112, 129, 0.9);
+          //     border: 1px solid transparent;
+          //     color: #eee;
+          //   }
+          // }
+        }
+
+        .pager {
+          // position: absolute;
+          // bottom: 12%;
+          // left: 36%;
+          margin-top: 12px;
+          text-align: center;
+        }
       }
     }
-    ul {
-      padding: 0 15px;
-      li {
-        margin-bottom: 25px;
+    .fer-table {
+      position: relative;
+      width: 670px;
+      height: 602px;
+      border: 1px solid #5c7b95;
+      border-radius: 10px;
+      background: rgba(19, 18, 18, 0.8);
+      padding-top: 60px;
+      margin-top: 30px;
 
-        .submit {
-          position: absolute;
-          top: 30px;
-          right: 42px;
-        }
-        .add {
-          position: absolute;
-          top: 30px;
-          right: 128px;
+      .bg-title {
+        position: absolute;
+        top: -25px;
+        left: 21%;
+        width: 380px;
+        height: 50px;
+        background: url(../../../assets/images/bg0.png) no-repeat;
+        background-size: contain;
+
+        p {
+          height: 50px;
+          line-height: 50px;
+          text-align: center;
+          color: #fff;
+          font-size: 26px;
+          font-weight: 800;
         }
       }
-      li:last-child {
-        div {
-          display: flex;
-          justify-content: space-evenly;
-          flex-wrap: wrap;
+      ul {
+        padding: 0 15px;
+        li {
+          margin-bottom: 25px;
 
-          .list-group-item {
-            margin: 10px 15px;
+          .submit {
+            position: absolute;
+            top: 30px;
+            right: 42px;
+          }
+          .add {
+            position: absolute;
+            top: 30px;
+            right: 128px;
+          }
+          .descr {
+            display: inline-block;
+            height: 60px;
+          }
+          /deep/ .el-textarea {
+              display: inline-block;
+              width: 230px;
+              .el-textarea__inner {
+              // width: 200px;
+              background-color: #2a3b49;
+              color: #fff;
+              border: 1px solid transparent;
+              font-size: 18px;
+            }
           }
         }
-      }
-      select {
-        height: 30px;
-        line-height: 30px;
+        li:last-child {
+          div {
+            // display: flex;
+            // justify-content: space-evenly;
+            // flex-wrap: wrap;
+            text-align: center;
+            span {
+              display: inline-block;
+              width: 150px;
+            }
+
+            .list-group-item {
+              margin: 10px 15px;
+            }
+          }
+        }
+        select {
+          height: 30px;
+          line-height: 30px;
+        }
       }
     }
   }

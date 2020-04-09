@@ -20,31 +20,42 @@
             <div class="bgfont">
               <div class="bgline">
                 <div class="icons">PH</div>
-                <div class="content">6.8</div>
+                <div class="content">{{Realtime.ph}}</div>
               </div>
               <div class="bgline">
-                <div class="icons">EC</div>
-                <div class="content">2613</div>
+                <div class="icons">
+                  <span>EC</span>
+                  <span>μs/cm</span>
+                </div>
+                <div class="content">{{Realtime.ec}}</div>
               </div>
               <div class="bgline">
-                <div class="icons">流量</div>
-                <div class="content">11.5</div>
+                <div class="icons">
+                  <span>流量</span>
+                  <span>m3/H</span>
+                </div>
+                <div class="content">{{Realtime.real_time_flow}}</div>
               </div>
               <div class="bgline">
-                <div class="icons">累计流量</div>
-                <div class="content">6.8</div>
+                <div class="icons">
+                  <span>累计流量</span>
+                  <span>L</span>
+                </div>
+                <div class="content">{{Realtime.total_volume}}</div>
               </div>
               <div class="bgline">
-                <div class="icons">液位</div>
-                <div class="content">10.1</div>
+                <div class="icons">
+                  <span>液位</span>
+                  <span>cm</span>
+                </div>
+                <div class="content">{{Realtime.liquid_level}}</div>
               </div>
               <div class="bgline">
-                <div class="icons">压力</div>
-                <div class="content">2.3</div>
-              </div>
-              <div class="bgline">
-                <div class="icons">负压</div>
-                <div class="content">20KP</div>
+                <div class="icons">
+                  <span>压力</span>
+                  <span>kg/cm2</span>
+                </div>
+                <div class="content">{{Realtime.pressure}}</div>
               </div>
             </div>
           </vue-scroll>
@@ -59,29 +70,46 @@
         </div>
         <div class="leftCard">
           <div class="bgfont">
-            <!-- <img src="../../assets/images/cut_img/juxing.png" alt=""> -->
             <div class="bgline">
-              <div class="icons">温度</div>
+              <div class="icons">
+                <span>温度</span>
+                <span>℃</span>
+              </div>
               <div class="content">22</div>
             </div>
             <div class="bgline">
-              <div class="icons">湿度</div>
+              <div class="icons">
+                <span>湿度</span>
+                <span>%</span>
+              </div>
               <div class="content">24</div>
             </div>
             <div class="bgline">
-              <div class="icons">光照</div>
+              <div class="icons">
+                <span>光照</span>
+                <span>LUX</span>
+              </div>
               <div class="content">11434</div>
             </div>
             <div class="bgline">
-              <div class="icons">CO2</div>
+              <div class="icons">
+                <span>CO2</span>
+                <span>PPM</span>
+              </div>
               <div class="content">328</div>
             </div>
             <div class="bgline">
-              <div class="icons">风向</div>
-              <div class="content">东南</div>
+              <div class="icons">
+                <span>风向</span>
+                <span>°</span>
+              </div>
+              <div class="content">48.6</div>
             </div>
             <div class="bgline">
-              <div class="icons">风速</div>
+              <div class="icons">
+                <span>风速</span>
+                <span>m/s</span>
+              </div>
               <div class="content">0.8</div>
             </div>
           </div>
@@ -96,30 +124,44 @@
         </div>
         <div class="leftCard">
           <div class="bgfont">
-            <!-- <img src="../../assets/images/cut_img/juxing.png" alt=""> -->
-            <div class="bgline">
-              <div class="icons">土温1</div>
-              <div class="content">17</div>
-            </div>
-            <div class="bgline">
-              <div class="icons">土湿2</div>
-              <div class="content">14</div>
-            </div>
-            <div class="bgline">
-              <div class="icons">土温2</div>
-              <div class="content">18</div>
-            </div>
-            <div class="bgline">
-              <div class="icons">土湿2</div>
-              <div class="content">15</div>
-            </div>
             <div class="bgline">
               <div class="icons">PH</div>
               <div class="content">6.4</div>
             </div>
             <div class="bgline">
-              <div class="icons">EC</div>
+              <div class="icons">
+                <span>EC</span>
+                <span>μs/cm</span>
+              </div>
               <div class="content">1.7</div>
+            </div>
+            <div class="bgline">
+              <div class="icons">
+                <span>土温1</span>
+                <span>℃</span>
+              </div>
+              <div class="content">17</div>
+            </div>
+            <div class="bgline">
+              <div class="icons">
+                <span>土湿1</span>
+                <span>%</span>
+              </div>
+              <div class="content">14</div>
+            </div>
+            <div class="bgline">
+              <div class="icons">
+                <span>土温2</span>
+                <span>℃</span>
+              </div>
+              <div class="content">18</div>
+            </div>
+            <div class="bgline">
+              <div class="icons">
+                <span>土湿1</span>
+                <span>%</span>
+              </div>
+              <div class="content">15</div>
             </div>
           </div>
         </div>
@@ -194,31 +236,42 @@
           <div class="bgfont">
             <div class="bgline">
               <div class="icons">PH</div>
-              <div class="content">0.8</div>
+              <div class="content">{{Realtime.ph}}</div>
             </div>
             <div class="bgline">
-              <div class="icons">EC</div>
-              <div class="content">2</div>
+              <div class="icons">
+                <span>EC</span>
+                <span>μs/cm</span>
+              </div>
+              <div class="content">{{Realtime.ec}}</div>
             </div>
             <div class="bgline">
-              <div class="icons">流量</div>
-              <div class="content">1000</div>
+              <div class="icons">
+                  <span>流量</span>
+                  <span>m3/H</span>
+              </div>
+              <div class="content">{{Realtime.real_time_flow}}</div>
             </div>
             <div class="bgline">
-              <div class="icons">累计流量</div>
-              <div class="content">15000</div>
+              <div class="icons">
+                  <span>累计流量</span>
+                  <span>L</span>
+              </div>
+              <div class="content">{{Realtime.total_volume}}</div>
             </div>
             <div class="bgline">
-              <div class="icons">液位</div>
-              <div class="content">10/L</div>
+              <div class="icons">
+                  <span>液位</span>
+                  <span>cm</span>
+              </div>
+              <div class="content">{{Realtime.liquid_level}}</div>
             </div>
             <div class="bgline">
-              <div class="icons">压力</div>
-              <div class="content">100KP</div>
-            </div>
-            <div class="bgline">
-              <div class="icons">负压</div>
-              <div class="content">20KP</div>
+              <div class="icons">
+                  <span>压力</span>
+                  <span>kg/cm2</span>
+              </div>
+              <div class="content">{{Realtime.pressure}}</div>
             </div>
           </div>
         </vue-scroll>
@@ -233,28 +286,46 @@
       <div class="leftCard">
         <div class="bgfont">
           <div class="bgline">
-            <div class="icons">温度</div>
-            <div class="content">25/℃</div>
+            <div class="icons">
+              <span>温度</span>
+              <span>℃</span>
+            </div>
+            <div class="content">22</div>
           </div>
           <div class="bgline">
-            <div class="icons">湿度</div>
-            <div class="content">10/%</div>
+            <div class="icons">
+              <span>湿度</span>
+              <span>%</span>
+            </div>
+            <div class="content">24</div>
           </div>
           <div class="bgline">
-            <div class="icons">光照</div>
-            <div class="content">0.5</div>
+            <div class="icons">
+              <span>光照</span>
+              <span>LUX</span>
+            </div>
+            <div class="content">11434</div>
           </div>
           <div class="bgline">
-            <div class="icons">CO2</div>
-            <div class="content">2/ml</div>
+            <div class="icons">
+              <span>CO2</span>
+              <span>PPM</span>
+            </div>
+            <div class="content">328</div>
           </div>
           <div class="bgline">
-            <div class="icons">风向</div>
-            <div class="content">东南</div>
+            <div class="icons">
+              <span>风向</span>
+              <span>°</span>
+            </div>
+            <div class="content">48.6</div>
           </div>
           <div class="bgline">
-            <div class="icons">风速</div>
-            <div class="content">10 m/s</div>
+            <div class="icons">
+              <span>风速</span>
+              <span>m/s</span>
+            </div>
+            <div class="content">0.8</div>
           </div>
         </div>
       </div>
@@ -267,30 +338,44 @@
       </div>
       <div class="leftCard">
         <div class="bgfont">
-          <!-- <img src="../../assets/images/cut_img/juxing.png" alt=""> -->
           <div class="bgline">
-            <div class="icons">土温1</div>
-            <div class="content">12</div>
+            <div class="icons">PH</div>
+            <div class="content">6.4</div>
           </div>
           <div class="bgline">
-            <div class="icons">土湿2</div>
-            <div class="content">0.8</div>
+            <div class="icons">
+              <span>EC</span>
+              <span>μs/cm</span>
+            </div>
+            <div class="content">1.7</div>
           </div>
           <div class="bgline">
-            <div class="icons">土温2</div>
+            <div class="icons">
+              <span>土温1</span>
+              <span>℃</span>
+            </div>
+            <div class="content">17</div>
+          </div>
+          <div class="bgline">
+            <div class="icons">
+              <span>土湿1</span>
+              <span>%</span>
+            </div>
+            <div class="content">14</div>
+          </div>
+          <div class="bgline">
+            <div class="icons">
+              <span>土温2</span>
+              <span>℃</span>
+            </div>
             <div class="content">18</div>
           </div>
           <div class="bgline">
-            <div class="icons">土湿2</div>
-            <div class="content">12 KPa</div>
-          </div>
-          <div class="bgline">
-            <div class="icons">PH</div>
-            <div class="content">0.8</div>
-          </div>
-          <div class="bgline">
-            <div class="icons">EC</div>
-            <div class="content">0.1</div>
+            <div class="icons">
+              <span>土湿1</span>
+              <span>%</span>
+            </div>
+            <div class="content">15</div>
           </div>
         </div>
       </div>
@@ -306,6 +391,22 @@ import linegraph from '@/components/linegraph.vue'
 export default {
   data () {
     return {
+      // 默认的实时数据
+      Realtime: {
+        datetime: 0,
+        fertilizer_id: '',
+        // 累计流量
+        total_volume: 0,
+        // 实时流量
+        real_time_flow: 0,
+        ph: 0,
+        // 液位
+        liquid_level: 0,
+        // 压力
+        pressure: 0,
+        ec: 0,
+        status: 0
+      },
       // 滚动条
       ops: {
         vuescroll: {},
@@ -336,64 +437,93 @@ export default {
       flagbig_2: false,
       flagbig_3: false,
       option1: {
-        // title: {
-        //   text: '实时数据',
-        //   top: 5
-        //   // left: 'center'
-        // },
         tooltip: {
           trigger: 'axis'
-          // formatter: '{a} <br/>{b} : {c}'
         },
         legend: {
           left: 'center',
-          data: ['PH', 'EC'],
-          top: 5
-          // textStyle: {// 图例文字的样式
-          //   color: 'white'
-          // }
+          data: ['PH', 'EC', '流量', '累计流量', '液位', '压力'],
+          top: 5,
+          z: 10
         },
         xAxis: {
           type: 'category',
-          // name: 'x', y轴的标题
-          // splitLine: { show: false }, 标题展示或不展示
-          data: ['15:00', '15:10', '15:20', '15:30', '15:40', '15:50', '16:00', '16:10', '16:20', '16:30', '16:40', '16:50']
+          data: []
         },
         grid: {
-          left: '1%',
+          left: '2%',
           right: '2%',
           bottom: '8%',
-          containLabel: true
+          containLabel: false
         },
-        yAxis: {
-          type: 'category',
-          // name: 'y', x轴的标题
-          // splitLine: { show: true },线展示或不展示
-          data: ['10%', '20%', '30%', '40%', '50%', '60%', '70%', '80%', '90%', '100%']
-        },
+        dataZoom: [{
+          type: 'inside'
+        }],
+        yAxis: [
+          {
+            show: false,
+            type: 'value'
+          },
+          {
+            show: false,
+            type: 'value'
+          },
+          {
+            show: false,
+            type: 'value'
+          },
+          {
+            show: false,
+            type: 'value'
+          }
+        ],
         series: [
           {
             name: 'PH',
             type: 'line',
-            data: [3.5, 2.4, 2.52, 2.25, 2.7, 2.5, 4.3, 1.23, 1.69, 1.25, 1.36, 1.56],
-            // 浮点
+            data: [],
             showSymbol: true,
+            yAxisIndex: 0,
             symbolSize: 5
           },
           {
             name: 'EC',
             type: 'line',
-            data: [6, 5.2, 5.4, 5.8, 5.16, 5.32, 5.64, 5.28, 5.6, 5.25, 5.63, 5.65, 5.12],
-            // itemStyle: {
-            //   normal: {
-            //     lineStyle: {
-            //       width: 5,
-            //       color: '#000'
-            //     }
-            //   }
-            // },
-            // 浮点
+            data: [],
             showSymbol: true,
+            yAxisIndex: 1,
+            symbolSize: 5
+          },
+          {
+            name: '流量',
+            type: 'line',
+            data: [],
+            showSymbol: true,
+            yAxisIndex: 2,
+            symbolSize: 5
+          },
+          {
+            name: '累计流量',
+            type: 'line',
+            data: [],
+            showSymbol: true,
+            yAxisIndex: 3,
+            symbolSize: 5
+          },
+          {
+            name: '液位',
+            type: 'line',
+            data: [],
+            showSymbol: true,
+            yAxisIndex: 3,
+            symbolSize: 5
+          },
+          {
+            name: '压力',
+            type: 'line',
+            data: [],
+            showSymbol: true,
+            yAxisIndex: 3,
             symbolSize: 5
           }
         ]
@@ -483,7 +613,9 @@ export default {
   created () {
     const projectId = JSON.parse(window.sessionStorage.getItem('projectId'))
     this.request.projectId = projectId
-    this.getfertilizer()
+  },
+  mounted () {
+    this.sequence()
   },
   methods: {
     realtimeBtn () {
@@ -510,11 +642,66 @@ export default {
       this.flagAll = true
       this.flagbig_3 = false
     },
+    // 控制顺序
+    sequence () {
+      this.getfertilizer().then(res => {
+        this.getRealtime()
+      })
+    },
+    // 施肥机id
     async getfertilizer () {
       const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/fertilizer/queryByProjectId', this.request)
       this.fertilizer = res.data.data
       this.reqParams.fertilizerId = this.fertilizer[0].id
-      console.log(res.data.data)
+      console.log(this.reqParams.fertilizerId)
+    },
+    // 获取实时数据
+    async getRealtime () {
+      const columns = []
+      const conditions = ["fertilizer_id='" + this.reqParams.fertilizerId + "'", "date_format(datetime,'%Y-%m-%d')='2020-04-07'", 'minute(datetime)%5=0']
+      // " + this.$moment(new Date()).format('YYYY-MM-DD') + "
+      const sorts = ['datetime desc']
+      const params = {
+        columns: columns,
+        conditions: conditions,
+        sorts: sorts
+      }
+      // 数据展示
+      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/data/queryByQueryVo', params)
+      this.Realtime = res.data.data[0]
+      // 曲线
+      var time = []
+      var PH = []
+      var totalVolume = []
+      var realTimeFlow = []
+      var liquidLevel = []
+      var pressure = []
+      var EC = []
+      for (let i = 0; i < res.data.data.length; i++) {
+        const element = res.data.data[i]
+        // 时间
+        time.unshift(this.$moment(element.datetime).format('HH:mm:ss'))
+        // ph
+        PH.unshift(element.ph)
+        // 累计流量
+        totalVolume.unshift(element.total_volume)
+        // 实时流量
+        realTimeFlow.unshift(element.real_time_flow)
+        // 液位
+        liquidLevel.unshift(element.liquid_level)
+        // 压力
+        pressure.unshift(element.pressure)
+        // EC
+        EC.unshift(element.ec)
+      }
+
+      this.option1.xAxis.data = time
+      this.option1.series[0].data = PH
+      this.option1.series[1].data = EC
+      this.option1.series[2].data = realTimeFlow
+      this.option1.series[3].data = totalVolume
+      this.option1.series[4].data = liquidLevel
+      this.option1.series[5].data = pressure
     },
     async fn () {
       const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/queryByFertilizerId', this.reqParams)
@@ -582,6 +769,18 @@ export default {
             border-right: 1px solid RGB(101,133,159);
             float: left;
             background-color: RGB(54,76,95);
+            span:first-child {
+              line-height: 26px;
+              height: 26px;
+              display: block;
+            }
+            span:last-child {
+              color: #ccc;
+              font-size: 14px;
+              line-height: 20px;
+              height: 20px;
+              display: block;
+            }
           }
           .content {
             width: 100px;
@@ -858,6 +1057,18 @@ export default {
             float: left;
             font-weight: 800;
             background-color: RGB(54,76,95);
+            span:first-child {
+              height: 44px;
+              line-height: 44px;
+              display: block;
+            }
+            span:last-child {
+              color: #ccc;
+              font-size: 1.3rem;
+              line-height: 36px;
+              height: 36px;
+              display: block;
+            }
           }
           .content {
             width: 58%;
@@ -928,6 +1139,18 @@ export default {
             float: left;
             font-weight: 800;
             background-color: RGB(54,76,95);
+            span:first-child {
+              height: 44px;
+              line-height: 44px;
+              display: block;
+            }
+            span:last-child {
+              color: #ccc;
+              font-size: 1.3rem;
+              line-height: 36px;
+              height: 36px;
+              display: block;
+            }
           }
           .content {
             width: 58%;
@@ -998,6 +1221,18 @@ export default {
             float: left;
             font-weight: 800;
             background-color: RGB(54,76,95);
+            span:first-child {
+              height: 44px;
+              line-height: 44px;
+              display: block;
+            }
+            span:last-child {
+              color: #ccc;
+              font-size: 1.3rem;
+              line-height: 36px;
+              height: 36px;
+              display: block;
+            }
           }
           .content {
             width: 58%;

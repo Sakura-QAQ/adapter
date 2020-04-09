@@ -3,8 +3,8 @@
     <span>
       选择施肥机:
       <select name="" id="">
-        <option value="">1#施肥机</option>
-        <option value="">2#施肥机</option>
+        <option value=""></option>
+        <option value=""></option>
       </select>
     </span>
     <!-- <input class="submit" type="submit"> -->

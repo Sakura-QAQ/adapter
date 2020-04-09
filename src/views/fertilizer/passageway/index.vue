@@ -127,22 +127,6 @@ export default {
     },
     // 清空
     clear () {
-      // this.edit = {
-      //   id: this.titles.id,
-      //   projectId: this.titles.projectId,
-      //   channel1: null,
-      //   channel2: null,
-      //   channel3: null,
-      //   channel4: null,
-      //   channel5: null,
-      //   channel6: null,
-      //   channel7: null,
-      //   channel8: null,
-      //   channel9: null,
-      //   createTime: this.titles.createTime,
-      //   updateTime: this.titles.updateTime,
-      //   isDel: 0
-      // }
       this.edit = {}
     }
   }
@@ -153,6 +137,7 @@ export default {
 .crop-container {
   display: flex;
   justify-content: space-evenly;
+  margin-top: 58px;
   .fer-table {
     position: relative;
     width: 670px;

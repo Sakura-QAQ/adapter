@@ -1,4 +1,14 @@
 <template>
+<div class="cotainer">
+  <div>
+    <button @click="add">添加施肥机</button>
+    <button @click="del">删除施肥机</button>
+    <button @click="addvalve">添加电磁阀</button>
+    <button @click="delvalve">删除电磁阀</button>
+    <label>关键词：<input v-model="keyword"></label>
+    <label>地区：<input v-model="location"></label>
+    <button @click="resetBtn">关闭</button>
+  </div>
   <baidu-map
     class="map"
     ak="BcFOSdgOOD2ie0nSulgGGRC3hrLrFQcX"
@@ -6,6 +16,8 @@
     :zoom="zoom"
     @ready="handler"
   >
+    <bm-local-search class="search" :keyword="keyword" :pageCapacity="5" :auto-viewport="true" :location="location"></bm-local-search>
+
     <bml-marker-clusterer :averageCenter="true">
       <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
       <bm-map-type
@@ -17,6 +29,7 @@
       <bm-marker
         v-for="(marker, i) of markers"
         :key="i"
+        :icon="{url: 'http://developer.baidu.com/map/jsdemo/img/fox.gif', size: {width: 300, height: 157}}"
         :position="{lng: marker.lng, lat: marker.lat}"
         :dragging="true"
         @click="clickHandler"
@@ -42,12 +55,9 @@
         />
         <!-- <bm-info-window :show="show" @close="infoWindowClose" @open="infoWindowOpen">{{i}}施肥机</bm-info-window> -->
       </bm-marker>
-      <button @click="add">添加施肥机</button>
-      <button @click="del">删除施肥机</button>
-      <button @click="addvalve">添加电磁阀</button>
-      <button @click="delvalve">删除电磁阀</button>
     </bml-marker-clusterer>
   </baidu-map>
+</div>
 </template>
 
 <script>
@@ -55,10 +65,12 @@ import { BmlMarkerClusterer } from 'vue-baidu-map'
 export default {
   data () {
     return {
+      location: '',
+      keyword: '',
       markers: [],
       valves: [],
       center: { lng: 0, lat: 0 },
-      zoom: 3,
+      zoom: 5,
       i: 1,
       show: false
     }
@@ -69,11 +81,12 @@ export default {
         lng: 116.276429,
         lat: 40.192602
       }
-      if (this.markers.length === 5) {
-        return false
-      } else {
-        this.markers.push(position)
-      }
+      // if (this.markers.length === 5) {
+      //   return false
+      // } else {
+      //   this.markers.push(position)
+      // }
+      this.markers.push(position)
     },
     del () {
       this.markers.splice(this.markers.indexOf(this.markers), 1)
@@ -83,11 +96,6 @@ export default {
         lng: 116.276429,
         lat: 40.192602
       }
-      // if (this.valve.length === 5) {
-      //   return false
-      // } else {
-      //   this.valves.push(valve)
-      // }
       this.valves.push(valve)
     },
     delvalve () {
@@ -96,10 +104,14 @@ export default {
     handler ({ BMap, map }) {
       this.center.lng = 116.27667165
       this.center.lat = 40.19271592
-      this.zoom = 18
+      this.zoom = 20
     },
     clickHandler (e) {
       alert(`当前施肥机坐标为：${e.point.lng}, ${e.point.lat}`)
+    },
+    resetBtn ({ BMap, map }) {
+      this.location = ''
+      this.keyword = ''
     }
   },
   components: {
@@ -109,12 +121,21 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.map {
+.cotainer {
   width: 100%;
-  height: 80%;
+  height: 100%;
+  .map {
+    position: relative;
+    width: 100%;
+    height: 90%;
 
-  /deep/ .anchorBL {
-    display: none;
+    /deep/ .anchorBL {
+      display: none;
+    }
+    .search {
+      position: absolute;
+      top: 0;
+    }
   }
 }
 </style>

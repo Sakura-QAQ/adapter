@@ -11,15 +11,16 @@ export default {
       ChartLineGraph: null
     }
   },
-  //  深度监听 父组件刚开始没有值，只有图标的配置项
-  //  父组件ajax请求后改变数据的值，传递过来，图标已生成，监听传过来的值的改变
+  //  深度监听 父组件刚开始没有值，只有图表的配置项
+  //  父组件ajax请求后改变数据的值，传递过来，图表已生成，监听传过来的值的改变
   watch: {
     data: {
       handler (newvalue, oldvalue) {
         this.drawLineGraph(this.id, newvalue)
-      }
-    },
-    deep: true
+      },
+      // deep:true必须放在data里！百度真他妈害人不浅
+      deep: true
+    }
   },
   props: ['id', 'data'],
   mounted () {

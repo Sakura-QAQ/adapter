@@ -19,6 +19,12 @@ import components from '@/components'
 
 // 全局echarts
 import echarts from 'echarts'
+// vue easytable
+import 'vue-easytable/libs/themes-base/index.css'
+import {
+  VTable,
+  VPagination
+} from 'vue-easytable'
 
 // jquery
 // import 'jquery'
@@ -26,17 +32,24 @@ import echarts from 'echarts'
 // 百度地图
 import BaiduMap from 'vue-baidu-map'
 
+// moment
+import moment from 'moment'
+
 // axios挂载到大vue原型上
 Vue.prototype.$http = axios
 // echarts挂载
 Vue.prototype.$echarts = echarts
+// moment挂载到原型
+Vue.prototype.$moment = moment
 
 Vue.use(components)
 
 Vue.use(ElementUI)
 
 Vue.use(vuescroll) // 使用
-
+// vue easytable
+Vue.component(VTable.name, VTable)
+Vue.component(VPagination.name, VPagination)
 Vue.use(echarts)
 
 Vue.use(BaiduMap, {
