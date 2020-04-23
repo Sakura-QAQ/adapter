@@ -20,8 +20,8 @@
           </div>
           <el-checkbox-group class="checkFl" v-model="checkboxGroup">
             <template v-for="(item, index) in fergroup">
-              <el-checkbox-button :label="index + 1" :key="index" v-show="index < 24">
-                <div class="valve_num" v-on:dblclick="editval($event, index)">{{Vals[index]}}</div>
+              <el-checkbox-button :label="index + 1" :key="index" v-show="index < 24" disabled>
+                <div class="valve_num">{{Vals[item - 1]}}</div>
               </el-checkbox-button>
             </template>
           </el-checkbox-group>
@@ -98,7 +98,8 @@
             <el-table
               :data="tableData"
               style="width: 100%"
-              :row-class-name="tableRowClassName">
+              :row-class-name="tableRowClassName"
+              @row-click="showValves($event)">
               <el-table-column
                 prop="exeTime"
                 label="执行时间"
@@ -150,7 +151,7 @@
           <el-checkbox-group class="checkFl" v-model="checkboxGroup">
             <template v-for="(item, index) in fergroup">
               <el-checkbox-button :label="index + 1" :key="index" v-show="index < 24">
-                <div class="valve_num" v-on:dblclick="editval($event, index)">{{Vals[index]}}</div>
+                <div class="valve_num" v-on:dblclick="editval($event, index)">{{Vals[item - 1]}}</div>
               </el-checkbox-button>
             </template>
           </el-checkbox-group>
@@ -210,7 +211,7 @@
           <el-checkbox-group class="checkFl" v-model="checkboxGroup">
             <template v-for="(item, index) in fergroup">
               <el-checkbox-button :label="index + 1" :key="index" v-show="index < 24">
-                <div class="valve_num" v-on:dblclick="editval($event, index)">{{Vals[index]}}</div>
+                <div class="valve_num" v-on:dblclick="editval($event, index)">{{Vals[item - 1]}}</div>
               </el-checkbox-button>
             </template>
           </el-checkbox-group>
@@ -256,7 +257,7 @@
                 <el-button size="small" @click="addDomain">新增</el-button>
               </el-form-item>
               <div class="fixBtn">
-                <input class="submit" type="button" value="返回" @click="flagHidden2=false">
+                <input class="submit" type="button" value="返回" @click="ReTurn2">
                 <input class="submit" type="button" value="提交" @click="editList">
               </div>
             </el-form>
@@ -382,18 +383,15 @@ export default {
   created () {
     const projectId = JSON.parse(window.sessionStorage.getItem('projectId'))
     this.request.projectId = projectId
-    this.getareas()
   },
   mounted () {
-    let that = this
-    setTimeout(() => {
-      that.getfomulalist()
-      that.QueryFer()
-      that.getpassway()
-    }, 200)
-    setTimeout(() => {
-      that.enterpage()
-    }, 300)
+    this.getareas().then(res => {
+      this.getfomulalist()
+      this.getpassway()
+      this.QueryFer().then(res => {
+        this.enterpage()
+      })
+    })
   },
   methods: {
     // 阀号修改
@@ -450,55 +448,69 @@ export default {
         areaId: this.areaId.id
       }
       const fomulaCrop = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/area/queryFormulaLinkByAreaId', ID)
-      this.fomulaCrop = fomulaCrop.data.data
+      if (fomulaCrop.data.data.length === 0) {
+        this.$message.warning('该温室没有配方数据！请到配方绑定页面中进行添加！')
+        return false
+      } else {
+        this.fomulaCrop = fomulaCrop.data.data
+      }
     },
     // 进入页面默认值
     async enterpage () {
-      this.addData.formulaId = this.fomulaCrop[0].formulaId
-      this.addData.areaFormulaLinkId = this.fomulaCrop[0].id
-      this.mathData = {
-        startDate: this.fomulaCrop[0].startDate,
-        endDate: this.fomulaCrop[0].endDate,
-        ecBase: this.fomulaCrop[0].formula.ecBase,
-        ecTarget: this.fomulaCrop[0].formula.ecTarget,
-        phTarget: this.fomulaCrop[0].formula.phTarget,
-        channel1: this.fomulaCrop[0].formula.channel1,
-        channel2: this.fomulaCrop[0].formula.channel2,
-        channel3: this.fomulaCrop[0].formula.channel3,
-        channel4: this.fomulaCrop[0].formula.channel4,
-        channel5: this.fomulaCrop[0].formula.channel5,
-        channel6: this.fomulaCrop[0].formula.channel6,
-        channel7: this.fomulaCrop[0].formula.channel7,
-        channel8: this.fomulaCrop[0].formula.channel8,
-        channel9: this.fomulaCrop[0].formula.channel9
-      }
-      let areaFormulaLinkId = {
-        areaFormulaLinkId: this.fomulaCrop[0].id
-      }
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/queryByAreaFormulaLinkId', areaFormulaLinkId)
-      this.tableData = res.data.data
-      this.tableData.map(val => {
-        if (val.status === 0) {
-          val.status = '未执行'
-        } else if (val.status === 1) {
-          val.status = '排队中'
-        } else if (val.status === 2) {
-          val.status = '执行中'
-        } else if (val.status === 3) {
-          val.status = '已完成'
-        } else if (val.status === 4) {
-          val.status = '执行异常'
+      if (this.fomulaCrop.length === 0) {
+        return false
+      } else {
+        this.addData.formulaId = this.fomulaCrop[0].formulaId
+        this.addData.areaFormulaLinkId = this.fomulaCrop[0].id
+        this.mathData = {
+          startDate: this.fomulaCrop[0].startDate,
+          endDate: this.fomulaCrop[0].endDate,
+          ecBase: this.fomulaCrop[0].formula.ecBase,
+          ecTarget: this.fomulaCrop[0].formula.ecTarget,
+          phTarget: this.fomulaCrop[0].formula.phTarget,
+          channel1: this.fomulaCrop[0].formula.channel1,
+          channel2: this.fomulaCrop[0].formula.channel2,
+          channel3: this.fomulaCrop[0].formula.channel3,
+          channel4: this.fomulaCrop[0].formula.channel4,
+          channel5: this.fomulaCrop[0].formula.channel5,
+          channel6: this.fomulaCrop[0].formula.channel6,
+          channel7: this.fomulaCrop[0].formula.channel7,
+          channel8: this.fomulaCrop[0].formula.channel8,
+          channel9: this.fomulaCrop[0].formula.channel9
         }
-      })
+        let areaFormulaLinkId = {
+          areaFormulaLinkId: this.fomulaCrop[0].id
+        }
+        const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/queryByAreaFormulaLinkId', areaFormulaLinkId)
+        this.tableData = res.data.data
+        this.tableData.map(val => {
+          if (val.status === 0) {
+            val.status = '未执行'
+          } else if (val.status === 1) {
+            val.status = '排队中'
+          } else if (val.status === 2) {
+            val.status = '执行中'
+          } else if (val.status === 3) {
+            val.status = '已完成'
+          } else if (val.status === 4) {
+            val.status = '执行异常'
+          }
+        })
+      }
     },
     // 获取通道
     async getpassway () {
       // 通道
       const plans = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/channel/queryByProjectId', this.request)
-      this.plans = plans.data.data
+      if (plans.data.data === null) {
+        return false
+      } else {
+        this.plans = plans.data.data
+      }
     },
     // 点击展示详细数据
     async showData (item, index) {
+      this.checkboxGroup = []
       this.num = index
       this.addData.formulaId = item.formulaId
       this.addData.areaFormulaLinkId = item.id
@@ -537,8 +549,9 @@ export default {
         }
       })
     },
-    // 打开弹出层
+    // 打开添加弹出层
     fog () {
+      this.checkboxGroup = []
       this.flagHidden = true
     },
     // 编辑阀名
@@ -550,6 +563,11 @@ export default {
     // 返回弹出层
     ReTurn () {
       this.flagHidden = false
+      this.checkboxGroup = []
+    },
+    ReTurn2 () {
+      this.flagHidden2 = false
+      this.checkboxGroup = []
     },
     // 循环监控计划
     start () {
@@ -624,16 +642,12 @@ export default {
     editData (index, row) {
       // this.clear()
       this.projectId = row.projectId
-      if (row.status === '未执行') {
-        row.status = 0
-      } else if (row.status === '排队中') {
-        row.status = 1
+      if (row.status === '排队中') {
+        this.$message.warning('排队中不可编辑！')
+        return false
       } else if (row.status === '执行中') {
-        row.status = 2
-      } else if (row.status === '已完成') {
-        row.status = 3
-      } else if (row.status === '执行异常') {
-        row.status = 4
+        this.$message.warning('执行中不可编辑！')
+        return false
       }
       this.flagHidden2 = true
       // id
@@ -679,6 +693,7 @@ export default {
         const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/addIrriSchedule', list)
         if (res.data.code === 200) {
           this.$message.success('提交成功')
+          this.checkboxGroup = []
           this.flagHidden = false
           this.getItem(this.addData.areaFormulaLinkId)
         }
@@ -705,8 +720,9 @@ export default {
       const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/saveOrUpdate', list)
       if (res.data.code === 200) {
         this.$message.success('提交成功')
+        this.checkboxGroup = []
+        this.flagHidden2 = false
       }
-      this.flagHidden2 = false
       this.getItem(this.addData.areaFormulaLinkId)
     },
     // 删除
@@ -729,29 +745,55 @@ export default {
     },
     // 切换
     async areaTab () {
+      this.checkboxGroup = []
       this.QueryFer()
       let ID = {
         areaId: this.areaId.id
       }
       const fomulaCrop = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/area/queryFormulaLinkByAreaId', ID)
-      this.fomulaCrop = fomulaCrop.data.data
-      this.addData.formulaId = this.fomulaCrop[0].formulaId
-      this.addData.areaFormulaLinkId = this.fomulaCrop[0].id
-      this.mathData = {
-        startDate: this.fomulaCrop[0].startDate,
-        endDate: this.fomulaCrop[0].endDate,
-        ecBase: this.fomulaCrop[0].formula.ecBase,
-        ecTarget: this.fomulaCrop[0].formula.ecTarget,
-        phTarget: this.fomulaCrop[0].formula.phTarget,
-        channel1: this.fomulaCrop[0].formula.channel1,
-        channel2: this.fomulaCrop[0].formula.channel2,
-        channel3: this.fomulaCrop[0].formula.channel3,
-        channel4: this.fomulaCrop[0].formula.channel4,
-        channel5: this.fomulaCrop[0].formula.channel5,
-        channel6: this.fomulaCrop[0].formula.channel6,
-        channel7: this.fomulaCrop[0].formula.channel7,
-        channel8: this.fomulaCrop[0].formula.channel8,
-        channel9: this.fomulaCrop[0].formula.channel9
+      if (fomulaCrop.data.data.length === 0) {
+        this.$message.warning('该温室没有配方数据！请到配方绑定页面中进行添加！')
+        this.fomulaCrop = []
+        this.mathData = {
+          startDate: '(年--月--日)',
+          endDate: '(年--月--日)',
+          ecBase: 0,
+          ecTarget: 0,
+          phTarget: 0,
+          channel1: 0,
+          channel2: 0,
+          channel3: 0,
+          channel4: 0,
+          channel5: 0,
+          channel6: 0,
+          channel7: 0,
+          channel8: 0,
+          channel9: 0
+        }
+        this.tableData = []
+        return false
+      } else {
+        // 直接调用this.getfomulalist()会出bug
+        this.num = 0
+        this.fomulaCrop = fomulaCrop.data.data
+        this.addData.formulaId = this.fomulaCrop[0].formulaId
+        this.addData.areaFormulaLinkId = this.fomulaCrop[0].id
+        this.mathData = {
+          startDate: this.fomulaCrop[0].startDate,
+          endDate: this.fomulaCrop[0].endDate,
+          ecBase: this.fomulaCrop[0].formula.ecBase,
+          ecTarget: this.fomulaCrop[0].formula.ecTarget,
+          phTarget: this.fomulaCrop[0].formula.phTarget,
+          channel1: this.fomulaCrop[0].formula.channel1,
+          channel2: this.fomulaCrop[0].formula.channel2,
+          channel3: this.fomulaCrop[0].formula.channel3,
+          channel4: this.fomulaCrop[0].formula.channel4,
+          channel5: this.fomulaCrop[0].formula.channel5,
+          channel6: this.fomulaCrop[0].formula.channel6,
+          channel7: this.fomulaCrop[0].formula.channel7,
+          channel8: this.fomulaCrop[0].formula.channel8,
+          channel9: this.fomulaCrop[0].formula.channel9
+        }
       }
       this.getItem(this.fomulaCrop[0].id)
     },
@@ -777,7 +819,20 @@ export default {
       // }
     },
     onStop (index, row, e) {
-
+    },
+    // 单击显示阀号
+    showValves (e) {
+      if (e.status === '排队中') {
+        this.$message.warning('排队中不可操作！')
+        this.checkboxGroup = []
+        return false
+      } else if (e.status === '执行中') {
+        this.$message.warning('执行中不可操作！')
+        this.checkboxGroup = []
+        return false
+      } else {
+        this.checkboxGroup = JSON.parse(e.valveNumbers)
+      }
     }
   }
 }
@@ -918,7 +973,7 @@ export default {
       width: 1300px;
       margin-top: 20px;
       .topData {
-        height: 200px;
+        height: 180px;
         background-color: #242c3b;
         >div {
           float: left;
@@ -943,14 +998,14 @@ export default {
           margin-left: 90px;
 
           div:first-child {
-            width: 110px;
-            height: 110px;
-            line-height: 110px;
+            width: 90px;
+            height: 90px;
+            line-height: 90px;
             border-radius: 50%;
             text-align: center;
             border: 1px solid #546d9d;
             border-radius: 50%;
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 800;
             background-color: #232733;
             color: #0ed6f4;
@@ -979,7 +1034,7 @@ export default {
       }
       .Mainbody {
         position: relative;
-        height: 420px;
+        height: 440px;
         margin-top: 20px;
         background-color: #232733;
         padding-top: 40px;

@@ -16,14 +16,6 @@
           <i class="el-icon-s-home"></i>
           <span slot="title">实时数据</span>
         </el-menu-item>
-        <el-menu-item index="/weather">
-          <i class="el-icon-s-opportunity"></i>
-          <span slot="title">历史数据</span>
-        </el-menu-item>
-        <el-menu-item index="/soil">
-          <i class="el-icon-tickets"></i>
-          <span slot="title">配方绑定</span>
-        </el-menu-item>
         <el-menu-item index="/irrigation">
           <i class="el-icon-edit-outline"></i>
           <span slot="title">灌溉策略</span>
@@ -41,6 +33,14 @@
             <el-menu-item index="/formula" style="padding-left: 64px;">配方管理</el-menu-item>
           </el-menu-item-group>
         </el-submenu>
+        <el-menu-item index="/soil">
+          <i class="el-icon-tickets"></i>
+          <span slot="title">配方绑定</span>
+        </el-menu-item>
+        <el-menu-item index="/weather">
+          <i class="el-icon-s-opportunity"></i>
+          <span slot="title">历史数据</span>
+        </el-menu-item>
         <el-menu-item index="/statistic">
           <i class="el-icon-s-data"></i>
           <span slot="title">数据统计</span>
@@ -49,10 +49,10 @@
           <i class="el-icon-connection"></i>
           <span slot="title">现场实况</span>
         </el-menu-item>
-        <el-menu-item index="/try">
+        <!-- <el-menu-item index="/try">
           <i class="el-icon-connection"></i>
           <span slot="title">测试页</span>
-        </el-menu-item>
+        </el-menu-item> -->
       </el-menu>
       <div class="logo-5g"></div>
     </el-aside>
@@ -168,6 +168,7 @@ export default {
           font-size: 18px;
           span {
             padding-left: 10px;
+            letter-spacing: 2px;
           }
         }
         .el-menu-item-group {
@@ -183,13 +184,15 @@ export default {
         font-weight: 800;
         span {
           padding-left: 10px;
+          letter-spacing: 2px;
         }
       }
     }
   }
-  .my-header {
-    border-bottom: 1px solid #ddd;
-    line-height: 60px;
+  /deep/ .my-header {
+    border-bottom: 1px solid #ffde00;
+    height: 80px !important;
+    line-height: 80px;
     background-color: #002033;
     .el-icon-s-fold {
       font-size: 26px;
@@ -206,7 +209,7 @@ export default {
       .el-form-item {
         margin-bottom: 0;
         .el-form-item__label {
-          padding: 12px 0 0 0;
+          padding: 22px 0 0 0;
           color: #fff;
           font-size: 16px;
         }
@@ -231,17 +234,18 @@ export default {
         .el-radio__label {
           color: #97b1c9;
         }
-        .el-form-item__label {
-          color: #fff;
-        }
       }
     }
     .hT {
       position: absolute;
       top: 0;
-      left: 50%;
+      left: 45%;
       font-weight: 800;
-      font-size: 28px;
+      font-size: 40px;
+      font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+      color: #fafafa;
+      letter-spacing: 5px;
+      text-shadow: 0px 1px 0px #999, 0px 2px 0px #888, 0px 3px 0px #777, 0px 4px 0px #666, 0px 5px 0px #555, 0px 6px 0px #444, 0px 7px 0px #333, 0px 8px 7px #001135;
     }
   }
 }

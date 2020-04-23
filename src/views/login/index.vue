@@ -1,8 +1,7 @@
 <template>
   <div class="login-container">
-    <!-- <img src="../../assets/images/cover.png" alt=""> -->
     <el-card class="login-box">
-      <p>欢迎登陆智能施肥机管理系统</p>
+      <p>欢迎登陆施肥机智能管理系统</p>
       <!-- 登录表单 -->
       <el-form ref="loginForm" :status-icon="true" :model="loginForm" :rules="loginRules">
         <el-form-item prop="name">
@@ -20,10 +19,10 @@
         </el-form-item>
       </el-form>
       <img src="../../assets/images/logo.png" alt />
-      <div class="lt"></div>
+      <!-- <div class="lt"></div>
       <div class="lb"></div>
       <div class="rt"></div>
-      <div class="rb"></div>
+      <div class="rb"></div> -->
     </el-card>
   </div>
 </template>
@@ -34,8 +33,8 @@ export default {
     return {
       loading: false,
       loginForm: {
-        name: '13145217573',
-        password: 'a123456789'
+        name: 'zhanglongtao12',
+        password: 'zhanglongtao1234'
       },
       loginRules: {
         name: [
@@ -101,8 +100,8 @@ export default {
   // 背景图定位 / 背景图尺寸
   background: url(../../assets/images/demo-1-bg.jpg) no-repeat center / cover;
   .login-box {
-    width: 600px;
-    height: 450px;
+    width: 800px;
+    height: 600px;
     position: relative;
     position: absolute;
     left: 50%;
@@ -110,21 +109,46 @@ export default {
     transform: translate(-50%, -50%);
     background-color: rgba(6,17,47,.7);
     border: none;
+    padding: 24px;
     img {
       display: block;
-      width: 200px;
-      margin: 10px auto;
+      width: 250px;
+      margin: 0 auto;
     }
     /deep/ .el-icon-loading {
       color: #fff;
       font-size: 14px;
     }
+    /deep/ .el-form {
+      margin: 55px 0;
+      .el-input {
+        font-size: 18px;
+      }
+      .el-checkbox {
+        .el-checkbox__label {
+          font-size: 16px;
+        }
+        .el-checkbox__input {
+          padding-bottom: 3px;
+        }
+      }
+      .el-form-item__content {
+        .el-button {
+          span {
+            font-weight: 600;
+            font-size: 20px;
+          }
+        }
+      }
+    }
     p {
-      color: #fff;
-      font-size: 32px;
+      color: #fafafa;
+      font-size: 44px;
       text-align: center;
-      margin: 20px 0;
+      margin: 24px 0;
       font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+      font-weight: 600;
+      letter-spacing: 5px;
     }
     .rt {
       z-index: 100;
@@ -165,16 +189,6 @@ export default {
       height: 40px;
       border-left: 2px solid #fff;
       border-bottom: 2px solid #fff;
-    }
-  }
-  .cover {
-    // background: url('../../assets/images/cover.png') no-repeat center / cover;
-    position: absolute;
-    right: 0;
-    top: 0;
-    img {
-      width: 800px;
-      height: 300px;
     }
   }
 }

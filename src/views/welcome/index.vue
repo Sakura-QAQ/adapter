@@ -1,19 +1,13 @@
 <template>
   <div class="container">
-    <div class="top-position">
-      <el-form :model="reqParams">
-        <el-form-item label="选择施肥机：">
-          <el-select v-model="reqParams.fertilizerId" @change="fn">
-            <el-option v-for="item in fertilizer" :key="item.id" :label="item.name" :value="item.id"></el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-    </div>
     <div class="chartData" v-if="flagAll">
       <!-- 实时数据 -->
       <div class="chart_1" v-if="flagMin">
         <div class="topCard">
-          实时数据
+          <span>实时数据</span>
+          <el-select v-model="reqParams.fertilizerId" placeholder="选择施肥机">
+            <el-option v-for="item in fertilizer" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
         </div>
         <div class="leftCard">
           <vue-scroll :ops="ops" style="width:100%;height:100%">
@@ -120,21 +114,13 @@
       <!-- 土壤墒情 -->
       <div class="chart_3" v-if="flagMin">
         <div class="topCard">
-          土壤墒情
+          <span>土壤墒情</span>
+          <el-select v-model="reqParams.fertilizerId" placeholder="选择温室">
+            <el-option v-for="item in fertilizer" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
         </div>
         <div class="leftCard">
           <div class="bgfont">
-            <div class="bgline">
-              <div class="icons">PH</div>
-              <div class="content">6.4</div>
-            </div>
-            <div class="bgline">
-              <div class="icons">
-                <span>EC</span>
-                <span>μs/cm</span>
-              </div>
-              <div class="content">1.7</div>
-            </div>
             <div class="bgline">
               <div class="icons">
                 <span>土温1</span>
@@ -163,6 +149,17 @@
               </div>
               <div class="content">15</div>
             </div>
+            <div class="bgline">
+              <div class="icons">PH</div>
+              <div class="content">6.4</div>
+            </div>
+            <div class="bgline">
+              <div class="icons">
+                <span>EC</span>
+                <span>μs/cm</span>
+              </div>
+              <div class="content">1.7</div>
+            </div>
           </div>
         </div>
         <linegraph class="bargraph" :id="'bargraph_3'" :data="option3"></linegraph>
@@ -171,7 +168,7 @@
       <!-- 天气预报 -->
       <div class="weather" v-if="flagMin">
         <div class="topCard">
-          实时天气
+          天气预报
         </div>
         <div class="header">
           <div class="pos">北京</div>
@@ -653,7 +650,6 @@ export default {
       const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/fertilizer/queryByProjectId', this.request)
       this.fertilizer = res.data.data
       this.reqParams.fertilizerId = this.fertilizer[0].id
-      console.log(this.reqParams.fertilizerId)
     },
     // 获取实时数据
     async getRealtime () {
@@ -791,6 +787,21 @@ export default {
           }
         }
       }
+      /deep/ .el-select {
+        position: absolute;
+        top: -1px;
+        left: 10px;
+        // left: 0;
+        .el-input__inner {
+          width: 162px;
+          height: 38px;
+          border: none;
+          border-radius: none;
+          background-color: rgba(77, 83, 95, 0.712);
+          border-radius: 0;
+          color: #fff;
+        }
+      }
     }
     .chart_1 {
       position: relative;
@@ -909,7 +920,7 @@ export default {
     .weather {
       width: 800px;
       height: 420px;
-      background-color:  rgb(49, 58, 68);
+      background-color:  rgba(41,52,65,1);
       position: relative;
       .topCard {
         float: left;
@@ -1262,7 +1273,7 @@ export default {
     }
   }
 
-    // 滚动条位置
+  // 滚动条位置
   /deep/.__bar-is-vertical {
     right: -1px !important;
   }
