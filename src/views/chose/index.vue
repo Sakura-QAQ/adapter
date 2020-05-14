@@ -44,9 +44,8 @@ export default {
   },
   methods: {
     async getlogin () {
-      const res = await this.$http.post('http://192.168.1.202:10010/sso/api/getLoginInfo')
+      const res = await this.$login.post('sso/api/getLoginInfo')
       this.options = res.data.data.projectList
-      console.log(this.options)
     },
     pushIn (item) {
       window.sessionStorage.setItem('projectId', JSON.stringify(item.id))
@@ -108,7 +107,7 @@ export default {
       }
       .descr {
         display: inline-block;
-        width: 450px;
+        width: 530px;
         height: 100px;
         line-height: 100px;
         padding-left: 50px;
@@ -119,7 +118,8 @@ export default {
       }
       .btn {
         display: inline-block;
-        width: 250px;
+        // width: 250px;
+        text-align: center;
         height: 100px;
         line-height: 100px;
         text-align: center;

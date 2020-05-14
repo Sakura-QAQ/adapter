@@ -5,67 +5,24 @@
       <div class="bg-title">
         <p>通道列表</p>
       </div>
-      <div class="btn" style="text-align:right;margin:0 50px 15px 0;">
+      <div class="btn">
+        <el-select v-model="reqParams.fertilizerId" placeholder="选择施肥机" @change="ferChange">
+          <el-option v-for="item in fertilizer" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        </el-select>
         <input class="submit" type="button" value="提交" @click="updata">
-        <!-- <input type="button" value="清空" @click="clear"> -->
       </div>
       <div class="pn-ltable">
         <table border="1" cellspacing="0" cellpadding="10" align="center">
           <thead  align="center">
             <tr>
-              <th width="80">序号</th>
+              <th width="100">序号</th>
               <th width="200">通道</th>
-              <!-- <th width="120">操作</th> -->
             </tr>
           </thead>
           <tbody  align="center">
-            <tr>
-              <td>1</td>
-              <!-- <td>{{plans.channel1}}</td> -->
-              <td><input type="text" v-model="plans.channel1"></td>
-              <!-- <td rowspan="9">
-                <span style="cursor: pointer;" @click="editData">编辑</span>
-              </td> -->
-            </tr>
-            <tr>
-              <td>2</td>
-              <!-- <td>{{plans.channel2}}</td> -->
-              <td><input type="text" v-model="plans.channel2"></td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <!-- <td>{{plans.channel3}}</td> -->
-              <td><input type="text" v-model="plans.channel3"></td>
-            </tr>
-            <tr>
-              <td>4</td>
-              <!-- <td>{{plans.channel4}}</td> -->
-              <td><input type="text" v-model="plans.channel4"></td>
-            </tr>
-            <tr>
-              <td>5</td>
-              <!-- <td>{{plans.channel5}}</td> -->
-              <td><input type="text" v-model="plans.channel5"></td>
-            </tr>
-            <tr>
-              <td>6</td>
-              <!-- <td>{{plans.channel6}}</td> -->
-              <td><input type="text" v-model="plans.channel6"></td>
-            </tr>
-            <tr>
-              <td>7</td>
-              <!-- <td>{{plans.channel7}}</td> -->
-              <td><input type="text" v-model="plans.channel7"></td>
-            </tr>
-            <tr>
-              <td>8</td>
-              <!-- <td>{{plans.channel8}}</td> -->
-              <td><input type="text" v-model="plans.channel8"></td>
-            </tr>
-            <tr>
-              <td>9</td>
-              <!-- <td>{{plans.channel9}}</td> -->
-              <td><input type="text" v-model="plans.channel9"></td>
+            <tr v-for="(item, index) in channels" :key="index">
+              <td>{{index + 1}}通道：</td>
+              <td><input type="text" v-model="channels[index]"></td>
             </tr>
           </tbody>
         </table>
@@ -76,54 +33,73 @@
 </template>
 
 <script>
+// 肥料主要有氮、磷、钾、硫、钙、镁、氯、硼、锰、铜、锌、铁、钼、钴、硼、锰、铜、锌、铁、钼、钴
 export default {
   data () {
     return {
       find: 'find',
       flag: false,
       edit: {},
-      plans: {},
-      request: { projectId: '' }
+      request: { projectId: '' },
+      // 施肥机id
+      reqParams: {
+        fertilizerId: ''
+      },
+      // 施肥机列表
+      fertilizer: [],
+      ferData: {},
+      channels: ''
     }
   },
   created () {
     const projectId = JSON.parse(window.sessionStorage.getItem('projectId'))
     this.request.projectId = projectId
-    this.getway()
+    this.getfertilizer().then(res => {
+      this.getway()
+    })
   },
   methods: {
+    async ferChange () {
+      this.getway()
+    },
+    async getfertilizer () {
+      const res = await this.$http.post('fertilizer/api/fertilizer/queryByProjectId', this.request)
+      this.fertilizer = res.data.data
+      this.reqParams.fertilizerId = this.fertilizer[0].id
+    },
     // 获取通道数据
     async getway () {
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/channel/queryByProjectId', this.request)
-      this.plans = res.data.data
-      // console.log(res.data.data)
+      const ID = {
+        id: this.reqParams.fertilizerId
+      }
+      const { data: { data } } = await this.$http.post('fertilizer/api/fertilizer/queryById', ID)
+      if (data.channels === null || data.channels === '') {
+        data.channels = ',,,,,,,,'
+        this.channels = data.channels.split(',')
+        this.$message.warning('此施肥机无通道名称，请编辑后提交')
+      } else {
+        this.ferData = data
+        this.channels = data.channels.split(',')
+      }
     },
     // 更新数据
     async updata () {
-      this.plans = {
-        id: this.plans.id,
-        projectId: this.plans.projectId,
-        channel1: this.plans.channel1,
-        channel2: this.plans.channel2,
-        channel3: this.plans.channel3,
-        channel4: this.plans.channel4,
-        channel5: this.plans.channel5,
-        channel6: this.plans.channel6,
-        channel7: this.plans.channel7,
-        channel8: this.plans.channel8,
-        channel9: this.plans.channel9,
-        createTime: this.plans.createTime,
-        updateTime: this.plans.updateTime,
-        isDel: this.plans.isDel
+      const channel = {
+        id: this.reqParams.fertilizerId,
+        channels: this.channels.join(',')
       }
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/channel/saveOrUpdate', this.plans)
-      // console.log(res)
-      if (res.data.code === 200) {
-        this.$message.success('修改成功')
+      if (channel.channels === ',,,,,,,,') {
+        this.$message.error('提交参数不能为空')
+        return false
       } else {
-        this.$message.error('修改失败')
+        const { data } = await this.$http.post('http://192.168.1.254:10020/fertilizer/api/fertilizer/updateFertilizerChannels', channel)
+        if (data.code === 200) {
+          this.$message.success('提交成功')
+          this.getway()
+        } else {
+          this.$message.error(data.msg)
+        }
       }
-      this.getway()
     },
     // 清空
     clear () {
@@ -134,6 +110,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
+@deep: ~'>>>';
 .crop-container {
   display: flex;
   justify-content: space-evenly;
@@ -169,6 +146,25 @@ export default {
     }
     .layer {
       text-align: center;
+    }
+    .btn {
+      text-align:left;
+      margin:0 0 15px 0;
+      padding-left: 50px;
+      .submit {
+        margin-left: 50%;
+      }
+      @{deep} .el-select {
+        .el-input__inner {
+          width: 162px;
+          height: 38px;
+          border: none;
+          border-radius: none;
+          background-color: rgba(77, 83, 95, 0.712);
+          border-radius: 0;
+          color: #fff;
+        }
+      }
     }
   }
   .modify {
@@ -209,7 +205,7 @@ export default {
       }
     }
     .btn {
-      text-align: right;
+      text-align: left;
       margin-right: 50px;
     }
   }

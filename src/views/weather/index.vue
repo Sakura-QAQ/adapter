@@ -1,28 +1,31 @@
 <template>
   <div class="container">
     <div class="top-position">
-      <el-form :model="houseId">
-        <el-form-item label="选择大棚：">
-          <el-select v-model="houseId.id">
-            <el-option v-for="item in house" :key="item.id" :label="item.name" :value="item.id"></el-option>
+      <el-form :model="areaId">
+        <el-form-item label="选择温室：">
+          <el-select v-model="areaId.id">
+            <el-option v-for="item in area" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
       <div class="ferz">
         <span>当前施肥机:</span>
-        <span>1#施肥机</span>
+        <span>{{ferName}}</span>
       </div>
       <div class="data">
-        <span>日期选择：</span>
+      <span>日期选择：</span>
         <el-date-picker
           v-model="daterange"
           type="daterange"
+          unlink-panels
           range-separator="至"
           start-placeholder="开始日期"
-          end-placeholder="结束日期">
+          end-placeholder="结束日期"
+          value-format="yyyy-MM-dd"
+          :picker-options="pickerOptions">
         </el-date-picker>
       </div>
-      <input type="button" class="submit" value="确定">
+      <input type="button" class="submit" value="确定" @click="sending">
     </div>
     <div class="chartData" v-if="flagAll">
       <!-- 实时数据 -->
@@ -33,10 +36,22 @@
         <div class="swimBtn" @mouseenter="enterItem" @mouseleave="leaveItem">
           <span>电磁阀</span>
         </div>
+        <!-- leaveItem -->
         <div class="hiddenCard" v-show="hiddenCard" @mouseenter="enterItem"
-        @mouseleave="leaveItem"></div>
+        @mouseleave="leaveItem">
+          <el-radio-group class="checkFl" v-model="checkboxGroup" @change="changebox">
+            <template v-for="(item, index) in fergroup">
+              <el-radio-button :label="index + 1" :key="index" v-show="index < 24" >
+                <div class="valve_num">{{Vals[item - 1]}}</div>
+              </el-radio-button>
+            </template>
+          </el-radio-group>
+          <div class="posBtn">
+            <input type="button" class="submit" value="确定" @click="checkvals">
+          </div>
+        </div>
         <linegraph class="bargraph" :id="'bargraph_1'" :data="option1"></linegraph>
-        <div class="share"></div>
+        <a class="share" :href="fertilizerUrl + fertilizerId.id + '&start=' + daterange[0] + '&end=' + daterange[1]"></a>
         <div class="btn" @click="realtimeBtn"></div>
       </div>
       <!-- 气象站 -->
@@ -45,6 +60,7 @@
           气象站
         </div>
         <linegraph class="bargraph" :id="'bargraph_2'" :data="option2"></linegraph>
+        <a class="share" :href="gatewayUrl + weatherID.gatewayId + '&start=' + daterange[0] + '&end=' + daterange[1]"></a>
         <div class="btn" @click="sceneBtn"></div>
       </div>
       <!-- 土壤墒情 -->
@@ -52,13 +68,13 @@
         <div class="topCard" @click="tableSoil" style="cursor:pointer;">
           土壤墒情
         </div>
-        <div class="swimBtn" @mouseenter="enterItem1" @mouseleave="leaveItem1">
-          <span>电磁阀</span>
+        <div class="ChoseGateWay">
+          <el-select v-model="soilId.id" placeholder="墒情列表">
+            <el-option v-for="item in soilList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
         </div>
-        <div class="hiddenCard" v-show="hiddenCard1" @mouseenter="enterItem1"
-        @mouseleave="leaveItem1"></div>
         <linegraph class="bargraph" :id="'bargraph_3'" :data="option3"></linegraph>
-        <div class="share"></div>
+        <a class="share" :href="gatewayUrl + soilId.id + '&start=' + daterange[0] + '&end=' + daterange[1]"></a>
         <div class="btn" @click="soilBtn"></div>
       </div>
       <!-- 历史数据表 -->
@@ -66,58 +82,47 @@
         <div class="topCard">
           历史数据表
         </div>
-        <!-- 表格-->
-        <v-table
-          v-if="flagtable1"
-          style="width:100%;"
-          :height="380"
-          :show-vertical-border="false"
-          table-bg-color="rgba(41,52,65)"
-          title-bg-color="rgba(41,52,65)"
-          odd-bg-color="rgba(85, 92, 98, 0.9)"
-          :is-horizontal-resize="true"
-          :columns="tableConfig.columns"
-          :table-data="tableConfig.tableData"
-        ></v-table>
-        <v-table
-          v-if="flagtable2"
-          style="width:100%"
-          :height="380"
-          :show-vertical-border="false"
-          table-bg-color="rgba(41,52,65)"
-          title-bg-color="rgba(41,52,65)"
-          odd-bg-color="#313a44"
-          :is-horizontal-resize="true"
-          :columns="tableConfig.columns"
-          :table-data="tableConfig.tableData"
-        ></v-table>
-        <v-table
-          v-if="flagtable3"
-          style="width:100%"
-          :height="380"
-          :show-vertical-border="false"
-          table-bg-color="rgba(41,52,65)"
-          title-bg-color="rgba(41,52,65)"
-          odd-bg-color="#313a44"
-          :is-horizontal-resize="true"
-          :columns="tableConfig.columns"
-          :table-data="tableConfig.tableData"
-        ></v-table>
-        <!-- <div class="pager">
-          <v-pagination
-            @page-change="pageChange"
-            @page-size-change="pageSizeChange"
-            :total="total"
-            :page-size="pageSize"
-            :layout="['total', 'prev', 'pager', 'next', 'jumper']"
-          ></v-pagination>
-        </div> -->
+        <!-- 施肥机-->
+        <el-table :data="tableConfig.tableData" v-show="flagtable1" height="380">
+          <el-table-column :label="val" v-for="(val, i) in tableConfig.columns" :key="i" min-width="180" align="center">
+          <template slot-scope="scope">{{tableConfig.tableData[scope.$index][i]}}</template>
+          </el-table-column>
+        </el-table>
+        <!-- 气象站 -->
+        <el-table :data="tableConfig2.tableData" v-show="flagtable2" height="380">
+          <el-table-column :label="val" v-for="(val, i) in tableConfig2.columns" :key="i" min-width="180" align="center">
+          <template slot-scope="scope">{{tableConfig2.tableData[scope.$index][i]}}</template>
+          </el-table-column>
+        </el-table>
+        <!-- 土壤 -->
+        <el-table :data="tableConfig3.tableData" v-show="flagtable3" height="380">
+          <el-table-column :label="item" v-for="(item, i) in tableConfig3.columns" :key="i" min-width="180" align="center">
+          <template slot-scope="scope">{{tableConfig3.tableData[scope.$index][i]}}</template>
+          </el-table-column>
+        </el-table>
       </div>
     </div>
     <div class="chart1_big" v-if="flagbig_1">
       <!-- 实时数据 -->
       <div class="topCard">
         施肥机数据
+      </div>
+      <div class="swimBtn" @mouseenter="enterItem" @mouseleave="leaveItem">
+        <span>电磁阀</span>
+      </div>
+      <!-- leaveItem -->
+      <div class="hiddenCard" v-show="hiddenCard" @mouseenter="enterItem"
+      @mouseleave="leaveItem">
+        <el-radio-group class="checkFl" v-model="checkboxGroup" @change="changebox">
+          <template v-for="(item, index) in fergroup">
+            <el-radio-button :label="index + 1" :key="index" v-show="index < 24" >
+              <div class="valve_num">{{Vals[item - 1]}}</div>
+            </el-radio-button>
+          </template>
+        </el-radio-group>
+        <div class="posBtn">
+          <input type="button" class="submit" value="确定" @click="checkvals">
+        </div>
       </div>
       <linegraph class="bargraph" :id="'bargraph1_big'" :data="option1"></linegraph>
       <div class="btn" @click="realtimeBtn_small"></div>
@@ -133,6 +138,11 @@
       <div class="topCard">
         土壤墒情
       </div>
+      <div class="ChoseGateWay">
+        <el-select v-model="soilId.id" placeholder="墒情列表">
+          <el-option v-for="item in soilList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        </el-select>
+      </div>
       <linegraph class="bargraph" :id="'bargraph3_big'" :data="option3"></linegraph>
       <div class="btn" @click="soilBtn_small"></div>
     </div>
@@ -144,79 +154,26 @@ import linegraph from '@/components/linegraph.vue'
 export default {
   data () {
     return {
-      // 分页和表格数据
-      // pageIndex: 1,
-      // pageSize: 7,
-      // total: 0,
+      // 下载excel路径
+      fertilizerUrl: 'http://192.168.1.254:10020/fertilizer/api/data/queryByQueryVoDown?fertilizer_id=',
+      gatewayUrl: 'http://192.168.1.254:10040/sensor/api/data/queryByQueryVoDown?gatewayId=',
+      // 施肥机数据
       tableConfig: {
         tableData: [
-          { date: '2020-04-02', PHdata: '58', ECdata: '68', flow: '112', Allflow: '584', level: '100', press: '50', pressCut: '130' },
-          { date: '2020-04-03', PHdata: '58', ECdata: '68', flow: '112', Allflow: '584', level: '100', press: '50', pressCut: '130' },
-          { date: '2020-04-04', PHdata: '58', ECdata: '68', flow: '112', Allflow: '584', level: '100', press: '50', pressCut: '130' },
-          { date: '2020-04-05', PHdata: '58', ECdata: '68', flow: '112', Allflow: '584', level: '100', press: '50', pressCut: '130' },
-          { date: '2020-04-06', PHdata: '58', ECdata: '68', flow: '112', Allflow: '584', level: '100', press: '50', pressCut: '130' },
-          { date: '2020-04-07', PHdata: '58', ECdata: '68', flow: '112', Allflow: '584', level: '100', press: '50', pressCut: '130' },
-          { date: '2020-04-08', PHdata: '58', ECdata: '68', flow: '112', Allflow: '584', level: '100', press: '50', pressCut: '130' },
-          { date: '2020-04-09', PHdata: '58', ECdata: '68', flow: '112', Allflow: '584', level: '100', press: '50', pressCut: '130' },
-          { date: '2020-04-10', PHdata: '58', ECdata: '68', flow: '112', Allflow: '584', level: '100', press: '50', pressCut: '130' }
+        ],
+        columns: []
+      },
+      // 气象站数据
+      tableConfig2: {
+        tableData: [
+        ],
+        columns: []
+      },
+      // 土壤墒情
+      tableConfig3: {
+        tableData: [
         ],
         columns: [
-          {
-            field: 'date',
-            title: '日期',
-            width: 180,
-            titleAlign: 'center',
-            columnAlign: 'center'
-          },
-          {
-            field: 'PHdata',
-            title: 'PH',
-            width: 100,
-            titleAlign: 'center',
-            columnAlign: 'center'
-          },
-          {
-            field: 'ECdata',
-            title: 'EC(μs/cm)',
-            width: 120,
-            titleAlign: 'center',
-            columnAlign: 'center'
-          },
-          {
-            field: 'flow',
-            title: '流量(m³/H)',
-            width: 100,
-            titleAlign: 'center',
-            columnAlign: 'center'
-          },
-          {
-            field: 'Allflow',
-            title: '累计流量(L)',
-            width: 100,
-            titleAlign: 'center',
-            columnAlign: 'center'
-          },
-          {
-            field: 'level',
-            title: '液位(cm)',
-            width: 100,
-            titleAlign: 'center',
-            columnAlign: 'center'
-          },
-          {
-            field: 'press',
-            title: '压力(kg/㎡)',
-            width: 120,
-            titleAlign: 'center',
-            columnAlign: 'center'
-          },
-          {
-            field: 'pressCut',
-            title: '负压(kg/㎡)',
-            width: 120,
-            titleAlign: 'center',
-            columnAlign: 'center'
-          }
         ]
       },
       flagtable1: true,
@@ -226,30 +183,65 @@ export default {
       hiddenCard: false,
       hiddenCard1: false,
       // 起始结束时间
-      daterange: '',
-      x: 0,
-      y: 0,
-      // 施肥机下拉框数据
-      houseId: {
-        id: ''
+      daterange: [],
+      // 日期快捷键
+      pickerOptions: {
+        shortcuts: [{
+          text: '最近一周',
+          onClick (picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+            picker.$emit('pick', [start, end])
+          }
+        }, {
+          text: '最近一个月',
+          onClick (picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+            picker.$emit('pick', [start, end])
+          }
+        }, {
+          text: '最近三个月',
+          onClick (picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+            picker.$emit('pick', [start, end])
+          }
+        }]
       },
-      house: [
-        {
-          id: 1,
-          name: '1#大棚'
-        },
-        {
-          id: 2,
-          name: '2#大棚'
-        }
-      ],
-      // 施肥机id
-      reqParams: {
-        fertilizerId: ''
-      },
+      // 项目id
       request: {
         projectId: ''
       },
+      // 园区下拉框数据
+      areaId: {
+        id: ''
+      },
+      area: [],
+      // 传感器类别列表
+      typeList: [],
+      // 气象网关id
+      weatherID: {
+        gatewayId: ''
+      },
+      // 土壤网关id
+      soilId: {
+        id: ''
+      },
+      // 土壤采集器和传感器列表
+      soilList: [],
+      soilData: [],
+      // 气象传感器
+      weatherlist: [],
+      // 施肥机id
+      fertilizerId: {
+        id: ''
+      },
+      // 施肥机名称
+      ferName: '',
       titles: [],
       fertilizer: [],
       flagAll: true,
@@ -258,27 +250,18 @@ export default {
       flagbig_2: false,
       flagbig_3: false,
       option1: {
-        // title: {
-        //   text: '实时数据',
-        //   top: 5
-        //   // left: 'center'
-        // },
         tooltip: {
           trigger: 'axis'
-          // formatter: '{a} <br/>{b} : {c}'
         },
         legend: {
           left: 'center',
-          data: ['PH', 'EC', '流量', '累计流量'],
+          data: ['PH', 'EC', '流量', '累计流量', '液位', '压力'],
           top: 5,
-          // textStyle: {// 图例文字的样式
-          //   color: 'white'
-          // }
           z: 10
         },
         xAxis: {
           type: 'category',
-          data: ['15:00', '15:10', '15:20', '15:30', '15:40', '15:50', '16:00', '16:10', '16:20', '16:30', '16:40', '16:50']
+          data: []
         },
         grid: {
           left: '2%',
@@ -286,7 +269,18 @@ export default {
           bottom: '8%',
           containLabel: false
         },
+        dataZoom: [{
+          type: 'inside'
+        }],
         yAxis: [
+          {
+            show: false,
+            type: 'value'
+          },
+          {
+            show: false,
+            type: 'value'
+          },
           {
             show: false,
             type: 'value'
@@ -308,7 +302,7 @@ export default {
           {
             name: 'PH',
             type: 'line',
-            data: [3.5, 2.4, 2.52, 2.25, 2.7, 2.5, 4.3, 1.23, 1.69, 1.25, 1.36, 1.56],
+            data: [],
             showSymbol: true,
             yAxisIndex: 0,
             symbolSize: 5
@@ -316,7 +310,7 @@ export default {
           {
             name: 'EC',
             type: 'line',
-            data: [6, 5.2, 5.4, 5.8, 5.16, 5.32, 5.64, 5.28, 5.6, 5.25, 5.63, 5.65, 5.12],
+            data: [],
             showSymbol: true,
             yAxisIndex: 1,
             symbolSize: 5
@@ -324,7 +318,7 @@ export default {
           {
             name: '流量',
             type: 'line',
-            data: [223, 252, 242, 385, 268, 374, 256, 300, 322, 215, 262, 323, 299],
+            data: [],
             showSymbol: true,
             yAxisIndex: 2,
             symbolSize: 5
@@ -332,9 +326,25 @@ export default {
           {
             name: '累计流量',
             type: 'line',
-            data: [12521, 16842, 13542, 16842, 13222, 14526, 13475, 16222.5, 14263, 13265, 14653, 12358, 13768],
+            data: [],
             showSymbol: true,
             yAxisIndex: 3,
+            symbolSize: 5
+          },
+          {
+            name: '液位',
+            type: 'line',
+            data: [],
+            showSymbol: true,
+            yAxisIndex: 4,
+            symbolSize: 5
+          },
+          {
+            name: '压力',
+            type: 'line',
+            data: [],
+            showSymbol: true,
+            yAxisIndex: 5,
             symbolSize: 5
           }
         ]
@@ -345,12 +355,13 @@ export default {
         },
         legend: {
           left: 'center',
-          data: ['温度', '湿度', '光照', 'CO2'],
-          top: 5
+          data: [],
+          top: 5,
+          z: 10
         },
         xAxis: {
           type: 'category',
-          data: ['15:00', '15:10', '15:20', '15:30', '15:40', '15:50', '16:00', '16:10', '16:20', '16:30', '16:40', '16:50']
+          data: []
         },
         grid: {
           left: '2%',
@@ -358,57 +369,24 @@ export default {
           bottom: '8%',
           containLabel: false
         },
+        dataZoom: [{
+          type: 'inside'
+        }],
         yAxis: [
-          {
-            show: false,
-            type: 'value'
-          },
-          {
-            show: false,
-            type: 'value'
-          },
-          {
-            show: false,
-            type: 'value'
-          },
           {
             show: false,
             type: 'value'
           }
         ],
         series: [
-          {
-            name: '温度',
-            type: 'line',
-            data: [1.8, 2.98, 1.96, 2.27, 3.81, 3.47, 1.74, 3.23, 4.69, 5.25, 4.36, 2.56],
-            showSymbol: true,
-            yAxisIndex: 0,
-            symbolSize: 5
-          },
-          {
-            name: '湿度',
-            type: 'line',
-            data: [3, 4.2, 2.4, 3.8, 4.16, 2.32, 1.64, 3.28, 4.6, 3.25, 2.63, 4.65, 3.12],
-            showSymbol: true,
-            yAxisIndex: 1,
-            symbolSize: 5
-          },
-          {
-            name: '光照',
-            type: 'line',
-            data: [20.5, 28, 24, 38, 26, 21, 21.64, 32, 26, 30, 19, 25, 22],
-            showSymbol: true,
-            yAxisIndex: 3,
-            symbolSize: 5
-          },
-          {
-            name: 'CO2',
-            type: 'line',
-            data: [50, 78, 87, 68, 76, 51, 61.64, 42, 56, 60, 59, 55, 42],
-            showSymbol: true,
-            yAxisIndex: 3,
-            symbolSize: 5
-          }
+          // {
+          //   name: 'PH',
+          //   type: 'line',
+          //   data: [],
+          //   showSymbol: true,
+          //   yAxisIndex: 0,
+          //   symbolSize: 5
+          // }
         ]
       },
       option3: {
@@ -417,93 +395,47 @@ export default {
         },
         legend: {
           left: 'center',
-          data: ['土温1', '土湿2', '土温2', 'PH'],
-          top: 5
+          data: [],
+          top: 5,
+          z: 10
         },
-        xAxis: [
-          {
-            type: 'category',
-            data: ['15:00', '15:10', '15:20', '15:30', '15:40', '15:50', '16:00', '16:10', '16:20', '16:30', '16:40', '16:50']
-          }
-        ],
+        xAxis: {
+          type: 'category',
+          data: []
+        },
         grid: {
           left: '2%',
           right: '2%',
           bottom: '8%',
-          // 区域是否包含坐标轴刻度
           containLabel: false
         },
+        dataZoom: [{
+          type: 'inside'
+        }],
         yAxis: [
-          {
-            show: false,
-            type: 'value'
-          },
-          {
-            show: false,
-            type: 'value'
-          },
-          {
-            show: false,
-            type: 'value'
-          },
           {
             show: false,
             type: 'value'
           }
         ],
-        /* dataZoom: [{
-          type: 'slider', // 图表下方的伸缩条
-          show: true, // 是否显示
-          realtime: true, // 拖动时，是否实时更新系列的视图
-          start: 0, // 伸缩条开始位置（1-100），可以随时更改
-          end: 100 // 伸缩条结束位置（1-100），可以随时更改
-        }], */
-        /* toolbox: {
-          show: true,
-          feature: {
-            dataZoom: {
-              yAxisIndex: 'none'
-            }
-          }
-        }, */
-        dataZoom: [{
-          type: 'inside'
-        }],
         series: [
-          {
-            name: '土温1',
-            type: 'line',
-            data: [0.8, 0.98, 0.96, 0.27, 0.81, 0.47, 0.74, 0.23, 0.69, 0.25, 0.36, 0.56],
-            showSymbol: true,
-            yAxisIndex: 0,
-            symbolSize: 5
-          },
-          {
-            name: '土湿2',
-            type: 'line',
-            data: [1, 0.2, 0.4, 0.8, 0.16, 0.32, 0.64, 1.28, 1.6, 0.25, 0.63, 0.65, 0.12],
-            showSymbol: true,
-            yAxisIndex: 1,
-            symbolSize: 5
-          },
-          {
-            name: '土温2',
-            type: 'line',
-            data: [20, 15, 14, 21, 23, 22, 14, 20, 13, 17, 19, 17, 20],
-            showSymbol: true,
-            yAxisIndex: 2,
-            symbolSize: 5
-          },
-          {
-            name: 'PH',
-            type: 'line',
-            data: [560, 780, 240, 462, 397, 512, 685, 482, 489, 564, 849, 231, 451],
-            showSymbol: true,
-            yAxisIndex: 3,
-            symbolSize: 5
-          }
+          // {
+          //   name: 'PH',
+          //   type: 'line',
+          //   data: [],
+          //   showSymbol: true,
+          //   yAxisIndex: 0,
+          //   symbolSize: 5
+          // }
         ]
-      }
+      },
+      // 电磁阀
+      checkboxGroup: [],
+      // 对应阀号
+      fergroup: [],
+      Vals: [],
+      // 选择的阀号
+      checkvalve: []
     }
   },
   created () {
@@ -511,21 +443,22 @@ export default {
     this.request.projectId = projectId
   },
   mounted () {
+    this.getareas().then(res => {
+      this.getfertilizerID().then(res => {
+        this.getferList()
+        this.getvalves()
+      })
+    })
+    this.getgatewayId().then(res => {
+      // 气象
+      this.queryAlltype().then(res => {
+        this.querySensor()
+      })
+      // 土壤
+      this.getsoilsensor()
+    })
   },
   methods: {
-    // 历史数据表格+分页
-    // getTableData () {
-    //   this.total = this.tableConfig.tableData.length
-    // },
-    // pageChange (pageIndex) {
-    //   this.pageIndex = pageIndex
-    //   this.getTableData()
-    // },
-    // pageSizeChange (pageSize) {
-    //   this.pageIndex = 1
-    //   this.pageSize = pageSize
-    //   this.getTableData()
-    // },
     // 点击标题切换表格
     tableFer () {
       this.flagtable1 = true
@@ -546,15 +479,9 @@ export default {
     enterItem () {
       this.hiddenCard = true
     },
-    enterItem1 () {
-      this.hiddenCard1 = true
-    },
     // 电磁阀按钮离开
     leaveItem () {
       this.hiddenCard = false
-    },
-    leaveItem1 () {
-      this.hiddenCard1 = false
     },
     choseHouse () {
     },
@@ -585,11 +512,327 @@ export default {
       this.flagAll = true
       this.flagbig_3 = false
     },
-    async getfertilizer () {
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/fertilizer/queryByProjectId', this.request)
-      this.fertilizer = res.data.data
-      this.reqParams.fertilizerId = this.fertilizer[0].id
-      console.log(res.data.data)
+    async getareas () {
+      // 获取园区第一条数据
+      const { data: { data } } = await this.$http.post('fertilizer/api/area/queryByProjectId', this.request)
+      this.area = data
+      this.areaId.id = this.area[0].id
+    },
+    // 获取当前温室的施肥机ID
+    async getfertilizerID () {
+      const { data: { data } } = await this.$http.post('fertilizer/api/area/queryById', this.areaId)
+      this.fergroup = data.fertilizerValves.split(',')
+      this.fertilizerId.id = data.fertilizerId
+    },
+    // 获取施肥机对应阀
+    async getvalves () {
+      const { data: { data } } = await this.$http.post('fertilizer/api/fertilizer/queryValveAlias', this.fertilizerId)
+      this.Vals = data.split(',')
+    },
+    // 通过施肥机id查列表
+    async getferList () {
+      const { data: { data } } = await this.$http.post('fertilizer/api/fertilizer/queryById', this.fertilizerId)
+      this.ferName = data.name
+    },
+    // 获取气象站采集器和土壤传感器列表
+    async getgatewayId () {
+      const { data: { data } } = await this.$sensor.post('sensor/api/gateway/queryByProject', this.request)
+      for (let i = 0; i < data.length; i++) {
+        const element = data[i]
+        if (element.type === 2) {
+          this.weatherID.gatewayId = element.id
+        } else {
+          this.soilList.push(element)
+        }
+      }
+      // 土壤采集器
+      this.soilId.id = this.soilList[0].id
+    },
+    // 获取所有类别
+    async queryAlltype () {
+      const { data: { data } } = await this.$sensor.post('http://192.168.1.254:10040/sensor/api/type/queryAll')
+      this.typeList = data
+    },
+    // 通过气象采集器获得气象传感器
+    async querySensor () {
+      const { data: { data } } = await this.$sensor.post('sensor/api/data/queryByGateway', this.weatherID)
+      for (let i = 0; i < data.length; i++) {
+        const sensorlist = data[i]
+        for (let j = 0; j < this.typeList.length; j++) {
+          const typeList = this.typeList[j]
+          if (sensorlist.typeId === typeList.id) {
+            sensorlist.unitName = typeList.unit
+            sensorlist.typeName = typeList.name
+            this.weatherlist.push(sensorlist)
+          }
+        }
+      }
+    },
+    // 获取气象数据
+    async getScene () {
+      const weatherlist = this.weatherlist
+      for (let i = 0; i < weatherlist.length; i++) {
+        // =====================
+        const element = weatherlist[i]
+        this.option2.legend.data.push(element.name)
+        const yAxis = {
+          show: false,
+          type: 'value'
+        }
+        this.option2.yAxis.push(yAxis)
+        const series = {
+          name: element.name,
+          type: 'line',
+          data: [],
+          showSymbol: true,
+          yAxisIndex: i,
+          symbolSize: 5
+        }
+        this.option2.series.push(series)
+        // ======================
+        const params = {
+          columns: [],
+          conditions: ["sensor_id='" + element.id + "'", "date_format(date_time,'%Y-%m-%d')>='" + this.daterange[0] + "'", "date_format(date_time,'%Y-%m-%d')<='" + this.daterange[1] + "'", 'minute(date_time)%10=0'],
+          sorts: []
+        }
+        const { data: { data } } = await this.$sensor.post('sensor/api/data/queryByQueryVo', params)
+        const val = []
+        const time = []
+        for (let k = 0; k < data.length; k++) {
+          const res = data[k]
+          val.push(res.value)
+          time.push(this.$moment(res.dateTime).format('YYYY-MM-DD HH:mm'))
+        }
+        this.option2.series[i].data = val
+        this.option2.xAxis.data = time
+        const obj = {
+          gatewayId: this.weatherID.gatewayId,
+          start: this.daterange[0],
+          end: this.daterange[1]
+        }
+        const res = await this.$sensor.post('sensor/api/data/queryByHis', obj)
+        this.tableConfig2.columns = res.data.data.hisHeadList
+        this.tableConfig2.tableData = res.data.data.hisDataList
+      }
+    },
+    // 获取土壤墒情网关
+    async getsoilsensor () {
+      const ID = {
+        gatewayId: this.soilId.id
+      }
+      const { data: { data } } = await this.$sensor.post('sensor/api/data/queryByGateway', ID)
+      for (let i = 0; i < data.length; i++) {
+        const sensorlist = data[i]
+        for (let j = 0; j < this.typeList.length; j++) {
+          const typeList = this.typeList[j]
+          if (sensorlist.typeId === typeList.id) {
+            sensorlist.unitName = typeList.unit
+            sensorlist.typeName = typeList.name
+            this.soilData.push(sensorlist)
+          }
+        }
+      }
+    },
+    // 土壤数据展示
+    async getsoildata () {
+      this.tableConfig3.columns = []
+      // 遍历土壤墒情网关
+      const soilData = this.soilData
+      for (let i = 0; i < soilData.length; i++) {
+        // =====================
+        const element = soilData[i]
+        this.option3.legend.data.push(element.name)
+        const yAxis = {
+          show: false,
+          type: 'value'
+        }
+        this.option3.yAxis.push(yAxis)
+        const series = {
+          name: element.name,
+          type: 'line',
+          data: [],
+          showSymbol: true,
+          yAxisIndex: i,
+          symbolSize: 5
+        }
+        this.option3.series.push(series)
+        // ======================
+        const params = {
+          columns: [],
+          conditions: ["sensor_id='" + element.id + "'", "date_format(date_time,'%Y-%m-%d')>='" + this.daterange[0] + "'", "date_format(date_time,'%Y-%m-%d')<='" + this.daterange[1] + "'", 'minute(date_time)%10=0'],
+          sorts: []
+        }
+        const { data: { data } } = await this.$sensor.post('sensor/api/data/queryByQueryVo', params)
+        const val = []
+        const time = []
+        for (let k = 0; k < data.length; k++) {
+          const res = data[k]
+          val.push(res.value)
+          time.push(this.$moment(res.dateTime).format('YYYY-MM-DD HH:mm'))
+        }
+        this.option3.series[i].data = val
+        this.option3.xAxis.data = time
+      }
+      this.table_head = this.option3.legend.data
+      // 获取表格数据
+      const params = {
+        gatewayId: this.soilId.id,
+        start: this.daterange[0],
+        end: this.daterange[1]
+      }
+      const { data: { data } } = await this.$sensor.post('sensor/api/data/queryByHis', params)
+      this.tableConfig3.columns = data.hisHeadList
+      this.tableConfig3.tableData = data.hisDataList
+    },
+    // 发送查询请求
+    async sending () {
+      this.tableConfig.tableData = []
+      // this.tableConfig.columns = []
+      // 施肥机的数据
+      const columns = []
+      const conditions = ["fertilizer_id='" + this.fertilizerId.id + "'", "date_format(datetime,'%Y-%m-%d')>='" + this.daterange[0] + "'", "date_format(datetime,'%Y-%m-%d')<='" + this.daterange[1] + "'", 'minute(datetime)%10=0']
+      // " + this.$moment(new Date()).format('YYYY-MM-DD') + "
+      const sorts = ['datetime desc']
+      const params = {
+        columns: columns,
+        conditions: conditions,
+        sorts: sorts
+      }
+      const res = await this.$http.post('fertilizer/api/data/queryByQueryVo', params)
+      if (res.data.data.length === 0) {
+        this.$message.error('此施肥机无数据！')
+        this.Realtime = {}
+        this.option1.xAxis.data = []
+        this.option1.series[0].data = []
+        this.option1.series[1].data = []
+        this.option1.series[2].data = []
+        this.option1.series[3].data = []
+        this.option1.series[4].data = []
+        this.option1.series[5].data = []
+        return false
+      } else {
+        // 曲线
+        var time = []
+        var PH = []
+        var totalVolume = []
+        var realTimeFlow = []
+        var liquidLevel = []
+        var pressure = []
+        var EC = []
+        for (let i = 0; i < res.data.data.length; i++) {
+          const element = res.data.data[i]
+          // 时间
+          time.unshift(this.$moment(element.datetime).format('YYYY-MM-DD HH:mm'))
+          // ph
+          PH.unshift(element.ph)
+          // 累计流量
+          totalVolume.unshift(element.total_volume)
+          // 实时流量
+          realTimeFlow.unshift(element.real_time_flow)
+          // 液位
+          liquidLevel.unshift(element.liquid_level)
+          // 压力
+          pressure.unshift(element.pressure)
+          // EC
+          EC.unshift(element.ec)
+        }
+        this.option1.xAxis.data = time
+        this.option1.series[0].data = PH
+        this.option1.series[1].data = EC
+        this.option1.series[2].data = realTimeFlow
+        this.option1.series[3].data = totalVolume
+        this.option1.series[4].data = liquidLevel
+        this.option1.series[5].data = pressure
+        // 表格
+        for (let i = 0; i < time.length; i++) {
+          const arr = [
+            time[i], PH[i], EC[i], realTimeFlow[i], totalVolume[i], liquidLevel[i], pressure[i]
+          ]
+          this.tableConfig.tableData.push(arr)
+        }
+        this.tableConfig.columns = ['日期', 'PH', 'EC(μs/cm)', '流量(m³/H)', '累计流量(L)', '液位(cm)', '压力(kg/㎡)']
+      }
+      // 气象站的数据
+      this.getScene()
+      // 土壤墒情的数据
+      this.getsoildata()
+    },
+    // 电磁阀变化事件
+    changebox () {
+      let a = [this.checkboxGroup]
+      let b = this.fergroup
+      this.checkvalve = b.filter((_, index) => a.includes(index + 1))
+    },
+    // 阀号过滤
+    async checkvals () {
+      const req = {
+        start: this.daterange[0],
+        end: this.daterange[1],
+        fertilizerId: this.fertilizerId.id,
+        valvenumber: this.checkvalve[0]
+      }
+      const { data: { data } } = await this.$http.post('fertilizer/api/data/queryByQueryVoAndValve', req)
+      this.tableConfig.tableData = []
+      if (this.checkboxGroup.length === 0) {
+        this.$message.error('请选择阀')
+        return false
+      } else {
+        if (data.length === 0) {
+          this.$message.error('此时间段无灌溉数据！')
+          this.Realtime = {}
+          this.option1.xAxis.data = []
+          this.option1.series[0].data = []
+          this.option1.series[1].data = []
+          this.option1.series[2].data = []
+          this.option1.series[3].data = []
+          this.option1.series[4].data = []
+          this.option1.series[5].data = []
+          this.hiddenCard = false
+          return false
+        } else {
+        // 曲线
+          var time = []
+          var PH = []
+          var totalVolume = []
+          var realTimeFlow = []
+          var liquidLevel = []
+          var pressure = []
+          var EC = []
+          for (let i = 0; i < data.length; i++) {
+            const element = data[i]
+            // 时间
+            time.unshift(this.$moment(element.datetime).format('YYYY-MM-DD HH:mm'))
+            // ph
+            PH.unshift(element.ph)
+            // 累计流量
+            totalVolume.unshift(element.totalVolume)
+            // 实时流量
+            realTimeFlow.unshift(element.realTimeFlow)
+            // 液位
+            liquidLevel.unshift(element.liquidLevel)
+            // 压力
+            pressure.unshift(element.pressure)
+            // EC
+            EC.unshift(element.ec)
+          }
+          this.option1.xAxis.data = time
+          this.option1.series[0].data = PH
+          this.option1.series[1].data = EC
+          this.option1.series[2].data = realTimeFlow
+          this.option1.series[3].data = totalVolume
+          this.option1.series[4].data = liquidLevel
+          this.option1.series[5].data = pressure
+          // 表格
+          for (let i = 0; i < time.length; i++) {
+            const arr = [
+              time[i], PH[i], EC[i], realTimeFlow[i], totalVolume[i], liquidLevel[i], pressure[i]
+            ]
+            this.tableConfig.tableData.push(arr)
+          }
+          this.tableConfig.columns = ['日期', 'PH', 'EC(μs/cm)', '流量(m³/H)', '累计流量(L)', '液位(cm)', '压力(kg/㎡)']
+          this.hiddenCard = false
+        }
+      }
     }
   },
   components: {
@@ -610,7 +853,7 @@ export default {
         width: 150px;
         height: 36px;
         border: none;
-        background-color: rgba(100, 87, 87, 0.3);
+        background-color: rgba(87, 82, 73, 0.3);
         border-radius: 0;
         color: #fff;
       }
@@ -630,15 +873,16 @@ export default {
     }
     .ferz {
       display: inline-block;
+      margin-right: 18px;
       span {
         display: inline-block;
       }
-      span:first-child {
-        width: 90px;
-      }
-      span:last-child {
-        width: 90px;
-      }
+      // span:first-child {
+      //   width: 90px;
+      // }
+      // span:last-child {
+      //   width: 90px;
+      // }
     }
     .data {
       display: inline-block;
@@ -727,13 +971,48 @@ export default {
       }
       .hiddenCard {
         z-index: 188;
+        position: relative;
         position: absolute;
         top: 45px;
         left: 70px;
         width: 90%;
         height: 370px;
+        padding: 20px;
         border-radius: 10px;
         background-color: rgba(85, 92, 98, 0.9);
+        /deep/ .el-radio-group {
+          display: inline-block;
+          background: transparent;
+
+          .el-radio-button__inner {
+            width: 80px;
+            border: 1px solid #6989a5;
+            border-radius: 5px;
+            background: transparent;
+            color: #6989a5;
+            margin: 0 0 8px 8px;
+            padding: 0 0;
+
+            .valve_num {
+              width:80px;
+              height:35px;
+              line-height: 35px;
+              text-align: center;
+              background:transparent;
+            }
+          }
+          .is-active {
+            .el-radio-button__inner {
+              background: #ccc;
+              border: 1px solid transparent;
+            }
+          }
+        }
+        .posBtn {
+          position: absolute;
+          right: 20px;
+          bottom: 20px;
+        }
       }
       .bargraph {
         float: left;
@@ -782,6 +1061,16 @@ export default {
         width: 100%;
         height: 380px;
       }
+      .share {
+        position: absolute;
+        top: 5px;
+        right: 45px;
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+        background: url(../../assets/images/l-007.png) no-repeat;
+        background-size: 30px 30px;
+      }
       .btn {
         position: absolute;
         top: 5px;
@@ -808,6 +1097,25 @@ export default {
         font-size: 18px;
         font-weight: 800;
       }
+      .ChoseGateWay {
+        position: absolute;
+          top: 0;
+          left: 0;
+        /deep/ .el-select {
+          // position: absolute;
+
+          // left: 0;
+          .el-input__inner {
+            width: 162px;
+            height: 40px;
+            border: none;
+            border-radius: none;
+            background-color: rgba(77, 83, 95, 0.712);
+            border-radius: 0;
+            color: #fff;
+          }
+        }
+      }
       .swimBtn {
         z-index: 166;
         width: 60px;
@@ -818,16 +1126,6 @@ export default {
         position: absolute;
         top: 48px;
         left: 10px;
-      }
-      .hiddenCard {
-        z-index: 188;
-        position: absolute;
-        top: 45px;
-        left: 70px;
-        width: 90%;
-        height: 370px;
-        border-radius: 10px;
-        background-color: rgba(85, 92, 98, 0.9);
       }
       .bargraph {
         float: left;
@@ -899,13 +1197,44 @@ export default {
           }
         }
       }
+      /deep/ .el-table::before {
+        height: 0;
+      }
+      /deep/ .el-table {
+        margin: 0 auto;
+        background-color: transparent;
+        color: #fff;
+        th {
+          border: 0;
+          background-color: rgba(41,52,65);
+        }
+        tr {
+          border: 0;
+          background-color: transparent;
+        }
+        tr:nth-child(odd) {
+          background-color: rgba(85, 92, 98, 0.9);
+        }
+        tr:nth-child(even) {
+          background-color: rgba(41,52,65);
+        }
+        tr:hover > td {
+          background-color: transparent;
+        }
+        td {
+          border: none;
+        }
+        thead {
+          color: #eee;
+          background-color: rgba(55, 59, 63, 0.9);
+        }
+      }
     }
   }
   .chart1_big {
     position: relative;
     width: 100%;
     height: 100%;
-
     .topCard {
       float: left;
       width: 100%;
@@ -916,6 +1245,62 @@ export default {
       color: #fff;
       font-size: 26px;
       font-weight: 800;
+    }
+    .swimBtn {
+      z-index: 166;
+      width: 60px;
+      height: 30px;
+      line-height: 30px;
+      text-align: center;
+      border: 1px solid #fff;
+      position: absolute;
+      top: 60px;
+      left: 10px;
+    }
+    .hiddenCard {
+      z-index: 188;
+      position: relative;
+      position: absolute;
+      top: 60px;
+      left: 70px;
+      width: 50%;
+      height: 370px;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: rgba(85, 92, 98, 0.9);
+      /deep/ .el-radio-group {
+        display: inline-block;
+        background: transparent;
+
+        .el-radio-button__inner {
+          width: 80px;
+          border: 1px solid #6989a5;
+          border-radius: 5px;
+          background: transparent;
+          color: #6989a5;
+          margin: 0 0 8px 8px;
+          padding: 0 0;
+
+          .valve_num {
+            width:80px;
+            height:35px;
+            line-height: 35px;
+            text-align: center;
+            background:transparent;
+          }
+        }
+        .is-active {
+          .el-radio-button__inner {
+            background: #ccc;
+            border: 1px solid transparent;
+          }
+        }
+      }
+      .posBtn {
+        position: absolute;
+        right: 20px;
+        bottom: 20px;
+      }
     }
     .leftCard {
       float: left;
@@ -1018,6 +1403,26 @@ export default {
       color: #fff;
       font-size: 26px;
       font-weight: 800;
+    }
+    .ChoseGateWay {
+      position: absolute;
+        top: 0;
+        left: 0;
+      /deep/ .el-select {
+        // position: absolute;
+
+        // left: 0;
+        .el-input__inner {
+          width: 250px;
+          height: 60px;
+          font-size: 18px;
+          border: none;
+          border-radius: none;
+          background-color: rgba(77, 83, 95, 0.712);
+          border-radius: 0;
+          color: #fff;
+        }
+      }
     }
     .bargraph {
       float: left;

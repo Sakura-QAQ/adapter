@@ -92,15 +92,9 @@ export default {
           // 发promise对象请求
           try {
             // 拿到注册结果
-            const res = await this.$http.post('http://192.168.1.202:10010/sso/api/user/signup', this.RegForm)
-            if (res.data.code === 100 && res.data.msg === '用户名只能使用字母和数字组合,且首位为字母,长度8-16位') {
-              this.$message.error('用户名只能使用字母和数字组合,且首位为字母,长度8-16位')
-            } else if (res.data.code === 100 && res.data.msg === '密码长度为8到20位,必须包含字母和数字，字母区分大小写') {
-              this.$message.error('密码长度为8到20位,必须包含字母和数字，字母区分大小写')
-            } else if (res.data.code === 100 && res.data.msg === 'email格式不正确') {
-              this.$message.error('email格式不正确')
-            } else if (res.data.code === 100 && res.data.msg === '手机格式不正确') {
-              this.$message.error('手机格式不正确')
+            const res = await this.$login.post('sso/api/user/signup', this.RegForm)
+            if (res.data.code === 100) {
+              this.$message.error(res.data.msg)
             } else if (res.data.code === 200) {
               this.$message({
                 message: '注册成功！',
@@ -109,7 +103,7 @@ export default {
               this.$router.push('/login')
             }
           } catch (err) {
-            this.$message.error('服务器异常')
+            this.$message.error(err)
           }
         }
       })
@@ -148,7 +142,7 @@ export default {
     /deep/ .el-form-item__content {
       width: 350px;
 
-      /deep/ .el-input {
+      .el-input {
         width: 350px;
       }
     }

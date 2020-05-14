@@ -3,7 +3,7 @@
     <div class="l-table">
       <div>温室作物配方绑定</div>
       <div>
-        <span>选择大棚:</span>
+        <span>选择温室:</span>
         <el-form :model="areaId">
           <el-select v-model="areaId.id" placeholder="请选择温室" @change="areaTab">
             <el-option
@@ -18,7 +18,7 @@
       </div>
       <div>
         <el-table
-          :data="tableData"
+          :data="tableData.slice((pageNum - 1)*pageSize, pageNum*pageSize)"
           style="width: 100%"
           :row-class-name="tableRowClassName">
           <el-table-column
@@ -51,6 +51,18 @@
             </template>
           </el-table-column>
         </el-table>
+        <div class="box" v-show="total > 7">
+          <el-pagination
+            background
+            layout="prev, pager, next"
+            @current-change="currentchange"
+            @next-click="nextpage"
+            @prev-click="prevpage"
+            :current-page="pageNum"
+            :page-size="pageSize"
+            :total="total"
+          ></el-pagination>
+        </div>
       </div>
     </div>
     <div class="r-table" v-if="flagform">
@@ -97,76 +109,78 @@
         </div>
         <span class="maxWidth">可用配方:</span>
         <div>
-          <div :class="{list:index==num}" v-for="(item, index) in fomula" :key="index" @click="getDataId(item, index)">
-            <div class="top">
-              <div>{{item.name}}</div>
-              <div>
-                <span>描述：</span>
-                <span>{{item.descr}}</span>
+          <vue-scroll :ops="ops" style="width:100%;height:100%">
+            <div :class="{model:true,list:index==num}" v-for="(item, index) in fomula" :key="index" @click="getDataId(item, index)">
+              <div class="top">
+                <div>{{item.name}}</div>
+                <div>
+                  <span>描述：</span>
+                  <span>{{item.descr}}</span>
+                </div>
+              </div>
+              <div class="middle">
+                <div>
+                  <span>EC基础值：</span>
+                  <span>{{item.ecBase}}</span>
+                </div>
+                <div>
+                  <span>EC目标值：</span>
+                  <span>{{item.ecTarget}}</span>
+                </div>
+                <div>
+                  <span>PH目标值：</span>
+                  <span>{{item.phTarget}}</span>
+                </div>
+              </div>
+              <div class="bottom">
+                <div>
+                  <span>{{channel[0]}}</span>
+                  <i>：</i>
+                  <span>{{item.channel1}}</span>
+                </div>
+                <div>
+                  <span>{{channel[1]}}</span>
+                  <i>：</i>
+                  <span>{{item.channel2}}</span>
+                </div>
+                <div>
+                  <span>{{channel[2]}}</span>
+                  <i>：</i>
+                  <span>{{item.channel3}}</span>
+                </div>
+                <div>
+                  <span>{{channel[3]}}</span>
+                  <i>：</i>
+                  <span>{{item.channel4}}</span>
+                </div>
+                <div>
+                  <span>{{channel[4]}}</span>
+                  <i>：</i>
+                  <span>{{item.channel5}}</span>
+                </div>
+                <div>
+                  <span>{{channel[5]}}</span>
+                  <i>：</i>
+                  <span>{{item.channel6}}</span>
+                </div>
+                <div>
+                  <span>{{channel[6]}}</span>
+                  <i>：</i>
+                  <span>{{item.channel7}}</span>
+                </div>
+                <div>
+                  <span>{{channel[7]}}</span>
+                  <i>：</i>
+                  <span>{{item.channel8}}</span>
+                </div>
+                <div>
+                  <span>{{channel[8]}}</span>
+                  <i>：</i>
+                  <span>{{item.channel9}}</span>
+                </div>
               </div>
             </div>
-            <div class="middle">
-              <div>
-                <span>EC基础值：</span>
-                <span>{{item.ecBase}}</span>
-              </div>
-              <div>
-                <span>EC目标值：</span>
-                <span>{{item.ecTarget}}</span>
-              </div>
-              <div>
-                <span>PH目标值：</span>
-                <span>{{item.phTarget}}</span>
-              </div>
-            </div>
-            <div class="bottom">
-              <div>
-                <span>{{channel.channel1}}</span>
-                <i>：</i>
-                <span>{{item.channel1}}</span>
-              </div>
-              <div>
-                <span>{{channel.channel2}}</span>
-                <i>：</i>
-                <span>{{item.channel2}}</span>
-              </div>
-              <div>
-                <span>{{channel.channel3}}</span>
-                <i>：</i>
-                <span>{{item.channel3}}</span>
-              </div>
-              <div>
-                <span>{{channel.channel4}}</span>
-                <i>：</i>
-                <span>{{item.channel4}}</span>
-              </div>
-              <div>
-                <span>{{channel.channel5}}</span>
-                <i>：</i>
-                <span>{{item.channel5}}</span>
-              </div>
-              <div>
-                <span>{{channel.channel6}}</span>
-                <i>：</i>
-                <span>{{item.channel6}}</span>
-              </div>
-              <div>
-                <span>{{channel.channel7}}</span>
-                <i>：</i>
-                <span>{{item.channel7}}</span>
-              </div>
-              <div>
-                <span>{{channel.channel8}}</span>
-                <i>：</i>
-                <span>{{item.channel8}}</span>
-              </div>
-              <div>
-                <span>{{channel.channel9}}</span>
-                <i>：</i>
-                <span>{{item.channel9}}</span>
-              </div>
-            </div>
-          </div>
+          </vue-scroll>
         </div>
         <div>
           <input class="submit" type="button" value="取消" @click="flagform=false">&nbsp;
@@ -181,6 +195,26 @@
 export default {
   data () {
     return {
+      // 分页参数
+      pageNum: 1,
+      pageSize: 7,
+      total: 0,
+      // 滚动条
+      ops: {
+        vuescroll: {},
+        scrollPanel: {},
+        rail: {
+          keepShow: true
+        },
+        bar: {
+          hoverStyle: true,
+          onlyShowBarOnScroll: false, // 是否只有滚动的时候才显示滚动条
+          background: '#F5F5F5', // 滚动条颜色
+          opacity: 0.5, // 滚动条透明度
+          'overflow-x': 'hidden'
+        }
+      },
+      // 索引点击
       num: null,
       flagform: false,
       cropId: {
@@ -216,24 +250,34 @@ export default {
       // 通道
       channel: [],
       // 作物配方绑定列表
-      tableData: []
+      tableData: [],
+      // ferId
+      ferId: ''
     }
   },
   created () {
     const projectId = JSON.parse(window.sessionStorage.getItem('projectId'))
     this.request.projectId = projectId
-    this.getareas()
   },
   mounted () {
-    let that = this
-    setTimeout(() => {
-      that.getcrop()
-      that.getcycle()
-      that.getfomulaOrchanner()
-      that.getfomulaLink()
-    }, 250)
+    this.getareas().then(res => {
+      this.getcrop()
+      this.getcycle()
+      this.getfomulaLink()
+    })
   },
   methods: {
+    // 分页
+    currentchange (newPage) {
+      this.pageNum = newPage
+    },
+    prevpage () {
+      this.pageNum = this.pageNum - 1
+    },
+    nextpage () {
+      this.pageNum = this.pageNum + 1
+    },
+    // 温室切换
     areaTab () {
       this.getfomulaLink()
     },
@@ -256,9 +300,12 @@ export default {
         type: 'warning'
       })
         .then(async () => {
-          await this.$http.post('http://192.168.1.202:10020/fertilizer/api/area/deleteFormulaLink', ID)
+          await this.$http.post('fertilizer/api/area/deleteFormulaLink', ID)
           // 删除成功
           this.$message.success('删除成功')
+          const totalPage = Math.ceil((this.total - 1) / this.pageSize)
+          const pageNum = this.pageNum > totalPage ? totalPage : this.pageNum
+          this.pageNum = pageNum < 1 ? 1 : pageNum
           this.getfomulaLink()
         })
         .catch(() => {})
@@ -266,7 +313,7 @@ export default {
     // 大棚
     async getareas () {
       // 获取园区第一条数据
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/area/queryByProjectId', this.request)
+      const res = await this.$http.post('fertilizer/api/area/queryByProjectId', this.request)
       this.area = res.data.data
       this.areaId.id = this.area[0].id
     },
@@ -276,35 +323,41 @@ export default {
       let ID = {
         areaId: this.areaId.id
       }
-      const fomulaCrop = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/area/queryFormulaLinkByAreaId', ID)
-      this.tableData = fomulaCrop.data.data
+      const { data: { data } } = await this.$http.post('fertilizer/api/area/queryFormulaLinkByAreaId', ID)
+      this.tableData = data
+      this.total = data.length
     },
     // 作物
     async getcrop () {
-      const crop = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/crop/queryByProjectId', this.request)
+      const crop = await this.$http.post('fertilizer/api/crop/queryByProjectId', this.request)
       this.crop = crop.data.data
     },
     // 周期
     async getcycle () {
-      const cycle = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/period/queryByProjectId', this.request)
+      const cycle = await this.$http.post('fertilizer/api/period/queryByProjectId', this.request)
       this.cycle = cycle.data.data
     },
     // 配方和通道
     async getfomulaOrchanner () {
-      const way = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/channel/queryByProjectId', this.request)
-      this.channel = way.data.data
+      const ID = {
+        id: this.ferId
+      }
+      const { data: { data } } = await this.$http.post('fertilizer/api/fertilizer/queryById', ID)
+      this.channel = data.channels.split(',')
     },
     async changeCrop () {
       let that = this
       let ID = {
         cropId: that.cropId.id,
-        periodId: that.cycleId.id
+        periodId: that.cycleId.id,
+        fertilizerId: this.ferId
       }
       if (ID.periodId !== '') {
-        const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/formula/queryByCropAndPeriod', ID)
+        const res = await this.$http.post('fertilizer/api/formula/queryByCropAndPeriod', ID)
         this.fomula = res.data.data
         if (res.data.data.length === 0) {
           this.$message.warning('未查到！')
+          this.fomula = []
         } else {
           this.$message.success('查到了！')
           this.fomula = res.data.data
@@ -315,13 +368,16 @@ export default {
       let that = this
       let ID = {
         cropId: that.cropId.id,
-        periodId: that.cycleId.id
+        periodId: that.cycleId.id,
+        fertilizerId: this.ferId
+
       }
       if (ID.cropId !== '') {
-        const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/formula/queryByCropAndPeriod', ID)
+        const res = await this.$http.post('fertilizer/api/formula/queryByCropAndPeriod', ID)
 
         if (res.data.data.length === 0) {
           this.$message.warning('未查到！')
+          this.fomula = []
         } else {
           this.$message.success('查到了！')
           this.fomula = res.data.data
@@ -343,28 +399,39 @@ export default {
       this.datatime = []
     },
     // 添加
-    fog () {
+    async fog () {
       this.clear()
+      const { data: { data } } = await this.$http.post('fertilizer/api/area/queryById', this.areaId)
+      this.ferId = data.fertilizerId
+      this.getfomulaOrchanner()
       this.flagform = true
     },
     // 编辑
     async edit (index, row) {
       this.clear()
-      // console.log(row)
       this.flagform = true
-      // this.num = 0
       this.editId = row.id
       this.areaId.id = row.areaId
       this.formulaId = row.formulaId
       this.sort = row.sort
       this.datatime.unshift(row.startDate, row.endDate)
-      this.cropId.id = row.formula.cropId
-      this.cycleId.id = row.formula.periodId
+      if (row.formula === null) {
+        this.cropId.id = ''
+        this.cycleId.id = ''
+        this.$message.error('无此配方，请继续编辑或删除')
+      } else {
+        this.cropId.id = row.formula.cropId
+        this.cycleId.id = row.formula.periodId
+      }
+      const { data: { data } } = await this.$http.post('fertilizer/api/area/queryById', this.areaId)
+      this.ferId = data.fertilizerId
       let ID = {
         cropId: row.formula.cropId,
-        periodId: row.formula.periodId
+        periodId: row.formula.periodId,
+        fertilizerId: this.ferId
       }
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/formula/queryByCropAndPeriod', ID)
+      this.getfomulaOrchanner()
+      const res = await this.$http.post('fertilizer/api/formula/queryByCropAndPeriod', ID)
       this.fomula = res.data.data
     },
     // 提交
@@ -377,12 +444,22 @@ export default {
         endDate: this.datatime[1],
         sort: Number(this.sort)
       }
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/area/saveOrUpdateFormulaLink', form)
-      if (res === undefined) {
-        this.$message.error('同一区域不允许绑定重复的配方')
+      if (this.datatime[0] === undefined && this.datatime[1] === undefined) {
+        this.$message.error('请填写起止时间')
+        return false
+      } else if (form.formulaId === '') {
+        this.$message.error('请选择配方')
+        return false
+      } else {
+        const { data } = await this.$http.post('fertilizer/api/area/saveOrUpdateFormulaLink', form)
+        if (data.code === 100) {
+          this.$message.error(data.msg)
+        } else if (data.code === 200) {
+          this.$message.success('添加成功')
+        }
+        this.flagform = false
+        this.getfomulaLink()
       }
-      this.flagform = false
-      this.getfomulaLink()
     }
   }
 }
@@ -459,6 +536,10 @@ export default {
       padding: 20px;
       border-radius: 5px;
       background-color: #242c3b;
+      .box {
+        margin-top: 12px;
+        text-align: center;
+      }
       /deep/ .el-table::before {
         height: 0;
       }
@@ -468,7 +549,7 @@ export default {
         color: #fff;
         th {
           border: 0;
-          background-color: transparent;
+          background-color: rgba(55, 59, 63, 0.9);
         }
         tr {
           border: 0;
@@ -571,8 +652,7 @@ export default {
       }
       > div:nth-child(4) {
         height: 400px;
-        // overflow-y: scroll;
-        > div {
+        .model {
           width: 600px;
           height: 130px;
           margin: 15px auto;

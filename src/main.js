@@ -14,6 +14,14 @@ import '@/styles/index.less'
 // 导入axios
 import axios from '@/api/axios'
 
+// 导入login.js
+import login from '@/login/login'
+
+// 网关端口
+import sensor from '@/sensorApi/sensor'
+// 天气端口
+import weather from '@/weatherApi/weather'
+
 // 全局注册的组件index.js
 import components from '@/components'
 
@@ -37,6 +45,9 @@ import moment from 'moment'
 
 // axios挂载到大vue原型上
 Vue.prototype.$http = axios
+Vue.prototype.$login = login
+Vue.prototype.$sensor = sensor
+Vue.prototype.$weather = weather
 // echarts挂载
 Vue.prototype.$echarts = echarts
 // moment挂载到原型

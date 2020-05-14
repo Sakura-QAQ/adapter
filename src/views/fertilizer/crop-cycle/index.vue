@@ -22,10 +22,9 @@
           </div>
           <div class="list">
             <el-table
-              :data="productList.slice((reqParams.currentPage-1)*reqParams.PageSize,reqParams.currentPage*reqParams.PageSize)"
+              :data="productList.slice((pageNum - 1)*pageSize, pageNum*pageSize)"
               style="width: 500px"
             >
-              <!-- <el-table-column label="序号" type="index" width="125" align="center"></el-table-column> -->
               <el-table-column prop="name" label="名称" width="250" align="center"></el-table-column>
               <el-table-column label="操作" width="250" align="center">
                 <template slot-scope="scope">
@@ -37,12 +36,12 @@
             <div class="pager">
               <el-pagination
                 layout="prev, pager, next"
-                @size-change="handleSizeChange"
-                @current-change="handleCurrentChange"
-                :current-page="reqParams.currentPage"
-                :page-sizes="reqParams.pageSizes"
-                :page-size="reqParams.PageSize"
-                :total="reqParams.totalCount"
+                @current-change="currentchange"
+                @next-click="nextpage"
+                @prev-click="prevpage"
+                :current-page="pageNum"
+                :page-size="pageSize"
+                :total="total"
               ></el-pagination>
             </div>
           </div>
@@ -71,7 +70,7 @@
           </div>
           <div class="list">
             <el-table
-              :data="titles.slice((reqParams1.currentPage-1)*reqParams1.PageSize,reqParams1.currentPage*reqParams1.PageSize)"
+              :data="titles.slice((pageNum1 - 1)*pageSize1, pageNum1*pageSize1)"
               style="width: 600px"
               >
               <el-table-column prop="name" label="名称" width="150" align="center"></el-table-column>
@@ -86,12 +85,12 @@
             <div class="pager">
               <el-pagination
                 layout="prev, pager, next"
-                @size-change="handleSizeChange1"
-                @current-change="handleCurrentChange1"
-                :current-page="reqParams1.currentPage"
-                :page-sizes="reqParams1.pageSizes"
-                :page-size="reqParams1.PageSize"
-                :total="reqParams1.totalCount"
+                @current-change="currentchange1"
+                @next-click="nextpage1"
+                @prev-click="prevpage1"
+                :current-page="pageNum1"
+                :page-size="pageSize1"
+                :total="total1"
               ></el-pagination>
             </div>
           </div>
@@ -105,22 +104,15 @@
 export default {
   data () {
     return {
-      reqParams: {
-        // 默认显示第几页
-        currentPage: 1,
-        // 总条数，根据接口获取数据长度(注意：这里不能为空)
-        totalCount: 1,
-        // 个数选择器（可修改）
-        pageSizes: [1, 2],
-        // 默认每页显示的条数（可修改）
-        PageSize: 5
-      },
-      reqParams1: {
-        currentPage: 1,
-        totalCount: 1,
-        pageSizes: [1, 2],
-        PageSize: 5
-      },
+      // 作物分页参数
+      pageNum: 1,
+      pageSize: 5,
+      total: 0,
+      // 周期分页参数
+      pageNum1: 1,
+      pageSize1: 5,
+      total1: 0,
+      // 弹框
       flag1: false,
       flagEdit: false,
       // add请求作物数据
@@ -172,24 +164,28 @@ export default {
     this.request.projectId = projectId
   },
   methods: {
-    handleSizeChange (val) {
-      // 改变每页显示的条数
-      this.reqParams.PageSize = val
-      this.reqParams.currentPage = 1
+    // 分页
+    currentchange (newPage) {
+      this.pageNum = newPage
+      this.getcrops()
     },
-    handleCurrentChange (newPage) {
-      // 提交当前页码给后台才能获取对应的数据
-      this.reqParams.currentPage = newPage
+    prevpage () {
+      this.pageNum = this.pageNum - 1
+      this.getcrops()
+    },
+    nextpage () {
+      this.pageNum = this.pageNum + 1
+      this.getcrops()
     },
     // 作物管理部分
     // 获取作物列表
     async getcrops () {
       const res = await this.$http.post(
-        'http://192.168.1.202:10020/fertilizer/api/crop/queryByProjectId',
+        'fertilizer/api/crop/queryByProjectId',
         this.request
       )
-      this.reqParams.totalCount = res.data.data.length
       this.productList = res.data.data
+      this.total = res.data.data.length
     },
     async add () {
       this.crops = {
@@ -199,7 +195,7 @@ export default {
         isDel: this.crops.isDel
       }
       const res = await this.$http.post(
-        'http://192.168.1.202:10020/fertilizer/api/crop/add',
+        'fertilizer/api/crop/add',
         this.crops
       )
       if (res.data.code === 200) {
@@ -221,11 +217,14 @@ export default {
       })
         .then(async () => {
           await this.$http.post(
-            'http://192.168.1.202:10020/fertilizer/api/crop/delete',
+            'fertilizer/api/crop/delete',
             this.cropsID
           )
           // 删除成功
           this.$message.success('删除成功')
+          const totalPage = Math.ceil((this.total - 1) / this.pageSize)
+          const pageNum = this.pageNum > totalPage ? totalPage : this.pageNum
+          this.pageNum = pageNum < 1 ? 1 : pageNum
           this.getcrops()
         })
         .catch(() => {})
@@ -247,10 +246,9 @@ export default {
     async updata () {
       this.flagEdit = false
       const res = await this.$http.post(
-        'http://192.168.1.202:10020/fertilizer/api/crop/update',
+        'fertilizer/api/crop/update',
         this.edit
       )
-      // console.log(res)
       if (res.data.code === 200) {
         this.$message.success('修改成功')
         this.getcrops()
@@ -261,22 +259,25 @@ export default {
     },
     // 周期管理部分
     // 获取周期列表
-    handleSizeChange1 (val) {
-      // 改变每页显示的条数
-      this.reqParams1.PageSize = val
-      this.reqParams1.currentPage = 1
+    currentchange1 (newPage) {
+      this.pageNum1 = newPage
+      this.getFerList()
     },
-    handleCurrentChange1 (newPage) {
-      // 提交当前页码给后台才能获取对应的数据
-      this.reqParams1.currentPage = newPage
+    prevpage1 () {
+      this.pageNum1 = this.pageNum1 - 1
+      this.getFerList()
+    },
+    nextpage1 () {
+      this.pageNum1 = this.pageNum1 + 1
+      this.getFerList()
     },
     async getCycle () {
       const res = await this.$http.post(
-        'http://192.168.1.202:10020/fertilizer/api/period/queryByProjectId',
+        'fertilizer/api/period/queryByProjectId',
         this.request
       )
-      this.reqParams1.totalCount = res.data.data.length
       this.titles = res.data.data
+      this.total1 = res.data.data.length
     },
     // 增加(编辑)数据
     async addCycle () {
@@ -288,7 +289,7 @@ export default {
         isDel: this.cycle.isDel
       }
       const res = await this.$http.post(
-        'http://192.168.1.202:10020/fertilizer/api/period/saveOrUpdate',
+        'fertilizer/api/period/saveOrUpdate',
         this.cycle
       )
       if (res.data.code === 200) {
@@ -312,11 +313,14 @@ export default {
       })
         .then(async () => {
           await this.$http.post(
-            'http://192.168.1.202:10020/fertilizer/api/period/delete',
+            'fertilizer/api/period/delete',
             this.cycleId
           )
           // 删除成功
           this.$message.success('删除成功')
+          const totalPage1 = Math.ceil((this.total1 - 1) / this.pageSize)
+          const pageNum1 = this.pageNum1 > totalPage1 ? totalPage1 : this.pageNum1
+          this.pageNum1 = pageNum1 < 1 ? 1 : pageNum1
           this.getCycle()
         })
         .catch(() => {})
@@ -339,7 +343,7 @@ export default {
     async updataCycle () {
       this.flagEdit2 = false
       const res = await this.$http.post(
-        'http://192.168.1.202:10020/fertilizer/api/period/saveOrUpdate',
+        'fertilizer/api/period/saveOrUpdate',
         this.edit1
       )
       if (res.data.code === 200) {

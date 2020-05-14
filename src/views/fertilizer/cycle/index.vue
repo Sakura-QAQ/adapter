@@ -87,13 +87,12 @@ export default {
   methods: {
     // 获取周期
     async getCycle () {
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/period/queryByProjectId', this.projectId)
-      // console.log(res)
+      const res = await this.$http.post('fertilizer/api/period/queryByProjectId', this.projectId)
       this.titles = res.data.data
     },
     // 增加数据
     async add () {
-      await this.$http.post('http://192.168.1.202:10020/fertilizer/api/period/saveOrUpdate', this.cycle)
+      await this.$http.post('fertilizer/api/period/saveOrUpdate', this.cycle)
       // 添加完成后清空
       this.cycle = {
         id: '',
@@ -133,7 +132,7 @@ export default {
     // 删除数据
     async del (index) {
       this.cycleId.id = this.titles[index].id
-      await this.$http.post('http://192.168.1.202:10020/fertilizer/api/period/delete', this.cycleId)
+      await this.$http.post('fertilizer/api/period/delete', this.cycleId)
       this.getCycle()
     },
     // 编辑数据
@@ -153,7 +152,7 @@ export default {
     // 更新数据
     async updata () {
       this.flag = false
-      await this.$http.post('http://192.168.1.202:10020/fertilizer/api/period/saveOrUpdate', this.edit)
+      await this.$http.post('fertilizer/api/period/saveOrUpdate', this.edit)
       this.getCycle()
     }
   }

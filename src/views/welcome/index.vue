@@ -5,7 +5,7 @@
       <div class="chart_1" v-if="flagMin">
         <div class="topCard">
           <span>实时数据</span>
-          <el-select v-model="reqParams.fertilizerId" placeholder="选择施肥机">
+          <el-select v-model="reqParams.fertilizerId" placeholder="选择施肥机" @change="ferchange">
             <el-option v-for="item in fertilizer" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </div>
@@ -63,50 +63,17 @@
           气象站
         </div>
         <div class="leftCard">
-          <div class="bgfont">
-            <div class="bgline">
-              <div class="icons">
-                <span>温度</span>
-                <span>℃</span>
+          <vue-scroll :ops="ops1" style="width:100%;height:100%">
+            <div class="bgfont">
+              <div class="bgline" v-for="(item, index) in weatherlist" :key="index">
+                <div class="icons">
+                  <span>{{item.name}}</span>
+                  <span>{{item.unitName}}</span>
+                </div>
+                <div class="content">{{item.value}}</div>
               </div>
-              <div class="content">22</div>
             </div>
-            <div class="bgline">
-              <div class="icons">
-                <span>湿度</span>
-                <span>%</span>
-              </div>
-              <div class="content">24</div>
-            </div>
-            <div class="bgline">
-              <div class="icons">
-                <span>光照</span>
-                <span>LUX</span>
-              </div>
-              <div class="content">11434</div>
-            </div>
-            <div class="bgline">
-              <div class="icons">
-                <span>CO2</span>
-                <span>PPM</span>
-              </div>
-              <div class="content">328</div>
-            </div>
-            <div class="bgline">
-              <div class="icons">
-                <span>风向</span>
-                <span>°</span>
-              </div>
-              <div class="content">48.6</div>
-            </div>
-            <div class="bgline">
-              <div class="icons">
-                <span>风速</span>
-                <span>m/s</span>
-              </div>
-              <div class="content">0.8</div>
-            </div>
-          </div>
+          </vue-scroll>
         </div>
         <linegraph class="bargraph" :id="'bargraph_2'" :data="option2"></linegraph>
         <div class="btn" @click="sceneBtn"></div>
@@ -115,52 +82,22 @@
       <div class="chart_3" v-if="flagMin">
         <div class="topCard">
           <span>土壤墒情</span>
-          <el-select v-model="reqParams.fertilizerId" placeholder="选择温室">
-            <el-option v-for="item in fertilizer" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          <el-select v-model="soilId.id" placeholder="墒情列表">
+            <el-option v-for="item in soilList" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </div>
         <div class="leftCard">
-          <div class="bgfont">
-            <div class="bgline">
-              <div class="icons">
-                <span>土温1</span>
-                <span>℃</span>
+          <vue-scroll :ops="ops2" style="width:100%;height:100%">
+            <div class="bgfont">
+              <div class="bgline" v-for="(item, index) in soilData" :key="index">
+                <div class="icons">
+                  <span>{{item.name}}</span>
+                  <span>{{item.unitName}}</span>
+                </div>
+                <div class="content">{{item.value}}</div>
               </div>
-              <div class="content">17</div>
             </div>
-            <div class="bgline">
-              <div class="icons">
-                <span>土湿1</span>
-                <span>%</span>
-              </div>
-              <div class="content">14</div>
-            </div>
-            <div class="bgline">
-              <div class="icons">
-                <span>土温2</span>
-                <span>℃</span>
-              </div>
-              <div class="content">18</div>
-            </div>
-            <div class="bgline">
-              <div class="icons">
-                <span>土湿1</span>
-                <span>%</span>
-              </div>
-              <div class="content">15</div>
-            </div>
-            <div class="bgline">
-              <div class="icons">PH</div>
-              <div class="content">6.4</div>
-            </div>
-            <div class="bgline">
-              <div class="icons">
-                <span>EC</span>
-                <span>μs/cm</span>
-              </div>
-              <div class="content">1.7</div>
-            </div>
-          </div>
+          </vue-scroll>
         </div>
         <linegraph class="bargraph" :id="'bargraph_3'" :data="option3"></linegraph>
         <div class="btn" @click="soilBtn"></div>
@@ -206,19 +143,29 @@
         </div>
         <div class="pos-table">
           <div class="fr">
-            <div>今天</div>
+            <div>05.06</div>
             <div class="icons"></div>
-            <div class="data">6°/22°</div>
+            <div class="data">16°/25°</div>
           </div>
           <div class="fr">
-            <div>明天</div>
+            <div>05.07</div>
             <div class="icons"></div>
-            <div class="data">6°/22°</div>
+            <div class="data">17°/24°</div>
           </div>
           <div class="fr">
-            <div>后天</div>
+            <div>05.08</div>
             <div class="icons"></div>
-            <div class="data">6°/22°</div>
+            <div class="data">16°/24°</div>
+          </div>
+          <div class="fr">
+            <div>05.09</div>
+            <div class="icons"></div>
+            <div class="data">16°/25°</div>
+          </div>
+          <div class="fr">
+            <div>05.10</div>
+            <div class="icons"></div>
+            <div class="data">16°/22°</div>
           </div>
         </div>
       </div>
@@ -281,50 +228,17 @@
         气象站
       </div>
       <div class="leftCard">
-        <div class="bgfont">
-          <div class="bgline">
-            <div class="icons">
-              <span>温度</span>
-              <span>℃</span>
+        <vue-scroll :ops="ops1_big" style="width:100%;height:100%">
+          <div class="bgfont">
+            <div class="bgline" v-for="(item, index) in weatherlist" :key="index">
+              <div class="icons">
+                <span>{{item.name}}</span>
+                <span>{{item.unitName}}</span>
+              </div>
+              <div class="content">{{item.value}}</div>
             </div>
-            <div class="content">22</div>
           </div>
-          <div class="bgline">
-            <div class="icons">
-              <span>湿度</span>
-              <span>%</span>
-            </div>
-            <div class="content">24</div>
-          </div>
-          <div class="bgline">
-            <div class="icons">
-              <span>光照</span>
-              <span>LUX</span>
-            </div>
-            <div class="content">11434</div>
-          </div>
-          <div class="bgline">
-            <div class="icons">
-              <span>CO2</span>
-              <span>PPM</span>
-            </div>
-            <div class="content">328</div>
-          </div>
-          <div class="bgline">
-            <div class="icons">
-              <span>风向</span>
-              <span>°</span>
-            </div>
-            <div class="content">48.6</div>
-          </div>
-          <div class="bgline">
-            <div class="icons">
-              <span>风速</span>
-              <span>m/s</span>
-            </div>
-            <div class="content">0.8</div>
-          </div>
-        </div>
+        </vue-scroll>
       </div>
       <linegraph class="bargraph" :id="'bargraph2_big'" :data="option2"></linegraph>
       <div class="btn" @click="sceneBtn_small"></div>
@@ -334,47 +248,17 @@
         土壤墒情
       </div>
       <div class="leftCard">
-        <div class="bgfont">
-          <div class="bgline">
-            <div class="icons">PH</div>
-            <div class="content">6.4</div>
-          </div>
-          <div class="bgline">
-            <div class="icons">
-              <span>EC</span>
-              <span>μs/cm</span>
+        <vue-scroll :ops="ops2_big" style="width:100%;height:100%">
+          <div class="bgfont">
+            <div class="bgline" v-for="(item, index) in soilData" :key="index">
+              <div class="icons">
+                <span>{{item.name}}</span>
+                <span>{{item.unitName}}</span>
+              </div>
+              <div class="content">{{item.value}}</div>
             </div>
-            <div class="content">1.7</div>
           </div>
-          <div class="bgline">
-            <div class="icons">
-              <span>土温1</span>
-              <span>℃</span>
-            </div>
-            <div class="content">17</div>
-          </div>
-          <div class="bgline">
-            <div class="icons">
-              <span>土湿1</span>
-              <span>%</span>
-            </div>
-            <div class="content">14</div>
-          </div>
-          <div class="bgline">
-            <div class="icons">
-              <span>土温2</span>
-              <span>℃</span>
-            </div>
-            <div class="content">18</div>
-          </div>
-          <div class="bgline">
-            <div class="icons">
-              <span>土湿1</span>
-              <span>%</span>
-            </div>
-            <div class="content">15</div>
-          </div>
-        </div>
+        </vue-scroll>
       </div>
       <linegraph class="bargraph" :id="'bargraph3_big'" :data="option3"></linegraph>
       <div class="btn" @click="soilBtn_small"></div>
@@ -419,13 +303,90 @@ export default {
           'overflow-x': 'hidden'
         }
       },
+      ops1: {
+        vuescroll: {},
+        scrollPanel: {},
+        rail: {
+          keepShow: true
+        },
+        bar: {
+          hoverStyle: true,
+          onlyShowBarOnScroll: false, // 是否只有滚动的时候才显示滚动条
+          background: '#F5F5F5', // 滚动条颜色
+          opacity: 0.5, // 滚动条透明度
+          'overflow-x': 'hidden'
+        }
+      },
+      ops1_big: {
+        vuescroll: {},
+        scrollPanel: {},
+        rail: {
+          keepShow: true
+        },
+        bar: {
+          hoverStyle: true,
+          onlyShowBarOnScroll: false, // 是否只有滚动的时候才显示滚动条
+          background: '#F5F5F5', // 滚动条颜色
+          opacity: 0.5, // 滚动条透明度
+          'overflow-x': 'hidden'
+        }
+      },
+      ops2: {
+        vuescroll: {},
+        scrollPanel: {},
+        rail: {
+          keepShow: true
+        },
+        bar: {
+          hoverStyle: true,
+          onlyShowBarOnScroll: false, // 是否只有滚动的时候才显示滚动条
+          background: '#F5F5F5', // 滚动条颜色
+          opacity: 0.5, // 滚动条透明度
+          'overflow-x': 'hidden'
+        }
+      },
+      ops2_big: {
+        vuescroll: {},
+        scrollPanel: {},
+        rail: {
+          keepShow: true
+        },
+        bar: {
+          hoverStyle: true,
+          onlyShowBarOnScroll: false, // 是否只有滚动的时候才显示滚动条
+          background: '#F5F5F5', // 滚动条颜色
+          opacity: 0.5, // 滚动条透明度
+          'overflow-x': 'hidden'
+        }
+      },
+      // 项目id
+      request: {
+        projectId: ''
+      },
       // 施肥机id
       reqParams: {
         fertilizerId: ''
       },
-      request: {
-        projectId: ''
+      // 土壤网关id
+      soilID: {
+        gatewayId: ''
       },
+      // 气象网关id
+      weatherID: {
+        gatewayId: ''
+      },
+      // 所有类别
+      typeList: [],
+      // 土壤列表
+      soilList: [],
+      // 默认土壤id
+      soilId: {
+        id: ''
+      },
+      // 土壤数据
+      soilData: [],
+      // 气象列表
+      weatherlist: [],
       titles: [],
       fertilizer: [],
       flagAll: true,
@@ -457,6 +418,14 @@ export default {
           type: 'inside'
         }],
         yAxis: [
+          {
+            show: false,
+            type: 'value'
+          },
+          {
+            show: false,
+            type: 'value'
+          },
           {
             show: false,
             type: 'value'
@@ -512,7 +481,7 @@ export default {
             type: 'line',
             data: [],
             showSymbol: true,
-            yAxisIndex: 3,
+            yAxisIndex: 4,
             symbolSize: 5
           },
           {
@@ -520,7 +489,7 @@ export default {
             type: 'line',
             data: [],
             showSymbol: true,
-            yAxisIndex: 3,
+            yAxisIndex: 5,
             symbolSize: 5
           }
         ]
@@ -531,38 +500,38 @@ export default {
         },
         legend: {
           left: 'center',
-          data: ['温度', '光照'],
-          top: 5
+          data: [],
+          top: 5,
+          z: 10
         },
         xAxis: {
           type: 'category',
-          data: ['15:00', '15:10', '15:20', '15:30', '15:40', '15:50', '16:00', '16:10', '16:20', '16:30', '16:40', '16:50']
+          data: []
         },
         grid: {
-          left: '1%',
+          left: '2%',
           right: '2%',
           bottom: '8%',
-          containLabel: true
+          containLabel: false
         },
-        yAxis: {
-          type: 'category',
-          data: ['10%', '20%', '30%', '40%', '50%', '60%', '70%', '80%', '90%', '100%']
-        },
-        series: [
+        dataZoom: [{
+          type: 'inside'
+        }],
+        yAxis: [
           {
-            name: '温度',
-            type: 'line',
-            data: [1.8, 2.98, 1.96, 2.27, 3.81, 3.47, 1.74, 3.23, 4.69, 5.25, 4.36, 2.56],
-            showSymbol: true,
-            symbolSize: 5
-          },
-          {
-            name: '光照',
-            type: 'line',
-            data: [3, 4.2, 2.4, 3.8, 4.16, 2.32, 1.64, 3.28, 4.6, 3.25, 2.63, 4.65, 3.12],
-            showSymbol: true,
-            symbolSize: 5
+            show: false,
+            type: 'value'
           }
+        ],
+        series: [
+          // {
+          //   name: 'PH',
+          //   type: 'line',
+          //   data: [],
+          //   showSymbol: true,
+          //   yAxisIndex: 0,
+          //   symbolSize: 5
+          // }
         ]
       },
       option3: {
@@ -571,38 +540,38 @@ export default {
         },
         legend: {
           left: 'center',
-          data: ['土温1', '土湿2'],
-          top: 5
+          data: [],
+          top: 5,
+          z: 10
         },
         xAxis: {
           type: 'category',
-          data: ['15:00', '15:10', '15:20', '15:30', '15:40', '15:50', '16:00', '16:10', '16:20', '16:30', '16:40', '16:50']
+          data: []
         },
         grid: {
-          left: '1%',
+          left: '2%',
           right: '2%',
           bottom: '8%',
-          containLabel: true
+          containLabel: false
         },
-        yAxis: {
-          type: 'category',
-          data: ['10%', '20%', '30%', '40%', '50%', '60%', '70%', '80%', '90%', '100%']
-        },
-        series: [
+        dataZoom: [{
+          type: 'inside'
+        }],
+        yAxis: [
           {
-            name: '土温1',
-            type: 'line',
-            data: [0.8, 0.98, 0.96, 0.27, 0.81, 0.47, 0.74, 0.23, 0.69, 0.25, 0.36, 0.56],
-            showSymbol: true,
-            symbolSize: 5
-          },
-          {
-            name: '土湿2',
-            type: 'line',
-            data: [1, 0.2, 0.4, 0.8, 0.16, 0.32, 0.64, 1.28, 1.6, 0.25, 0.63, 0.65, 0.12],
-            showSymbol: true,
-            symbolSize: 5
+            show: false,
+            type: 'value'
           }
+        ],
+        series: [
+          // {
+          //   name: 'PH',
+          //   type: 'line',
+          //   data: [],
+          //   showSymbol: true,
+          //   yAxisIndex: 0,
+          //   symbolSize: 5
+          // }
         ]
       }
     }
@@ -612,7 +581,24 @@ export default {
     this.request.projectId = projectId
   },
   mounted () {
-    this.sequence()
+    // 施肥机数据
+    this.getfertilizer().then(res => {
+      this.getRealtime()
+    })
+    // 气象和土壤
+    this.getgatewayId().then(res => {
+      // 获取类别
+      this.queryAlltype().then(res => {
+        // 气象采集器获得传感器
+        this.querySensor().then(res => {
+          this.getScene()
+        })
+        // 土壤墒情
+        this.getsoilsensor().then(res => {
+          this.getsoildata()
+        })
+      })
+    })
   },
   methods: {
     realtimeBtn () {
@@ -639,22 +625,16 @@ export default {
       this.flagAll = true
       this.flagbig_3 = false
     },
-    // 控制顺序
-    sequence () {
-      this.getfertilizer().then(res => {
-        this.getRealtime()
-      })
-    },
     // 施肥机id
     async getfertilizer () {
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/fertilizer/queryByProjectId', this.request)
+      const res = await this.$http.post('fertilizer/api/fertilizer/queryByProjectId', this.request)
       this.fertilizer = res.data.data
       this.reqParams.fertilizerId = this.fertilizer[0].id
     },
     // 获取实时数据
     async getRealtime () {
       const columns = []
-      const conditions = ["fertilizer_id='" + this.reqParams.fertilizerId + "'", "date_format(datetime,'%Y-%m-%d')='2020-04-07'", 'minute(datetime)%5=0']
+      const conditions = ["fertilizer_id='" + this.reqParams.fertilizerId + "'", "date_format(datetime,'%Y-%m-%d')='" + this.$moment(new Date()).format('YYYY-MM-DD') + "'", 'minute(datetime)%10=0']
       // " + this.$moment(new Date()).format('YYYY-MM-DD') + "
       const sorts = ['datetime desc']
       const params = {
@@ -663,45 +643,190 @@ export default {
         sorts: sorts
       }
       // 数据展示
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/data/queryByQueryVo', params)
-      this.Realtime = res.data.data[0]
-      // 曲线
-      var time = []
-      var PH = []
-      var totalVolume = []
-      var realTimeFlow = []
-      var liquidLevel = []
-      var pressure = []
-      var EC = []
-      for (let i = 0; i < res.data.data.length; i++) {
-        const element = res.data.data[i]
-        // 时间
-        time.unshift(this.$moment(element.datetime).format('HH:mm:ss'))
-        // ph
-        PH.unshift(element.ph)
-        // 累计流量
-        totalVolume.unshift(element.total_volume)
-        // 实时流量
-        realTimeFlow.unshift(element.real_time_flow)
-        // 液位
-        liquidLevel.unshift(element.liquid_level)
-        // 压力
-        pressure.unshift(element.pressure)
-        // EC
-        EC.unshift(element.ec)
-      }
+      const res = await this.$http.post('fertilizer/api/data/queryByQueryVo', params)
 
-      this.option1.xAxis.data = time
-      this.option1.series[0].data = PH
-      this.option1.series[1].data = EC
-      this.option1.series[2].data = realTimeFlow
-      this.option1.series[3].data = totalVolume
-      this.option1.series[4].data = liquidLevel
-      this.option1.series[5].data = pressure
+      if (res.data.data.length === 0) {
+        this.$message.error('此施肥机无数据！')
+        this.Realtime = {}
+        this.option1.xAxis.data = []
+        this.option1.series[0].data = []
+        this.option1.series[1].data = []
+        this.option1.series[2].data = []
+        this.option1.series[3].data = []
+        this.option1.series[4].data = []
+        this.option1.series[5].data = []
+        return false
+      } else {
+        this.Realtime = res.data.data[0]
+        // 曲线
+        var time = []
+        var PH = []
+        var totalVolume = []
+        var realTimeFlow = []
+        var liquidLevel = []
+        var pressure = []
+        var EC = []
+        for (let i = 0; i < res.data.data.length; i++) {
+          const element = res.data.data[i]
+
+          // 时间
+          time.unshift(this.$moment(element.datetime).format('HH:mm'))
+          // ph
+          PH.unshift(element.ph)
+          // 累计流量
+          totalVolume.unshift(element.total_volume)
+          // 实时流量
+          realTimeFlow.unshift(element.real_time_flow)
+          // 液位
+          liquidLevel.unshift(element.liquid_level)
+          // 压力
+          pressure.unshift(element.pressure)
+          // EC
+          EC.unshift(element.ec)
+        }
+
+        this.option1.xAxis.data = time
+        this.option1.series[0].data = PH
+        this.option1.series[1].data = EC
+        this.option1.series[2].data = realTimeFlow
+        this.option1.series[3].data = totalVolume
+        this.option1.series[4].data = liquidLevel
+        this.option1.series[5].data = pressure
+      }
     },
-    async fn () {
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/queryByFertilizerId', this.reqParams)
-      this.titles = res.data.data
+    // 获取所有类别
+    async queryAlltype () {
+      const { data: { data } } = await this.$sensor.post('http://192.168.1.254:10040/sensor/api/type/queryAll')
+      this.typeList = data
+    },
+    // 获取气象站或土壤
+    async getgatewayId () {
+      const { data: { data } } = await this.$sensor.post('sensor/api/gateway/queryByProject', this.request)
+      for (let i = 0; i < data.length; i++) {
+        const element = data[i]
+        if (element.type === 2) {
+          this.weatherID.gatewayId = element.id
+        } else {
+          this.soilList.push(element)
+        }
+      }
+      this.soilId.id = this.soilList[0].id
+    },
+    // 通过气象网关id获取传感器
+    async querySensor () {
+      const { data: { data } } = await this.$sensor.post('sensor/api/data/queryByGateway', this.weatherID)
+      for (let i = 0; i < data.length; i++) {
+        const sensorlist = data[i]
+        for (let j = 0; j < this.typeList.length; j++) {
+          const typeList = this.typeList[j]
+          if (sensorlist.typeId === typeList.id) {
+            sensorlist.unitName = typeList.unit
+            sensorlist.typeName = typeList.name
+            this.weatherlist.push(sensorlist)
+          }
+        }
+      }
+    },
+    // 通过气象传感器ID获取气象数据
+    async getScene () {
+      const weatherlist = this.weatherlist
+      for (let i = 0; i < weatherlist.length; i++) {
+        // =====================
+        const element = weatherlist[i]
+        this.option2.legend.data.push(element.name)
+        const yAxis = {
+          show: false,
+          type: 'value'
+        }
+        this.option2.yAxis.push(yAxis)
+        const series = {
+          name: element.name,
+          type: 'line',
+          data: [],
+          showSymbol: true,
+          yAxisIndex: i,
+          symbolSize: 5
+        }
+        this.option2.series.push(series)
+        // ======================
+        const params = {
+          columns: [],
+          conditions: ["sensor_id='" + element.id + "'", "date_time<'2020-05-09'", 'minute(date_time)%10=0'],
+          sorts: []
+        }
+        const { data: { data } } = await this.$sensor.post('sensor/api/data/queryByQueryVo', params)
+        const val = []
+        const time = []
+        for (let k = 0; k < data.length; k++) {
+          const res = data[k]
+          val.push(res.value)
+          time.push(this.$moment(res.dateTime).format('HH:mm'))
+        }
+        this.option2.series[i].data = val
+        this.option2.xAxis.data = time
+      }
+    },
+    // 获取土壤墒情网关
+    async getsoilsensor () {
+      const ID = {
+        gatewayId: this.soilId.id
+      }
+      const { data: { data } } = await this.$sensor.post('sensor/api/data/queryByGateway', ID)
+      for (let i = 0; i < data.length; i++) {
+        const sensorlist = data[i]
+        for (let j = 0; j < this.typeList.length; j++) {
+          const typeList = this.typeList[j]
+          if (sensorlist.typeId === typeList.id) {
+            sensorlist.unitName = typeList.unit
+            sensorlist.typeName = typeList.name
+            this.soilData.push(sensorlist)
+          }
+        }
+      }
+    },
+    // 土壤数据展示
+    async getsoildata () {
+      // 遍历土壤墒情网关
+      const soilData = this.soilData
+      for (let i = 0; i < soilData.length; i++) {
+        // =====================
+        const element = soilData[i]
+        this.option3.legend.data.push(element.name)
+        const yAxis = {
+          show: false,
+          type: 'value'
+        }
+        this.option3.yAxis.push(yAxis)
+        const series = {
+          name: element.name,
+          type: 'line',
+          data: [],
+          showSymbol: true,
+          yAxisIndex: i,
+          symbolSize: 5
+        }
+        this.option3.series.push(series)
+        // ======================
+        const params = {
+          columns: [],
+          conditions: ["sensor_id='" + element.id + "'", "date_time>'2020-05-09'", 'minute(date_time)%10=0'],
+          sorts: []
+        }
+        const { data: { data } } = await this.$sensor.post('sensor/api/data/queryByQueryVo', params)
+        const val = []
+        const time = []
+        for (let k = 0; k < data.length; k++) {
+          const res = data[k]
+          val.push(res.value)
+          time.push(this.$moment(res.dateTime).format('HH:mm'))
+        }
+        this.option3.series[i].data = val
+        this.option3.xAxis.data = time
+      }
+    },
+    // 施肥机切换
+    ferchange () {
+      this.getRealtime()
     }
   },
   components: {

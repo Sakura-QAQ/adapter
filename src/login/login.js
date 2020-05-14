@@ -4,7 +4,7 @@ import JSONBig from 'json-bigint'
 import Message from 'element-ui'
 const instance = axios.create({
   // 配置对象 基准路径 外部信息
-  baseURL: 'http://192.168.1.254:10020',
+  baseURL: 'http://192.168.1.254:10010',
   // 设置超时的连接时间
   // timeout: 1000,
   transformResponse: [(data) => {

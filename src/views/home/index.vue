@@ -49,10 +49,10 @@
           <i class="el-icon-connection"></i>
           <span slot="title">现场实况</span>
         </el-menu-item>
-        <!-- <el-menu-item index="/try">
-          <i class="el-icon-connection"></i>
-          <span slot="title">测试页</span>
-        </el-menu-item> -->
+        <el-menu-item index="/daily">
+          <i class="el-icon-postcard"></i>
+          <span slot="title">系统日志</span>
+        </el-menu-item>
       </el-menu>
       <div class="logo-5g"></div>
     </el-aside>
@@ -69,7 +69,7 @@
         <el-dropdown style="float:right;color:#fff" @command="handleCommand">
           <span class="el-dropdown-link">
             <img style="vertical-align:middle" width="30" height="30" :src="avatar" alt />
-            <b style="vertical-align:middle;padding-left:5px">admin</b>
+            <b style="vertical-align:middle;padding-left:5px">{{userName}}</b>
             <i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
@@ -77,7 +77,8 @@
             <el-dropdown-item icon="el-icon-lock" command="logout">退出登录</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-        <span class="text">北京蓝洋益海科技有限公司</span>
+        <span class="text">{{company}}</span>
+        <!-- <span class="text">{{currentTime}}</span> -->
         <span class="hT">水肥一体化集群施肥机</span>
       </el-header>
       <el-main>
@@ -99,17 +100,29 @@ export default {
       },
       collapse: false,
       avatar: '',
-      name: ''
+      name: '',
+      userName: '',
+      company: '',
+      timer: '',
+      currentTime: new Date()
     }
   },
   created () {
-    this.getProject()
     const projectId = JSON.parse(window.sessionStorage.getItem('projectId'))
     this.reqParams.projectId = projectId
   },
+  mounted () {
+    this.getUer()
+    this.getProject()
+  },
   methods: {
+    async getUer () {
+      const { data: { data } } = await this.$login.post('/sso/api/getUser')
+      this.company = data.company
+      this.userName = data.name
+    },
     async getProject () {
-      const res = await this.$http.post('http://192.168.1.202:10010/sso/api/getLoginInfo')
+      const res = await this.$login.post('sso/api/getLoginInfo')
       this.options = res.data.data.projectList
     },
     toggleMenu () {
@@ -189,12 +202,12 @@ export default {
       }
     }
   }
-  /deep/ .my-header {
+  .my-header {
     border-bottom: 1px solid #ffde00;
     height: 80px !important;
     line-height: 80px;
     background-color: #002033;
-    .el-icon-s-fold {
+    /deep/ .el-icon-s-fold {
       font-size: 26px;
       vertical-align: middle;
     }
@@ -203,10 +216,10 @@ export default {
       padding-right: 20px;
       float: right;
     }
-    /deep/ .area {
+    .area {
       display: inline-block;
       margin-left: 55px;
-      .el-form-item {
+      /deep/ .el-form-item {
         margin-bottom: 0;
         .el-form-item__label {
           padding: 22px 0 0 0;

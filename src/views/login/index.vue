@@ -33,8 +33,8 @@ export default {
     return {
       loading: false,
       loginForm: {
-        name: 'zhanglongtao12',
-        password: 'zhanglongtao1234'
+        name: '',
+        password: ''
       },
       loginRules: {
         name: [
@@ -57,13 +57,14 @@ export default {
           // 发promise对象请求
           try {
           // 拿到登录的结果
-            const res = await this.$http.post('http://192.168.1.202:10010/sso/api/login', this.loginForm)
-            console.log(res)
+            const res = await this.$login.post('sso/api/login', this.loginForm)
             if (res.data.code === 100 && res.data.msg === '用户不存在') {
               this.$message.error('用户不存在')
+              this.loading = false
               return false
             } else if (res.data.code === 100 && res.data.msg === '密码不正确') {
               this.$message.error('密码错误')
+              this.loading = false
               return false
             } else if (res.data.code === 200) {
               this.$message.success('登录成功！请选择园区')
@@ -74,7 +75,6 @@ export default {
             }
           } catch (err) {
             this.$message.error('Error')
-            console.log(err)
             if (err) {
               this.loading = false
             }

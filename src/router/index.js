@@ -19,6 +19,7 @@ import Statistic from '@/views/statistic'
 import Scene from '@/views/scene'
 import NotFound from '@/views/404'
 import Try from '@/views/try'
+import Daily from '@/views/daily'
 
 Vue.use(VueRouter)
 const router = new VueRouter({
@@ -71,7 +72,8 @@ const router = new VueRouter({
         { name: 'passageway', path: '/passageway', component: Passageway },
         { name: 'statistic', path: '/statistic', component: Statistic },
         { name: 'scene', path: '/scene', component: Scene },
-        { name: 'try', path: '/try', component: Try }
+        { name: 'try', path: '/try', component: Try },
+        { name: 'daily', path: '/daily', component: Daily }
       ]
     },
     { name: '404', path: '*', component: NotFound }
@@ -80,12 +82,12 @@ const router = new VueRouter({
 
 // 加前置守卫
 
-// router.beforeEach((to, from, next) => {
-//   if (to.path === '/login') return next()
-//   if (to.path === '/registe') return next()
-//   const user = window.sessionStorage.getItem('token')
-//   if (user) return next()
-//   next('/login')
-// })
+router.beforeEach((to, from, next) => {
+  if (to.path === '/login') return next()
+  if (to.path === '/registe') return next()
+  const user = window.sessionStorage.getItem('token')
+  if (user) return next()
+  next('/login')
+})
 
 export default router

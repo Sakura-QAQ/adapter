@@ -5,10 +5,15 @@
       <div class="bg-title">
         <p>配方列表</p>
       </div>
+      <div class="chosefer">
+        <el-select v-model="reqParams.fertilizerId" placeholder="选择施肥机" @change="listChange">
+          <el-option v-for="item in fertilizer" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        </el-select>
+      </div>
       <div class="add-data"><input class="submit" type="button" value="添加" @click="clear"></div>
       <div class="list">
         <el-table
-          :data="titles.slice((reqParamsFl.currentPage-1)*reqParamsFl.PageSize,reqParamsFl.currentPage*reqParamsFl.PageSize)"
+          :data="titles.slice((pageNum - 1)*pageSize, pageNum*pageSize)"
           style="width:760px"
         >
           <el-table-column prop="name" label="配方" width="120" align="center"></el-table-column>
@@ -23,14 +28,15 @@
             </template>
           </el-table-column>
         </el-table>
-        <div class="pager" v-show="reqParamsFl.totalCount > 6">
+        <div class="pager" v-show="total > 7">
           <el-pagination
             layout="prev, pager, next"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :current-page="reqParamsFl.currentPage"
-            :page-size="reqParamsFl.PageSize"
-            :total="reqParamsFl.totalCount"
+            @current-change="currentchange"
+            @next-click="nextpage"
+            @prev-click="prevpage"
+            :current-page="pageNum"
+            :page-size="pageSize"
+            :total="total"
           ></el-pagination>
         </div>
       </div>
@@ -39,10 +45,10 @@
       <div class="bg-title">
         <p>配方详情</p>
       </div>
+      <div class="btn">
+        <input class="submit" type="button" value="提交" @click="updata" />
+      </div>
       <ul>
-        <li>
-          <input class="submit" type="button" value="提交" @click="updata" />
-        </li>
         <li class="check-time">
           <span>
             选择作物:
@@ -56,10 +62,12 @@
               <option v-for="item in cycle" :value="item.id" :label="item.name" :key="item.id">{{item.name}}</option>
             </select>
           </span>
-          <!-- <span>
-            周期:
-            <input type="text" v-model="edit.periodDay" /> 天
-          </span> -->
+          <span>
+            选择施肥机:
+            <select v-model="reqParams2.fertilizerId" @change="wayChange">
+              <option v-for="item in fertilizer" :value="item.id" :label="item.name" :key="item.id">{{item.name}}</option>
+            </select>
+          </span>
         </li>
         <li>
           <span>
@@ -86,34 +94,43 @@
           </el-input>
         </li>
         <li>
-          施肥通道:
+          <span>吸肥通道:</span>
           <div>
             <span class="list-group-item">
-              {{channel.channel1}}: <input type="text" v-model="edit.channel1" />
+              <i>{{channels[0]}}: </i>
+              <input type="text" v-model="edit.channel1" />
             </span>
             <span class="list-group-item">
-              {{channel.channel2}}: <input type="text" v-model="edit.channel2" />
+              <i>{{channels[1]}}: </i>
+              <input type="text" v-model="edit.channel2" />
             </span>
             <span class="list-group-item">
-              {{channel.channel3}}: <input type="text" v-model="edit.channel3" />
+              <i>{{channels[2]}}: </i>
+              <input type="text" v-model="edit.channel3" />
             </span>
             <span class="list-group-item">
-              {{channel.channel4}}: <input type="text" v-model="edit.channel4" />
+              <i>{{channels[3]}}: </i>
+              <input type="text" v-model="edit.channel4" />
             </span>
             <span class="list-group-item">
-              {{channel.channel5}}: <input type="text" v-model="edit.channel5" />
+              <i>{{channels[4]}}: </i>
+              <input type="text" v-model="edit.channel5" />
             </span>
             <span class="list-group-item">
-              {{channel.channel6}}: <input type="text" v-model="edit.channel6" />
+              <i>{{channels[5]}}: </i>
+              <input type="text" v-model="edit.channel6" />
             </span>
             <span class="list-group-item">
-              {{channel.channel7}}: <input type="text" v-model="edit.channel7" />
+              <i>{{channels[6]}}: </i>
+              <input type="text" v-model="edit.channel7" />
             </span>
             <span class="list-group-item">
-              {{channel.channel8}}: <input type="text" v-model="edit.channel8" />
+              <i>{{channels[7]}}: </i>
+              <input type="text" v-model="edit.channel8" />
             </span>
             <span class="list-group-item">
-              {{channel.channel9}}: <input type="text" v-model="edit.channel9" />
+              <i>{{channels[8]}}: </i>
+              <input type="text" v-model="edit.channel9" />
             </span>
           </div>
         </li>
@@ -128,16 +145,9 @@ export default {
   data () {
     return {
       // 分页
-      reqParamsFl: {
-        // 默认显示第几页
-        currentPage: 1,
-        // 总条数，根据接口获取数据长度(注意：这里不能为空)
-        totalCount: 0,
-        // 个数选择器（可修改）
-        pageSizes: [1, 2, 3, 4],
-        // 默认每页显示的条数（可修改）
-        PageSize: 6
-      },
+      pageNum: 1,
+      pageSize: 7,
+      total: 0,
       // 项目id
       request: {
         projectId: ''
@@ -152,53 +162,82 @@ export default {
         id: ''
       },
       // 通道
-      channel: {},
+      channels: '',
       // 作物列表
       crop: [],
       // 周期
       cycle: [],
       // 编辑
-      edit: {}
+      edit: {},
+      // 施肥机id
+      reqParams: {
+        fertilizerId: ''
+      },
+      reqParams2: {
+        fertilizerId: ''
+      },
+      // 施肥机列表
+      fertilizer: []
     }
   },
   created () {
-    this.getcrop()
-    this.getcycle()
-    this.getchannel()
     const projectId = JSON.parse(window.sessionStorage.getItem('projectId'))
     this.request.projectId = projectId
   },
   mounted () {
-    let that = this
-    setTimeout(() => {
-      that.getfomula()
-    }, 150)
+    this.getfertilizer().then(res => {
+      this.queryByFertilizerId()
+      this.getway()
+    })
+    this.getcrop()
+    this.getcycle()
   },
   methods: {
-    tableRowClassName (row, rowIndex) {
-      if (rowIndex % 2 !== 1) {
-        return 'success-row'
+    // 分页
+    currentchange (newPage) {
+      this.pageNum = newPage
+      this.queryByFertilizerId()
+    },
+    prevpage () {
+      this.pageNum = this.pageNum - 1
+      this.queryByFertilizerId()
+    },
+    nextpage () {
+      this.pageNum = this.pageNum + 1
+      this.queryByFertilizerId()
+    },
+    // 列表改变
+    listChange () {
+      this.queryByFertilizerId()
+    },
+    // 通道改变
+    wayChange () {
+      this.getway()
+    },
+    // 施肥机id查配方列表
+    async queryByFertilizerId () {
+      const ID = {
+        fertilizerId: this.reqParams.fertilizerId
       }
-      return ''
+      const { data: { data } } = await this.$http.post('fertilizer/api/formula/queryByFertilizerId', ID)
+      this.titles = data
+      this.total = data.length
     },
-    handleSizeChange (val) {
-      // 改变每页显示的条数
-      this.reqParamsFl.PageSize = val
-      this.reqParamsFl.currentPage = 1
-    },
-    handleCurrentChange (newPage) {
-      // 提交当前页码给后台才能获取对应的数据
-      this.reqParamsFl.currentPage = newPage
+    // 施肥机下拉框
+    async getfertilizer () {
+      const res = await this.$http.post('fertilizer/api/fertilizer/queryByProjectId', this.request)
+      this.fertilizer = res.data.data
+      this.reqParams.fertilizerId = this.fertilizer[0].id
+      this.reqParams2.fertilizerId = this.fertilizer[0].id
     },
     // 获取作物
     async getcrop () {
-      const crop = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/crop/queryByProjectId', this.request)
-      // console.log(crop)
+      const crop = await this.$http.post('fertilizer/api/crop/queryByProjectId', this.request)
       this.crop = crop.data.data
     },
     // 渲染配方列表
     async getfomula () {
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/formula/queryByProjectId', this.request)
+      const res = await this.$http.post('fertilizer/api/formula/queryByProjectId', this.request)
       var crop2 = this.crop
       var cycle2 = this.cycle
       var titles2 = res.data.data
@@ -217,17 +256,26 @@ export default {
         }
       }
       this.titles = titles2
-      this.reqParamsFl.totalCount = res.data.data.length
+      this.total = res.data.data.length
     },
-    // 获取施肥通道
-    async getchannel () {
-      const way = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/channel/queryByProjectId', this.request)
-      this.channel = way.data.data
+    // 获取通道数据
+    async getway () {
+      const ID = {
+        id: this.reqParams2.fertilizerId
+      }
+      const { data: { data } } = await this.$http.post('fertilizer/api/fertilizer/queryById', ID)
+      if (data.channels === null || data.channels === '') {
+        data.channels = ',,,,,,,,'
+        this.channels = data.channels.split(',')
+        this.$message.warning('此施肥机无通道名称，通道管理可编辑')
+      } else {
+        this.channels = data.channels.split(',')
+      }
     },
     // 获取到作物id赋值给列表
     // 获取周期
     async getcycle () {
-      const cycle = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/period/queryByProjectId', this.request)
+      const cycle = await this.$http.post('fertilizer/api/period/queryByProjectId', this.request)
       this.cycle = cycle.data.data
     },
     // 删除
@@ -240,19 +288,21 @@ export default {
         type: 'warning'
       })
         .then(async () => {
-          await this.$http.post('http://192.168.1.202:10020/fertilizer/api/formula/delete', this.fomulaId)
+          const { data } = await this.$http.post('fertilizer/api/formula/delete', this.fomulaId)
           // 删除成功
-          // this.$message.success('删除成功')
-          let totalPage = Math.ceil((this.reqParamsFl.totalCount) / this.reqParamsFl.PageSize)
-          let currentPage = this.reqParamsFl.currentPage > totalPage ? totalPage : this.reqParamsFl.currentPage
-          this.reqParamsFl.currentPage = currentPage < 1 ? 1 : currentPage
-          this.getfomula()
+          if (data.code === 200) {
+            this.$message.success('删除成功')
+            const totalPage = Math.ceil((this.total - 1) / this.pageSize)
+            const pageNum = this.pageNum > totalPage ? totalPage : this.pageNum
+            this.pageNum = pageNum < 1 ? 1 : pageNum
+            this.queryByFertilizerId()
+          }
         })
         .catch(() => {})
     },
     // 编辑
     editData (index, row) {
-      console.log(row)
+      // console.log(row)
       this.edit = {
         id: row.id,
         projectId: row.projectId,
@@ -273,16 +323,17 @@ export default {
         channel8: row.channel8,
         channel9: row.channel9
       }
+      this.reqParams2.fertilizerId = row.fertilizerId
     },
     // 更新和提交
     async updata () {
       this.edit = {
         id: this.edit.id,
         projectId: this.request.projectId,
+        fertilizerId: this.reqParams2.fertilizerId,
         descr: this.edit.descr,
         cropId: this.edit.cropId,
         periodId: this.edit.periodId,
-        // periodDay: this.edit.periodDay,
         ecBase: this.edit.ecBase,
         desc: this.edit.desc,
         ecTarget: this.edit.ecTarget,
@@ -297,26 +348,23 @@ export default {
         channel8: this.edit.channel8,
         channel9: this.edit.channel9
       }
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/formula/saveOrUpdate', this.edit)
-      console.log(res)
-
+      const res = await this.$http.post('fertilizer/api/formula/saveOrUpdate', this.edit)
       if (res.data.code === 200) {
         this.$message.success('处理成功')
-        this.getfomula()
+        this.queryByFertilizerId()
       } else {
-        this.$message.error('处理失败')
-        this.getfomula()
+        this.$message.error(res.data.msg)
+        return false
       }
       this.edit = {}
     },
+    // 清空
     clear () {
       this.edit = {
         id: null,
         projectId: null,
-        // name: null,
         cropId: null,
         periodId: null,
-        // periodDay: null,
         ecBase: null,
         ecTarget: null,
         phTarget: null,
@@ -336,6 +384,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
+@deep: ~'>>>';
 .container{
   width: 100%;
   height: 100%;
@@ -349,9 +398,7 @@ export default {
     bottom: 0;
     width: 1625px;
     height: 825px;
-    // border: 1px solid #6989a5;
     border-radius: 15px;
-    // background-color: rgba(0, 0, 0, 0.8);
     display: flex;
     justify-content: space-evenly;
     padding-top: 44px;
@@ -383,6 +430,22 @@ export default {
           font-weight: 800;
         }
       }
+      .chosefer {
+        position: absolute;
+        top: 30px;
+        left: 42px;
+        @{deep} .el-select {
+          .el-input__inner {
+            width: 162px;
+            height: 38px;
+            border: none;
+            border-radius: none;
+            background-color: rgba(77, 83, 95, 0.712);
+            border-radius: 0;
+            color: #fff;
+          }
+        }
+      }
       .add-data {
         position: absolute;
         top: 30px;
@@ -395,10 +458,10 @@ export default {
         padding-top: 28px;
         // background-color: #232733;
         border-radius: 10px;
-        /deep/ .el-table::before {
+        @{deep} .el-table::before {
           height: 0;
         }
-        /deep/ .el-table {
+        @{deep} .el-table {
           margin: 0 auto;
           // margin: 10px 0;
           background-color: transparent;
@@ -429,14 +492,6 @@ export default {
             color: #eee;
             background-color: rgba(91, 112, 129, 0.9);
           }
-          // 按钮样式
-          // .cell {
-          //   .el-button {
-          //     background-color: rgba(91, 112, 129, 0.9);
-          //     border: 1px solid transparent;
-          //     color: #eee;
-          //   }
-          // }
         }
 
         .pager {
@@ -455,7 +510,7 @@ export default {
       border: 1px solid #5c7b95;
       border-radius: 10px;
       background: rgba(19, 18, 18, 0.8);
-      padding-top: 60px;
+      padding-top: 90px;
       margin-top: 30px;
 
       .bg-title {
@@ -476,9 +531,22 @@ export default {
           font-weight: 800;
         }
       }
+      .btn {
+        position: absolute;
+        top: 30px;
+        right: 42px;
+      }
       ul {
         padding: 0 15px;
+        // .check-time {
+        //   span {
+        //     display: inline-block;
+        //     height: 30px;
+        //   }
+        // }
         li {
+          overflow: none;
+          vertical-align: none;
           margin-bottom: 25px;
 
           .submit {
@@ -495,7 +563,7 @@ export default {
             display: inline-block;
             height: 60px;
           }
-          /deep/ .el-textarea {
+          @{deep} .el-textarea {
               display: inline-block;
               width: 230px;
               .el-textarea__inner {
@@ -509,23 +577,30 @@ export default {
         }
         li:last-child {
           div {
-            // display: flex;
-            // justify-content: space-evenly;
-            // flex-wrap: wrap;
             text-align: center;
+            margin-top: 20px;
             span {
               display: inline-block;
-              width: 150px;
+              width: 170px;
             }
 
             .list-group-item {
+              // width: 170px;
               margin: 10px 15px;
+              i {
+                display: inline-block;
+              vertical-align: middle;
+
+                width: 90px;
+                font-size: 16px;
+                text-align: right;
+                padding-right: 5px;
+                    overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+              }
             }
           }
-        }
-        select {
-          height: 30px;
-          line-height: 30px;
         }
       }
     }

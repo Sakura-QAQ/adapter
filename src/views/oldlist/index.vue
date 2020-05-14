@@ -297,7 +297,6 @@ export default {
   methods: {
     setCurrent (row) {
       // this.$refs.singleTable.setCurrentRow(row)
-      console.log(row)
     },
     ChangeAuto (val) {
       this.currentRow = val
@@ -310,11 +309,10 @@ export default {
     handleCurrentChange (newPage) {
       // 提交当前页码给后台才能获取对应的数据
       this.reqParamsIrr.currentPage = newPage
-      // console.log(newPage)
     },
     // 进入页面渲染
     async enterPage () {
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/queryByFertilizerId', this.reqParams)
+      const res = await this.$http.post('fertilizer/api/irrigation/queryByFertilizerId', this.reqParams)
       var options = this.options
       var titles2 = res.data.data
       for (var i = 0; i < titles2.length; i++) {
@@ -340,7 +338,7 @@ export default {
     },
     // 切换施肥机
     async fn () {
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/queryByFertilizerId', this.reqParams)
+      const res = await this.$http.post('fertilizer/api/irrigation/queryByFertilizerId', this.reqParams)
       this.titles = res.data.data
       var options = this.options
       var titles2 = res.data.data
@@ -373,7 +371,6 @@ export default {
           onlyOnce: 1
         }
         this.edit.onlyOnce = data.onlyOnce
-        // console.log(this.edit.onlyOnce)
       } else if (this.radio === 1) {
         let data = {
           onlyOnce: 0
@@ -391,13 +388,13 @@ export default {
     },
     // 获取施肥机列表
     async getfertilizer () {
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/fertilizer/queryByProjectId', this.request)
+      const res = await this.$http.post('fertilizer/api/fertilizer/queryByProjectId', this.request)
       this.fertilizer = res.data.data
       this.reqParams.fertilizerId = this.fertilizer[0].id
     },
     // 获取灌溉策略列表
     async getIrrigation () {
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/queryByProjectId', this.request)
+      const res = await this.$http.post('fertilizer/api/irrigation/queryByProjectId', this.request)
       var options = this.options
       var titles2 = res.data.data
       for (var i = 0; i < titles2.length; i++) {
@@ -422,7 +419,7 @@ export default {
     },
     // 获取配方列表
     async getfomula () {
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/formula/queryByProjectId', this.request)
+      const res = await this.$http.post('fertilizer/api/formula/queryByProjectId', this.request)
       this.options = res.data.data
     },
     // 添加和修改
@@ -445,8 +442,7 @@ export default {
       } else if (this.edit.irrigationType === '流量') {
         this.edit.irrigationType = 1
       }
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/saveOrUpdate', this.edit)
-      // console.log(res)
+      const res = await this.$http.post('fertilizer/api/irrigation/saveOrUpdate', this.edit)
       if (res.data.code === 200) {
         this.$message.success('处理成功')
       } else {
@@ -456,7 +452,6 @@ export default {
       this.enterPage()
     },
     changebox () {
-      // console.log(this.checkboxGroup)
       this.edit.valveNumbers = this.checkboxGroup
     },
     // 删除数据
@@ -468,7 +463,7 @@ export default {
         type: 'warning'
       })
         .then(async () => {
-          await this.$http.post('http://192.168.1.202:10020/fertilizer/api/irrigation/delete', this.planId)
+          await this.$http.post('fertilizer/api/irrigation/delete', this.planId)
           // 删除成功
           this.$message.success('删除成功')
           this.enterPage()
@@ -482,7 +477,6 @@ export default {
       // this.flag = true
       // 将要编辑的数据赋值给this.edit，绑定this.edit
       // this.edit.valveNumbers = this.checkboxGroup
-      // console.log(item.intervalTime)
       // 赋值之前先清空上一个
       this.clear()
       this.day = parseInt(row.intervalTime / (24 * 60))
@@ -528,8 +522,6 @@ export default {
       this.datatime.unshift(row.startDate, row.endDate)
       const valnum = JSON.parse(this.edit.valveNumbers)
       this.checkboxGroup = valnum
-
-      // console.log(this.edit)
     },
     // 清空后添加
     clear () {
@@ -582,13 +574,12 @@ export default {
     },
     // 日期选择监控
     check () {
-      console.log(this.datatime)
       this.edit.startDate = this.datatime[0]
       this.edit.endDate = this.datatime[1]
     },
     // 获取阀名
     async getValve () {
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/fertilizer/queryValveAlias', this.ValId)
+      const res = await this.$http.post('fertilizer/api/fertilizer/queryValveAlias', this.ValId)
       const strs = res.data.data
       this.Vals = strs.split(',')
     },
@@ -607,7 +598,7 @@ export default {
         id: this.ValId.id,
         valveAlias: this.Vals.join(',')
       }
-      const res = await this.$http.post('http://192.168.1.202:10020/fertilizer/api/fertilizer/updateValveAlias', valve)
+      const res = await this.$http.post('fertilizer/api/fertilizer/updateValveAlias', valve)
       if (res.data.code === 200) {
         this.$message.success('处理成功')
       } else {
