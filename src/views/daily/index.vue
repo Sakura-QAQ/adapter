@@ -193,9 +193,14 @@ export default {
     },
     // 通过查施肥机id查日志
     async queryData () {
+      // const params = {
+      //   columns: [],
+      //   conditions: ["fertilizer_id='" + this.fertilizerId.id + "'", "date_format(datetime,'%Y-%m-%d')>='" + this.daterange[0] + "'", "date_format(datetime,'%Y-%m-%d')<='" + this.daterange[1] + "'"],
+      //   sorts: []
+      // }
       const params = {
         columns: [],
-        conditions: ["fertilizer_id='" + this.fertilizerId.id + "'", "date_format(datetime,'%Y-%m-%d')>='" + this.daterange[0] + "'", "date_format(datetime,'%Y-%m-%d')<='" + this.daterange[1] + "'"],
+        conditions: ["fertilizer_id='" + this.fertilizerId.id + "'", "datetime>='" + this.daterange[0] + "'", "datetime<='" + this.daterange[1] + "'"],
         sorts: []
       }
       const { data: { data } } = await this.$http.post('fertilizer/api/log/queryIrriLogs', params)

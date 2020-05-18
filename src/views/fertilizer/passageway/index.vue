@@ -20,7 +20,7 @@
             </tr>
           </thead>
           <tbody  align="center">
-            <tr v-for="(item, index) in channels" :key="index">
+            <tr v-for="(item, index) in channels" :key="index" v-show="channels[index] !== ''">
               <td>{{index + 1}}通道：</td>
               <td><input type="text" v-model="channels[index]"></td>
             </tr>
@@ -92,7 +92,7 @@ export default {
         this.$message.error('提交参数不能为空')
         return false
       } else {
-        const { data } = await this.$http.post('http://192.168.1.254:10020/fertilizer/api/fertilizer/updateFertilizerChannels', channel)
+        const { data } = await this.$http.post('fertilizer/api/fertilizer/updateFertilizerChannels', channel)
         if (data.code === 200) {
           this.$message.success('提交成功')
           this.getway()

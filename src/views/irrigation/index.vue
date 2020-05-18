@@ -57,39 +57,39 @@
               </div>
             </div>
             <div class="title">吸肥比例</div>
-            <li>
+            <li v-show="channels[0]!==''">
               <span>{{channels[0]}}：</span>
               <span>{{mathData.channel1}}</span>
             </li>
-            <li>
+            <li v-show="channels[1]!==''">
               <span>{{channels[1]}}：</span>
               <span>{{mathData.channel2}}</span>
             </li>
-            <li>
+            <li v-show="channels[2]!==''">
               <span>{{channels[2]}}：</span>
               <span>{{mathData.channel3}}</span>
             </li>
-            <li>
+            <li v-show="channels[3]!==''">
               <span>{{channels[3]}}：</span>
               <span>{{mathData.channel4}}</span>
             </li>
-            <li>
+            <li v-show="channels[4]!==''">
               <span>{{channels[4]}}：</span>
               <span>{{mathData.channel5}}</span>
             </li>
-            <li>
+            <li v-show="channels[5]!==''">
               <span>{{channels[5]}}：</span>
               <span>{{mathData.channel6}}</span>
             </li>
-            <li>
+            <li v-show="channels[6]!==''">
               <span>{{channels[6]}}：</span>
               <span>{{mathData.channel7}}</span>
             </li>
-            <li>
+            <li v-show="channels[7]!==''">
               <span>{{channels[7]}}：</span>
               <span>{{mathData.channel8}}</span>
             </li>
-            <li>
+            <li v-show="channels[8]!==''">
               <span>{{channels[8]}}：</span>
               <span>{{mathData.channel9}}</span>
             </li>
@@ -164,13 +164,16 @@
     <div class="hiddenData" v-if="flagHidden">
       <div class="Data-add">
         <div class="vavles">
-          <el-checkbox-group class="checkFl" v-model="checkboxGroup" @change="changebox">
-            <template v-for="(item, index) in fergroup">
-              <el-checkbox-button :label="index + 1" :key="index" v-show="index < 24">
-                <div class="valve_num">{{Vals[item - 1]}}</div>
-              </el-checkbox-button>
-            </template>
-          </el-checkbox-group>
+          <div class="title">选择电磁阀：</div>
+          <div class="valgroup">
+            <el-checkbox-group class="checkFl" v-model="checkboxGroup" @change="changebox">
+              <template v-for="(item, index) in fergroup">
+                <el-checkbox-button :label="index + 1" :key="index" v-show="index < 24">
+                  <div class="valve_num">{{Vals[item - 1]}}</div>
+                </el-checkbox-button>
+              </template>
+            </el-checkbox-group>
+          </div>
         </div>
         <div class="formData">
           <div>
@@ -225,13 +228,16 @@
     <div class="hiddenData" v-if="flagHidden2">
       <div class="Data-add">
         <div class="vavles">
-          <el-checkbox-group class="checkFl" v-model="checkboxGroup"  @change="changebox">
-            <template v-for="(item, index) in fergroup">
-              <el-checkbox-button :label="index + 1" :key="index" v-show="index < 24">
-                <div class="valve_num">{{Vals[item - 1]}}</div>
-              </el-checkbox-button>
-            </template>
-          </el-checkbox-group>
+          <div class="title">选择电磁阀：</div>
+          <div class="valgroup">
+            <el-checkbox-group class="checkFl" v-model="checkboxGroup"  @change="changebox">
+              <template v-for="(item, index) in fergroup">
+                <el-checkbox-button :label="index + 1" :key="index" v-show="index < 24">
+                  <div class="valve_num">{{Vals[item - 1]}}</div>
+                </el-checkbox-button>
+              </template>
+            </el-checkbox-group>
+          </div>
         </div>
         <div class="formData">
           <div>
@@ -429,12 +435,15 @@ export default {
     // 分页
     currentchange (newPage) {
       this.pageNum = newPage
+      this.getItem(this.addData.areaFormulaLinkId)
     },
     prevpage () {
       this.pageNum = this.pageNum - 1
+      this.getItem(this.addData.areaFormulaLinkId)
     },
     nextpage () {
       this.pageNum = this.pageNum + 1
+      this.getItem(this.addData.areaFormulaLinkId)
     },
     // 阀号修改
     async modifyVal () {
@@ -778,10 +787,10 @@ export default {
 
       this.projectId = row.projectId
       if (row.status === '排队中') {
-        // this.$message.warning('排队中不可编辑！')
+        this.$message.warning('排队中不可编辑！')
         return false
       } else if (row.status === '执行中') {
-        // this.$message.warning('执行中不可编辑！')
+        this.$message.warning('执行中不可编辑！')
         return false
       }
       this.flagHidden2 = true
@@ -869,27 +878,33 @@ export default {
         irrigationVolume: Number(this.irrData.irrVolume),
         exeTime: this.dynamicValidateForm.domains[0].value
       }
-      if (list.irrigationTime > 65535) {
-        this.$message.error('灌溉时长不能超过65535秒')
-        return false
-      } else {
-        const res = await this.$http.post('fertilizer/api/irrigation/saveOrUpdate', list)
-        if (res.data.code === 100) {
-          this.$message.error(res.data.data)
+      if (list.valveNumbers !== '') {
+        if (list.irrigationTime > 65535) {
+          this.$message.error('灌溉时长不能超过65535秒')
           return false
-        } else if (res.data.code === 200) {
-          this.$message.success('提交成功')
-          this.dynamicValidateForm.domains = [{ value: '' }]
-          this.irrData = {
-            //  时长
-            irrTime: 0,
-            // 灌溉量
-            irrVolume: 0
+        } else {
+          const res = await this.$http.post('fertilizer/api/irrigation/saveOrUpdate', list)
+          if (res.data.code === 100) {
+            this.$message.error(res.data.data)
+            return false
+          } else if (res.data.code === 200) {
+            this.$message.success('提交成功')
+            this.dynamicValidateForm.domains = [{ value: '' }]
+            this.irrData = {
+              //  时长
+              irrTime: 0,
+              // 灌溉量
+              irrVolume: 0
+            }
+            this.checkboxGroup = []
+            this.checkvalve = ''
+            this.flagHidden2 = false
+            this.getItem(this.addData.areaFormulaLinkId)
           }
-          this.checkboxGroup = []
-          this.checkvalve = ''
-          this.flagHidden2 = false
         }
+      } else if (list.valveNumbers === '') {
+        this.$message.error('提交失败，阀号为必选项')
+        return false
       }
     },
     // 删除
@@ -899,9 +914,11 @@ export default {
       }
       if (row.status === '排队中') {
         this.checkboxGroup = []
+        this.$message.warning('排队中不可删除！')
         return false
       } else if (row.status === '执行中') {
         this.checkboxGroup = []
+        this.$message.warning('执行中不可删除！')
         return false
       } else {
         this.$confirm('此操作将永久删除该策略, 是否继续?', '提示', {
@@ -1022,11 +1039,11 @@ export default {
     // 单击显示阀号
     showValves (e) {
       if (e.status === '排队中') {
-        this.$message.warning('排队中不可操作！')
+        // this.$message.warning('排队中不可操作！')
         this.checkboxGroup = []
         return false
       } else if (e.status === '执行中') {
-        this.$message.warning('执行中不可操作！')
+        // this.$message.warning('执行中不可操作！')
         this.checkboxGroup = []
         return false
       } else {
@@ -1364,32 +1381,44 @@ export default {
         line-height: 46px;
         margin: 20px auto;
         padding-top: 4px;
-        text-align: center;
+        // text-align: center;
         background-color: #242c3b;
-        /deep/ .el-checkbox-group {
-          background: transparent;
-
-          .el-checkbox-button__inner {
-            width: 70px;
-            border: 1px solid #6989a5;
-            border-radius: 5px;
+        .title {
+          float: left;
+          width: 120px;
+          height: 146px;
+          font-size: 18px;
+          text-align: right;
+        }
+        .valgroup {
+          float: left;
+          width: 500px;
+          height: 146px;
+          /deep/ .el-checkbox-group {
             background: transparent;
-            color: #6989a5;
-            margin: 0 0 0 10px;
-            padding: 0 0;
 
-            .valve_num {
-              width:65px;
-              height:40px;
-              line-height: 40px;
-              text-align: center;
-              background:transparent;
-            }
-          }
-          .is-checked {
             .el-checkbox-button__inner {
-              background-color: #ccc;
-              border: 1px solid transparent;
+              width: 70px;
+              border: 1px solid #6989a5;
+              border-radius: 5px;
+              background: transparent;
+              color: #6989a5;
+              margin: 0 0 0 10px;
+              padding: 0 0;
+
+              .valve_num {
+                width:65px;
+                height:40px;
+                line-height: 40px;
+                // text-align: center;
+                background:transparent;
+              }
+            }
+            .is-checked {
+              .el-checkbox-button__inner {
+                background-color: #ccc;
+                border: 1px solid transparent;
+              }
             }
           }
         }

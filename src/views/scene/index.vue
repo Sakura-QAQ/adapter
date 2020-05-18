@@ -65,7 +65,7 @@
     <div class="valve" v-for="valve in Vavles" :key="valve.id" :style="{top: valve.top + 'px', left: valve.left + 'px'}" @mouseenter="enter(valve)" @mouseleave="leave">
       <el-button :class="[valve.onCheck === 0?'noActive':'isActive']" circle type="warning">
         <!-- [valve.status === 0? 'dcf-icon' : 'dfc-block'] -->
-        <i :class="[valve.isOnline === 0? 'offline' : (valve.status === 0? 'dcf-off' : 'dfc-on')]"></i>
+        <i :class="[valve.isOnline === 0? 'offline' : (valve.status === 0? 'dcf-off' : 'dcf-on')]"></i>
       </el-button>
     </div>
     <div class="hover_con" v-show="seen" :style="positionStyle">
@@ -93,7 +93,7 @@ export default {
       seen: false,
       positionStyle: { top: 0, left: 0 },
       // 背景图路径
-      imgUrl: 'http://192.168.1.254:10010/image/avatar/',
+      imgUrl: 'http://47.104.128.108:10010/image/avatar/',
       areaUrl: '',
       // 悬停阀坐标显示的数据
       showValve: {
@@ -154,8 +154,6 @@ export default {
     // 通过园区获取现场
     async getProject () {
       const { data: { data } } = await this.$login.post('sso/api/project/queryById', this.proID)
-      console.log(data.situationUrl)
-
       this.areaUrl = this.imgUrl + data.situationUrl
     },
     // 后台的回显数据
@@ -344,8 +342,10 @@ export default {
         padding: 6px;
       }
       .isActive {
-        background-color:rgb(84, 216, 8);
-        border-color: rgb(95, 233, 15);
+        background-color: #fff;
+        border: 3px solid #15d393;
+        // border-color: rgb(95, 233, 15);
+        // border-color: #15d393;
       }
       .offline {
         display: block;

@@ -3,6 +3,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Login from '@/views/login'
 import Registe from '@/views/registe'
+import Password from '@/views/password'
 import Chose from '@/views/chose'
 import Home from '@/views/home'
 import Welcome from '@/views/welcome'
@@ -42,10 +43,18 @@ const router = new VueRouter({
       component: Registe
     },
     {
+      name: 'password',
+      path: '/password',
+      meta: {
+        index: 2
+      },
+      component: Password
+    },
+    {
       name: 'chose',
       path: '/chose',
       meta: {
-        index: 2
+        index: 3
       },
       component: Chose
     },
@@ -57,7 +66,7 @@ const router = new VueRouter({
           name: 'welcome',
           path: '/',
           meta: {
-            index: 3
+            index: 4
           },
           component: Welcome
         },
@@ -85,6 +94,7 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   if (to.path === '/login') return next()
   if (to.path === '/registe') return next()
+  if (to.path === '/password') return next()
   const user = window.sessionStorage.getItem('token')
   if (user) return next()
   next('/login')

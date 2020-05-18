@@ -96,39 +96,39 @@
         <li>
           <span>吸肥通道:</span>
           <div>
-            <span class="list-group-item">
+            <span class="list-group-item" v-show="channels[0]!==''">
               <i>{{channels[0]}}: </i>
               <input type="text" v-model="edit.channel1" />
             </span>
-            <span class="list-group-item">
+            <span class="list-group-item" v-show="channels[1]!==''">
               <i>{{channels[1]}}: </i>
               <input type="text" v-model="edit.channel2" />
             </span>
-            <span class="list-group-item">
+            <span class="list-group-item" v-show="channels[2]!==''">
               <i>{{channels[2]}}: </i>
               <input type="text" v-model="edit.channel3" />
             </span>
-            <span class="list-group-item">
+            <span class="list-group-item" v-show="channels[3]!==''">
               <i>{{channels[3]}}: </i>
               <input type="text" v-model="edit.channel4" />
             </span>
-            <span class="list-group-item">
+            <span class="list-group-item" v-show="channels[4]!==''">
               <i>{{channels[4]}}: </i>
               <input type="text" v-model="edit.channel5" />
             </span>
-            <span class="list-group-item">
+            <span class="list-group-item" v-show="channels[5]!==''">
               <i>{{channels[5]}}: </i>
               <input type="text" v-model="edit.channel6" />
             </span>
-            <span class="list-group-item">
+            <span class="list-group-item" v-show="channels[6]!==''">
               <i>{{channels[6]}}: </i>
               <input type="text" v-model="edit.channel7" />
             </span>
-            <span class="list-group-item">
+            <span class="list-group-item" v-show="channels[7]!==''">
               <i>{{channels[7]}}: </i>
               <input type="text" v-model="edit.channel8" />
             </span>
-            <span class="list-group-item">
+            <span class="list-group-item" v-show="channels[8]!==''">
               <i>{{channels[8]}}: </i>
               <input type="text" v-model="edit.channel9" />
             </span>
@@ -577,7 +577,6 @@ export default {
         }
         li:last-child {
           div {
-            text-align: center;
             margin-top: 20px;
             span {
               display: inline-block;

@@ -12,6 +12,7 @@
         </el-form-item>
         <el-form-item>
           <el-checkbox :value="true">我已阅读并同意用户协议和隐私条款</el-checkbox>
+          <el-link type="info" style="float: right;font-size:16px;" @click="forgotPassword">忘记密码？</el-link>
         </el-form-item>
         <el-form-item>
           <el-button style="width:48%" type="primary" @click="login" :loading="loading">登 录</el-button>
@@ -57,13 +58,9 @@ export default {
           // 发promise对象请求
           try {
           // 拿到登录的结果
-            const res = await this.$login.post('sso/api/login', this.loginForm)
-            if (res.data.code === 100 && res.data.msg === '用户不存在') {
-              this.$message.error('用户不存在')
-              this.loading = false
-              return false
-            } else if (res.data.code === 100 && res.data.msg === '密码不正确') {
-              this.$message.error('密码错误')
+            const res = await this.$login.post('sso/api/login?app=fert', this.loginForm)
+            if (res.data.code === 100) {
+              this.$message.error(res.data.msg)
               this.loading = false
               return false
             } else if (res.data.code === 200) {
@@ -84,6 +81,9 @@ export default {
     },
     async registe () {
       await this.$router.push('/registe')
+    },
+    forgotPassword () {
+      this.$router.push('/password')
     }
   }
 }

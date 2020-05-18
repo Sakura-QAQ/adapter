@@ -82,7 +82,7 @@
       <div class="chart_3" v-if="flagMin">
         <div class="topCard">
           <span>土壤墒情</span>
-          <el-select v-model="soilId.id" placeholder="墒情列表">
+          <el-select v-model="soilId.id" placeholder="墒情列表" @change="soilChange">
             <el-option v-for="item in soilList" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </div>
@@ -108,64 +108,38 @@
           天气预报
         </div>
         <div class="header">
-          <div class="pos">北京</div>
-          <div class="gengxin">刚刚更新</div>
+          <div class="pos">城市：{{fengHeNow.city}}</div>
+          <div class="gengxin">更新时间: {{fengHeNow.time}}</div>
         </div>
         <div class="sunshine">
-          <div class="sun-img">
-            <img src="../../assets/images/cond-a-00d.png" alt="">
-          </div>
           <div class="cound">
-            <div>晴</div>
-            <div>21°</div>
+            <div>{{fengHeNow.tmp}}°</div>
+            <div class="hold">{{fengHeNow.cond_txt}}</div>
           </div>
         </div>
-        <div class="hold">优</div>
         <div class="math">
           <div class="data">
-            <span>东南风</span>
-            <span>3级</span>
+            <span>{{fengHeNow.wind_dir}}</span>
+            <span>{{fengHeNow.wind_sc}}级</span>
           </div>
           <div class="data">
             <span>降雨量</span>
-            <span>0</span>
+            <span>{{fengHeNow.pcpn}}</span>
           </div>
-        </div>
-        <div class="math1">
           <div class="data">
             <span>湿度值</span>
-            <span>8%</span>
+            <span>{{fengHeNow.hum}}%</span>
           </div>
           <div class="data">
             <span>大气压</span>
-            <span>1014kpa</span>
+            <span>{{fengHeNow.pres}}kpa</span>
           </div>
         </div>
         <div class="pos-table">
-          <div class="fr">
-            <div>05.06</div>
-            <div class="icons"></div>
-            <div class="data">16°/25°</div>
-          </div>
-          <div class="fr">
-            <div>05.07</div>
-            <div class="icons"></div>
-            <div class="data">17°/24°</div>
-          </div>
-          <div class="fr">
-            <div>05.08</div>
-            <div class="icons"></div>
-            <div class="data">16°/24°</div>
-          </div>
-          <div class="fr">
-            <div>05.09</div>
-            <div class="icons"></div>
-            <div class="data">16°/25°</div>
-          </div>
-          <div class="fr">
-            <div>05.10</div>
-            <div class="icons"></div>
-            <div class="data">16°/22°</div>
+          <div class="fr" v-for="(item, index) in fengHe" :key="index">
+            <div>{{item.date}}</div>
+            <div>{{item.cond_txt_d}}/{{item.cond_txt_n}}</div>
+            <div class="data">{{item.tmp_max}}°/{{item.tmp_min}}°</div>
           </div>
         </div>
       </div>
@@ -406,7 +380,11 @@ export default {
         },
         xAxis: {
           type: 'category',
-          data: []
+          data: [],
+          axisLabel: {
+            align: 'center',
+            showMinLabel: false
+          }
         },
         grid: {
           left: '2%',
@@ -506,7 +484,11 @@ export default {
         },
         xAxis: {
           type: 'category',
-          data: []
+          data: [],
+          axisLabel: {
+            align: 'center',
+            showMinLabel: false
+          }
         },
         grid: {
           left: '2%',
@@ -546,7 +528,11 @@ export default {
         },
         xAxis: {
           type: 'category',
-          data: []
+          data: [],
+          axisLabel: {
+            align: 'center',
+            showMinLabel: false
+          }
         },
         grid: {
           left: '2%',
@@ -573,7 +559,9 @@ export default {
           //   symbolSize: 5
           // }
         ]
-      }
+      },
+      fengHe: [],
+      fengHeNow: {}
     }
   },
   created () {
@@ -581,6 +569,10 @@ export default {
     this.request.projectId = projectId
   },
   mounted () {
+    // 三天天气预报
+    this.getWeather_three()
+    // 当前预报
+    this.getWeather_now()
     // 施肥机数据
     this.getfertilizer().then(res => {
       this.getRealtime()
@@ -599,6 +591,21 @@ export default {
         })
       })
     })
+    // 30秒刷一次
+    if (this.timer) {
+      clearInterval(this.timer)
+    } else {
+      this.timer = setInterval(() => {
+        // 施肥机数据
+        this.getRealtime()
+        // 气象和土壤
+        this.getsoilsensor().then(res => {
+          this.getsoildata()
+        })
+        // 气象刷新
+        this.getScene()
+      }, 30000)
+    }
   },
   methods: {
     realtimeBtn () {
@@ -632,9 +639,10 @@ export default {
       this.reqParams.fertilizerId = this.fertilizer[0].id
     },
     // 获取实时数据
+    // "date_format(datetime,'%Y-%m-%d')='" + this.$moment(new Date()).format('YYYY-MM-DD') + "'",
     async getRealtime () {
       const columns = []
-      const conditions = ["fertilizer_id='" + this.reqParams.fertilizerId + "'", "date_format(datetime,'%Y-%m-%d')='" + this.$moment(new Date()).format('YYYY-MM-DD') + "'", 'minute(datetime)%10=0']
+      const conditions = ["fertilizer_id='" + this.reqParams.fertilizerId + "'", 'datetime>DATE_SUB(NOW(),INTERVAL 30 MINUTE)']
       // " + this.$moment(new Date()).format('YYYY-MM-DD') + "
       const sorts = ['datetime desc']
       const params = {
@@ -670,7 +678,7 @@ export default {
           const element = res.data.data[i]
 
           // 时间
-          time.unshift(this.$moment(element.datetime).format('HH:mm'))
+          time.unshift(this.$moment(element.datetime).format('HH:mm:ss'))
           // ph
           PH.unshift(element.ph)
           // 累计流量
@@ -696,7 +704,7 @@ export default {
     },
     // 获取所有类别
     async queryAlltype () {
-      const { data: { data } } = await this.$sensor.post('http://192.168.1.254:10040/sensor/api/type/queryAll')
+      const { data: { data } } = await this.$sensor.post('sensor/api/type/queryAll')
       this.typeList = data
     },
     // 获取气象站或土壤
@@ -749,9 +757,10 @@ export default {
         }
         this.option2.series.push(series)
         // ======================
+        // "date_format(date_time,'%Y-%m-%d')='" + this.$moment(new Date()).format('YYYY-MM-DD') + "'",
         const params = {
           columns: [],
-          conditions: ["sensor_id='" + element.id + "'", "date_time<'2020-05-09'", 'minute(date_time)%10=0'],
+          conditions: ["sensor_id='" + element.id + "'", 'date_time>DATE_SUB(NOW(),INTERVAL 30 MINUTE)'],
           sorts: []
         }
         const { data: { data } } = await this.$sensor.post('sensor/api/data/queryByQueryVo', params)
@@ -760,7 +769,7 @@ export default {
         for (let k = 0; k < data.length; k++) {
           const res = data[k]
           val.push(res.value)
-          time.push(this.$moment(res.dateTime).format('HH:mm'))
+          time.push(this.$moment(res.dateTime).format('HH:mm:ss'))
         }
         this.option2.series[i].data = val
         this.option2.xAxis.data = time
@@ -768,6 +777,7 @@ export default {
     },
     // 获取土壤墒情网关
     async getsoilsensor () {
+      this.soilData = []
       const ID = {
         gatewayId: this.soilId.id
       }
@@ -786,6 +796,7 @@ export default {
     },
     // 土壤数据展示
     async getsoildata () {
+      this.option3.legend.data = []
       // 遍历土壤墒情网关
       const soilData = this.soilData
       for (let i = 0; i < soilData.length; i++) {
@@ -807,9 +818,10 @@ export default {
         }
         this.option3.series.push(series)
         // ======================
+        // "date_format(date_time,'%Y-%m-%d')='" + this.$moment(new Date()).format('YYYY-MM-DD') + "'",
         const params = {
           columns: [],
-          conditions: ["sensor_id='" + element.id + "'", "date_time>'2020-05-09'", 'minute(date_time)%10=0'],
+          conditions: ["sensor_id='" + element.id + "'", 'date_time>DATE_SUB(NOW(),INTERVAL 30 MINUTE)'],
           sorts: []
         }
         const { data: { data } } = await this.$sensor.post('sensor/api/data/queryByQueryVo', params)
@@ -818,7 +830,7 @@ export default {
         for (let k = 0; k < data.length; k++) {
           const res = data[k]
           val.push(res.value)
-          time.push(this.$moment(res.dateTime).format('HH:mm'))
+          time.push(this.$moment(res.dateTime).format('HH:mm:ss'))
         }
         this.option3.series[i].data = val
         this.option3.xAxis.data = time
@@ -827,7 +839,64 @@ export default {
     // 施肥机切换
     ferchange () {
       this.getRealtime()
+    },
+    // 土壤墒情切换
+    soilChange () {
+      this.getsoilsensor().then(res => {
+        this.getsoildata()
+      })
+    },
+    // 风和天气
+    async getWeather_three () {
+      const { data: { HeWeather6 } } = await this.$weather.get('forecast?location=auto_ip&key=b6d124ce986a40f6874e5c296dc9f9f1')
+      this.fengHe = [
+        {
+          date: HeWeather6[0].daily_forecast[0].date,
+          cond_txt_d: HeWeather6[0].daily_forecast[0].cond_txt_d,
+          cond_txt_n: HeWeather6[0].daily_forecast[0].cond_txt_n,
+          tmp_max: HeWeather6[0].daily_forecast[0].tmp_max,
+          tmp_min: HeWeather6[0].daily_forecast[0].tmp_min
+        },
+        {
+          date: HeWeather6[0].daily_forecast[1].date,
+          cond_txt_d: HeWeather6[0].daily_forecast[1].cond_txt_d,
+          cond_txt_n: HeWeather6[0].daily_forecast[1].cond_txt_n,
+          tmp_max: HeWeather6[0].daily_forecast[1].tmp_max,
+          tmp_min: HeWeather6[0].daily_forecast[1].tmp_min
+        },
+        {
+          date: HeWeather6[0].daily_forecast[2].date,
+          cond_txt_d: HeWeather6[0].daily_forecast[2].cond_txt_d,
+          cond_txt_n: HeWeather6[0].daily_forecast[2].cond_txt_n,
+          tmp_max: HeWeather6[0].daily_forecast[2].tmp_max,
+          tmp_min: HeWeather6[0].daily_forecast[2].tmp_min
+        }
+      ]
+    },
+    async getWeather_now () {
+      const { data: { HeWeather6 } } = await this.$weather.get('now?location=auto_ip&key=b6d124ce986a40f6874e5c296dc9f9f1')
+      this.fengHeNow = {
+        city: HeWeather6[0].basic.location,
+        time: HeWeather6[0].update.loc,
+        // 温度
+        tmp: HeWeather6[0].now.tmp,
+        // 阴晴
+        cond_txt: HeWeather6[0].now.cond_txt,
+        // 相对湿度
+        hum: HeWeather6[0].now.hum,
+        // 风向
+        wind_dir: HeWeather6[0].now.wind_dir,
+        // 风力
+        wind_sc: HeWeather6[0].now.wind_sc,
+        // 降雨量
+        pcpn: HeWeather6[0].now.pcpn,
+        // 大气压
+        pres: HeWeather6[0].now.pres
+      }
     }
+  },
+  destroyed () {
+    clearInterval(this.timer)
   },
   components: {
     linegraph
@@ -915,7 +984,7 @@ export default {
       /deep/ .el-select {
         position: absolute;
         top: -1px;
-        left: 10px;
+        left: 0;
         // left: 0;
         .el-input__inner {
           width: 162px;
@@ -1067,8 +1136,9 @@ export default {
           float: left;
           width: 58.333333%;
           overflow: hidden;
-          font-size: 1.75rem;
-          padding-left: 20px;
+          font-size: 2rem;
+          color: #f2ac39;
+          padding-left: 50px;
         }
         .gengxin {
           text-align: right;
@@ -1081,40 +1151,47 @@ export default {
       }
       .sunshine {
         height: 5.625rem;
-        .sun-img {
-          float: left;
-          margin-left: .625rem;
-        }
         .cound {
-          width: 2.75rem;
+          width: 15.75rem;
           float: left;
           margin-left: 30px;
           text-align: center;
 
-          div:last-child {
-            width: 3.125rem;
+          div {
             font-size: 2.125rem;
+            display: inline-block;
+          }
+          .hold {
+            color: green;
+            font-weight: 800;
+            font-size: 1.75rem;
+            margin-left: 1.25rem;
           }
         }
       }
-      .hold {
-        width: 100%;
-        float: left;
-        color: green;
-        font-weight: 800;
-        font-size: 1.75rem;
-        margin-left: 1.25rem;
-      }
       .math {
-        width: 100%;
+        width: 40%;
+        height: 15.625rem;
         float: left;
-        height: 2.125rem;
         margin-top: .625rem;
 
         .data {
-          float: left;
-          span {
-            margin: 0 20px;
+          height: 40px;
+          line-height: 40px;
+          text-align: center;
+          span:first-child {
+            width: 150px;
+            display: inline-block;
+            font-size: 18px;
+            font-weight: 800;
+            // margin: 0 20px;
+          }
+          span:last-child {
+            width: 150px;
+            display: inline-block;
+            font-size: 18px;
+            // font-weight: 800;
+            // margin: 0 20px;
           }
         }
       }
@@ -1132,14 +1209,14 @@ export default {
       }
       .pos-table {
         position: absolute;
-        top: 8.5rem;
-        right: 2.125rem;
+        top: 10.5rem;
+        right: -0.875rem;
         .fr {
           height: 3.125rem;
           div {
             float: left;
             margin-right: 3.125rem;
-            font-size: 1.8rem;
+            font-size: 1.3rem;
           }
           .icons {
             width: 40px;

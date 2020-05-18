@@ -69,7 +69,7 @@
           土壤墒情
         </div>
         <div class="ChoseGateWay">
-          <el-select v-model="soilId.id" placeholder="墒情列表">
+          <el-select v-model="soilId.id" placeholder="墒情列表" @change="soilChange">
             <el-option v-for="item in soilList" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </div>
@@ -83,21 +83,21 @@
           历史数据表
         </div>
         <!-- 施肥机-->
-        <el-table :data="tableConfig.tableData" v-show="flagtable1" height="380">
-          <el-table-column :label="val" v-for="(val, i) in tableConfig.columns" :key="i" min-width="180" align="center">
-          <template slot-scope="scope">{{tableConfig.tableData[scope.$index][i]}}</template>
+        <el-table :data="tableConfig.tableData" v-show="flagtable1" height="380" :row-style="{height:'40px'}" :cell-style="{padding:'0px'}">
+          <el-table-column :label="val" v-for="(val, i) in tableConfig.columns" :key="i" min-width="130" align="center" :show-overflow-tooltip="true">
+            <template slot-scope="scope">{{tableConfig.tableData[scope.$index][i]}}</template>
           </el-table-column>
         </el-table>
         <!-- 气象站 -->
-        <el-table :data="tableConfig2.tableData" v-show="flagtable2" height="380">
-          <el-table-column :label="val" v-for="(val, i) in tableConfig2.columns" :key="i" min-width="180" align="center">
-          <template slot-scope="scope">{{tableConfig2.tableData[scope.$index][i]}}</template>
+        <el-table :data="tableConfig2.tableData" v-show="flagtable2" height="380" :row-style="{height:'40px'}" :cell-style="{padding:'0px'}">
+          <el-table-column :label="val" v-for="(val, i) in tableConfig2.columns" :key="i" min-width="130" align="center" :show-overflow-tooltip="true">
+            <template slot-scope="scope">{{tableConfig2.tableData[scope.$index][i]}}</template>
           </el-table-column>
         </el-table>
         <!-- 土壤 -->
-        <el-table :data="tableConfig3.tableData" v-show="flagtable3" height="380">
-          <el-table-column :label="item" v-for="(item, i) in tableConfig3.columns" :key="i" min-width="180" align="center">
-          <template slot-scope="scope">{{tableConfig3.tableData[scope.$index][i]}}</template>
+        <el-table :data="tableConfig3.tableData" v-show="flagtable3" height="380" :row-style="{height:'40px'}" :cell-style="{padding:'0px'}">
+          <el-table-column :label="item" v-for="(item, i) in tableConfig3.columns" :key="i" align="center" min-width="130" :show-overflow-tooltip="true">
+            <template slot-scope="scope">{{tableConfig3.tableData[scope.$index][i]}}</template>
           </el-table-column>
         </el-table>
       </div>
@@ -155,8 +155,8 @@ export default {
   data () {
     return {
       // 下载excel路径
-      fertilizerUrl: 'http://192.168.1.254:10020/fertilizer/api/data/queryByQueryVoDown?fertilizer_id=',
-      gatewayUrl: 'http://192.168.1.254:10040/sensor/api/data/queryByQueryVoDown?gatewayId=',
+      fertilizerUrl: 'http://47.104.128.108:10020/fertilizer/api/data/queryByQueryVoDown?fertilizer_id=',
+      gatewayUrl: 'http://47.104.128.108:10040/sensor/api/data/queryByQueryVoDown?gatewayId=',
       // 施肥机数据
       tableConfig: {
         tableData: [
@@ -459,6 +459,15 @@ export default {
     })
   },
   methods: {
+    cellStyle ({ row, column, rowIndex, columnIndex }) {
+      if (columnIndex === 0) {
+        // 指定列号
+        return 'asdf'
+      }
+      // else {
+      //   return 'padding:0'
+      // }
+    },
     // 点击标题切换表格
     tableFer () {
       this.flagtable1 = true
@@ -550,7 +559,7 @@ export default {
     },
     // 获取所有类别
     async queryAlltype () {
-      const { data: { data } } = await this.$sensor.post('http://192.168.1.254:10040/sensor/api/type/queryAll')
+      const { data: { data } } = await this.$sensor.post('sensor/api/type/queryAll')
       this.typeList = data
     },
     // 通过气象采集器获得气象传感器
@@ -617,6 +626,7 @@ export default {
     },
     // 获取土壤墒情网关
     async getsoilsensor () {
+      this.soilData = []
       const ID = {
         gatewayId: this.soilId.id
       }
@@ -635,6 +645,7 @@ export default {
     },
     // 土壤数据展示
     async getsoildata () {
+      this.option3.legend.data = []
       this.tableConfig3.columns = []
       // 遍历土壤墒情网关
       const soilData = this.soilData
@@ -801,19 +812,19 @@ export default {
           for (let i = 0; i < data.length; i++) {
             const element = data[i]
             // 时间
-            time.unshift(this.$moment(element.datetime).format('YYYY-MM-DD HH:mm'))
+            time.push(this.$moment(element.datetime).format('YYYY-MM-DD HH:mm'))
             // ph
-            PH.unshift(element.ph)
+            PH.push(element.ph)
             // 累计流量
-            totalVolume.unshift(element.totalVolume)
+            totalVolume.push(element.totalVolume)
             // 实时流量
-            realTimeFlow.unshift(element.realTimeFlow)
+            realTimeFlow.push(element.realTimeFlow)
             // 液位
-            liquidLevel.unshift(element.liquidLevel)
+            liquidLevel.push(element.liquidLevel)
             // 压力
-            pressure.unshift(element.pressure)
+            pressure.push(element.pressure)
             // EC
-            EC.unshift(element.ec)
+            EC.push(element.ec)
           }
           this.option1.xAxis.data = time
           this.option1.series[0].data = PH
@@ -833,6 +844,12 @@ export default {
           this.hiddenCard = false
         }
       }
+    },
+    // 土壤切换
+    soilChange () {
+      this.getsoilsensor().then(res => {
+        this.getsoildata()
+      })
     }
   },
   components: {
@@ -1184,19 +1201,6 @@ export default {
           // overflow-y: hidden;
         }
       }
-      /deep/ .v-table-views {
-        border: none;
-        .v-table-header-row {
-          .v-table-title-cell {
-            border-color: #666;
-          }
-        }
-        .v-table-body {
-          .v-table-body-cell {
-            border-color: #666;
-          }
-        }
-      }
       /deep/ .el-table::before {
         height: 0;
       }
@@ -1228,6 +1232,25 @@ export default {
           color: #eee;
           background-color: rgba(55, 59, 63, 0.9);
         }
+        // .el-table__header {
+        //   width: 900px !important;
+        // }
+        // .el-table__header-wrapper {
+        //   .has-gutter {
+        //     tr {
+        //       th:first-child {
+        //         width: 180px !important;
+        //       }
+        //     }
+        //   }
+        // }
+        // .el-table__body-wrapper {
+        //   .el-table__row {
+        //     td:first-child {
+        //       width: 180px !important;
+        //     }
+        //   }
+        // }
       }
     }
   }

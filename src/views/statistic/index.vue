@@ -57,39 +57,39 @@
         </div>
         <div>吸肥比列：</div>
         <div>
-          <span>
+          <span v-show="channels[0]!==''">
             <strong>{{channels[0]}}:</strong>
             {{fomulaData.channel1}}
           </span>
-          <span>
+          <span v-show="channels[1]!==''">
             <strong>{{channels[1]}}:</strong>
             {{fomulaData.channel2}}
           </span>
-          <span>
+          <span v-show="channels[2]!==''">
             <strong>{{channels[2]}}:</strong>
             {{fomulaData.channel3}}
           </span>
-          <span>
+          <span v-show="channels[3]!==''">
             <strong>{{channels[3]}}:</strong>
             {{fomulaData.channel4}}
           </span>
-          <span>
+          <span v-show="channels[4]!==''">
             <strong>{{channels[4]}}:</strong>
             {{fomulaData.channel5}}
           </span>
-          <span>
+          <span v-show="channels[5]!==''">
             <strong>{{channels[5]}}:</strong>
             {{fomulaData.channel6}}
           </span>
-          <span>
+          <span v-show="channels[6]!==''">
             <strong>{{channels[6]}}:</strong>
             {{fomulaData.channel7}}
           </span>
-          <span>
+          <span v-show="channels[7]!==''">
             <strong>{{channels[7]}}:</strong>
             {{fomulaData.channel8}}
           </span>
-          <span>
+          <span v-show="channels[8]!==''">
             <strong>{{channels[8]}}:</strong>
             {{fomulaData.channel9}}
           </span>
@@ -378,7 +378,7 @@ export default {
             }
             const valnum = JSON.parse(historylist.valveNumbers).map(Number)
             historylist.valveNumbers = this.Vals.filter((_, index) => valnum.includes(index + 1)).join(',')
-            historylist.exeTime = this.$moment(historylist.exeTime).format('YYYY-MM-DD HH:ss')
+            historylist.exeTime = this.$moment(historylist.exeTime).format('YYYY-MM-DD HH:mm')
           }
           this.$message.success('查到了' + data.length + '条数据')
           this.tableConfig.tableData = data
@@ -543,7 +543,8 @@ export default {
         // padding-left: 55px;
       }
       div:nth-child(4) {
-        text-align: center;
+        // text-align: center;
+        padding-left: 60px;
         span {
           display: inline-block;
           width: 130px;

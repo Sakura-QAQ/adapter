@@ -93,6 +93,16 @@ select {
   color: #fff;
   background-color: #fff;
 }
+.el-tooltip__popper {
+  background: #fff !important;
+  color: #000 !important;
+}
+.el-tooltip__popper .popper__arrow {
+  border-top-color: #fff !important;
+}
+.el-tooltip__popper .popper__arrow:after {
+  border-top-color: #fff !important;
+}
 .top-position {
   background: linear-gradient(to right, #213b53, transparent);
   height: 40px;
