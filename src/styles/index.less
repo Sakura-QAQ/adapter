@@ -109,7 +109,7 @@ select {
   color: #fff;
   background-color: #fff;
 }
-.el-tooltip__popper {
+.el-tooltip__popper[x-placement^="top"] {
   background: #fff !important;
   color: #000 !important;
 
@@ -120,7 +120,16 @@ select {
     border-top-color: #fff !important;
   }
 }
-
+.el-tooltip__popper[x-placement^="right"] {
+  background: #fff !important;
+  color: #000 !important;
+  .popper__arrow {
+    border-right-color: #fff !important;
+  }
+  .popper__arrow:after {
+    border-right-color: #fff !important;
+  }
+}
 
 .top-position {
   background: linear-gradient(to right, #213b53, transparent);

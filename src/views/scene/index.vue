@@ -275,7 +275,7 @@ export default {
     position: relative;
     width: 1660px;
     height: 780px;
-    background: url(../../assets/images/sence.jpg) center / cover no-repeat;
+    // background: url(../../assets/images/sence.jpg) center / cover no-repeat;
     .ferz {
       position: relative;
       position: absolute;

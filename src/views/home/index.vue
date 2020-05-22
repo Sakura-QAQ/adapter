@@ -54,7 +54,7 @@
           <span slot="title">系统日志</span>
         </el-menu-item>
       </el-menu>
-      <div class="logo-5g"></div>
+      <div class="logo-5g" v-show="logo_bottom"></div>
     </el-aside>
     <el-container>
       <el-header class="my-header">
@@ -73,7 +73,7 @@
             <i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item icon="el-icon-setting" command="setting">个人设置</el-dropdown-item>
+            <!-- <el-dropdown-item icon="el-icon-setting" command="setting">个人设置</el-dropdown-item> -->
             <el-dropdown-item icon="el-icon-lock" command="logout">退出登录</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
@@ -104,7 +104,8 @@ export default {
       userName: '',
       company: '',
       timer: '',
-      currentTime: new Date()
+      currentTime: new Date(),
+      logo_bottom: true
     }
   },
   created () {
@@ -127,6 +128,11 @@ export default {
     },
     toggleMenu () {
       this.collapse = !this.collapse
+      if (this.logo_bottom) {
+        this.logo_bottom = false
+      } else {
+        this.logo_bottom = true
+      }
     },
     logout () {
       window.sessionStorage.removeItem('token')
