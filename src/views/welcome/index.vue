@@ -1215,8 +1215,14 @@ export default {
           height: 3.125rem;
           div {
             float: left;
-            margin-right: 3.125rem;
+            margin-right: 2.75rem;
             font-size: 1.3rem;
+          }
+          div:nth-child(1) {
+            width: 120px;
+          }
+          div:nth-child(2) {
+            width: 136px;
           }
           .icons {
             width: 40px;
